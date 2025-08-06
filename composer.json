@@ -1,0 +1,10 @@
+{
+    "name": "xvlvv/task-force",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "xvlvv\\": "src/"
+        }
+    },
+    "require": {}
+}
