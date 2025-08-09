@@ -53,13 +53,42 @@ final class Task
         return $this->taskStateManager->getNextStatus($this->getCurrentStatus(), $action);
     }
 
+    public function applyAction(Action $action): bool
+    {
+        $actions = $this->taskStateManager->getAvailableActions($this->getCurrentStatus());
+
+        if (null === $actions) {
+            return false;
+        }
+
+        if (!in_array($action, $actions)) {
+            return false;
+        }
+
+        $this->setStatus($this->getNextStatus($action));
+        return true;
+    }
+
+    private function setStatus(Status $status): void
+    {
+        $this->currentStatus = $status;
+    }
+
     /**
      * Список возможных действий для текущего статуса
      *
-     * @return array
+     * @return ?array
      */
-    public function getAvailableActions(): array
+    public function getAvailableActions(): ?array
     {
-        return $this->taskStateManager->getAvailableActions($this->getCurrentStatus());
+        $actions = $this->taskStateManager->getAvailableActions($this->getCurrentStatus());
+
+        if (null === $actions) {
+            return null;
+        }
+
+        return array_map(static function (Action $action) {
+            return $action->value;
+        }, $actions);
     }
 }

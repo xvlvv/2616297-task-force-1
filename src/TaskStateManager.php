@@ -27,13 +27,13 @@ class TaskStateManager
     {
         $availableActions = [
             Status::NEW->value => [
-                Action::APPLY->value,
-                Action::REJECT->value,
+                Action::APPLY,
+                Action::REJECT,
             ],
             Status::CANCELLED->value => [],
             Status::IN_PROGRESS->value => [
-                Action::COMPLETE->value,
-                Action::REJECT->value,
+                Action::COMPLETE,
+                Action::REJECT,
             ],
             Status::COMPLETED->value => [],
             Status::FAILED->value => [],
