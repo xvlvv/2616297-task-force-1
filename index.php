@@ -1,7 +1,5 @@
 <?php
 
-namespace Xvlvv\Tests;
-
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use Xvlvv\Task;
