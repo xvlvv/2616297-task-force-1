@@ -1,5 +1,5 @@
 <?php
 
-use \xvlvv\Task;
+use \Xvlvv\Task;
 
 require_once "vendor/autoload.php";
