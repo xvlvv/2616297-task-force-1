@@ -18,10 +18,10 @@ enum Action: string
      */
     public function getName(): string
     {
-        return match($this) {
-            self::APPLY => 'Откликнуться',
-            self::REJECT => 'Отменить',
-            self::COMPLETE => 'Выполнено',
+        return match($this->value) {
+            self::APPLY->value => 'Откликнуться',
+            self::REJECT->value => 'Отменить',
+            self::COMPLETE->value => 'Выполнено',
         };
     }
 }

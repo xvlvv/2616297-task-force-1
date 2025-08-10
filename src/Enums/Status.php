@@ -17,12 +17,12 @@ enum Status: string
      */
     public function getName(): string
     {
-        return match($this) {
-            self::NEW => 'Новое',
-            self::CANCELLED => 'Отменено',
-            self::IN_PROGRESS => 'В работе',
-            self::COMPLETED => 'Выполнено',
-            self::FAILED => 'Провалено',
+        return match($this->value) {
+            self::NEW->value => 'Новое',
+            self::CANCELLED->value => 'Отменено',
+            self::IN_PROGRESS->value => 'В работе',
+            self::COMPLETED->value => 'Выполнено',
+            self::FAILED->value => 'Провалено',
         };
     }
 }
