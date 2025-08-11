@@ -1,9 +1,10 @@
 <?php
 
-namespace Xvlvv;
+namespace Xvlvv\Models;
 
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
+use Xvlvv\Services\TaskStateManager;
 
 /**
  * Представляет сущность «Задание». Определяет списки действий и статусов, а также выполняет базовую работу с ними

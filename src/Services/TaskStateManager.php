@@ -1,6 +1,6 @@
 <?php
 
-namespace Xvlvv;
+namespace Xvlvv\Services;
 
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
