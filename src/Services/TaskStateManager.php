@@ -1,11 +1,11 @@
 <?php
 
-namespace Xvlvv;
+namespace Xvlvv\Services;
 
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 
-class TaskStateManager
+final class TaskStateManager
 {
     public function getNextStatus(Status $status, Action $action): ?Status
     {
