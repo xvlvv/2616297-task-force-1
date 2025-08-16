@@ -15,7 +15,7 @@ USE task_force;
 
 CREATE TABLE city
 (
-    id         INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id         INT UNSIGNED   NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(128)   NOT NULL,
     latitude   DECIMAL(10, 8) NOT NULL,
     longitude  DECIMAL(11, 8) NOT NULL COMMENT 'Вместе с latitude указывают на точку центра города',
@@ -25,7 +25,7 @@ CREATE TABLE city
 
 CREATE TABLE category
 (
-    id         INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name       VARCHAR(128) NOT NULL UNIQUE,
     icon       VARCHAR(128),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -34,12 +34,12 @@ CREATE TABLE category
 
 CREATE TABLE user
 (
-    id                             INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id                             INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name                           VARCHAR(255) NOT NULL,
     email                          VARCHAR(255) NOT NULL UNIQUE,
-    password_hash                  VARCHAR(255) NOT NULL,
+    password_hash                  VARCHAR(255) NULL COMMENT 'Может быть NULL для пользователей, авторизованных через ВК',
     role                           VARCHAR(255) NOT NULL,
-    city_id                        INT          NOT NULL,
+    city_id                        INT UNSIGNED NOT NULL,
     avatar_path                    VARCHAR(255),
     day_of_birth                   DATE,
     bio                            TEXT,
@@ -54,9 +54,9 @@ CREATE TABLE user
 
 CREATE TABLE user_specialization
 (
-    id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id     INT NOT NULL,
-    category_id INT NOT NULL,
+    id          INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT UNSIGNED NOT NULL,
+    category_id INT UNSIGNED NOT NULL,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
@@ -66,7 +66,7 @@ CREATE TABLE user_specialization
 
 CREATE TABLE file
 (
-    id            INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id            INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     original_name VARCHAR(255) NOT NULL,
     path          VARCHAR(255) NOT NULL UNIQUE,
     mime_type     VARCHAR(128) NOT NULL,
@@ -77,13 +77,13 @@ CREATE TABLE file
 
 CREATE TABLE task
 (
-    id          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id          INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(255) NOT NULL,
     description TEXT         NOT NULL,
-    category_id INT          NOT NULL,
-    customer_id INT          NOT NULL,
-    worker_id   INT,
-    city_id     INT,
+    category_id INT UNSIGNED NOT NULL,
+    customer_id INT UNSIGNED NOT NULL,
+    worker_id   INT UNSIGNED,
+    city_id     INT UNSIGNED,
     status      VARCHAR(32)  NOT NULL DEFAULT 'new',
     budget      INT UNSIGNED,
     latitude    DECIMAL(10, 8),
@@ -99,9 +99,9 @@ CREATE TABLE task
 
 CREATE TABLE task_file
 (
-    id         INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    task_id    INT NOT NULL,
-    file_id    INT NOT NULL,
+    id         INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    task_id    INT UNSIGNED NOT NULL,
+    file_id    INT UNSIGNED NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (task_id) REFERENCES task (id) ON DELETE CASCADE,
@@ -111,25 +111,25 @@ CREATE TABLE task_file
 
 CREATE TABLE task_response
 (
-    id          INT     NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    task_id     INT     NOT NULL,
-    worker_id   INT     NOT NULL,
+    id          INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    task_id     INT UNSIGNED NOT NULL,
+    worker_id   INT UNSIGNED NOT NULL,
     comment     TEXT,
     price       INT UNSIGNED,
-    is_rejected BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Флаг, указывает что отклик отклонён',
-    created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_rejected BOOLEAN      NOT NULL DEFAULT FALSE COMMENT 'Флаг, указывает что отклик отклонён',
+    created_at  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (task_id) REFERENCES task (id) ON DELETE CASCADE,
     FOREIGN KEY (worker_id) REFERENCES user (id) ON DELETE CASCADE
 );
 
 CREATE TABLE review
 (
-    id          INT              NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    task_id     INT              NOT NULL UNIQUE,
-    customer_id INT              NOT NULL,
-    worker_id   INT              NOT NULL,
-    comment     TEXT,
+    id          INT UNSIGNED     NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    task_id     INT UNSIGNED     NOT NULL UNIQUE,
+    customer_id INT UNSIGNED     NOT NULL,
+    worker_id   INT UNSIGNED     NOT NULL,
+    comment     TEXT             NOT NULL COMMENT 'По ТЗ является обязательным полем при завершении задания',
     rating      TINYINT UNSIGNED NOT NULL,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
