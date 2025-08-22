@@ -34,13 +34,21 @@ CREATE TABLE category
 
 CREATE TABLE user
 (
-    id                             INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name                           VARCHAR(255) NOT NULL,
-    email                          VARCHAR(255) NOT NULL UNIQUE,
-    password_hash                  VARCHAR(255) NULL COMMENT 'Может быть NULL для пользователей, авторизованных через ВК',
-    role                           VARCHAR(255) NOT NULL,
-    city_id                        INT UNSIGNED NOT NULL,
-    avatar_path                    VARCHAR(255),
+    id            INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name          VARCHAR(255) NOT NULL,
+    email         VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NULL COMMENT 'Может быть NULL для пользователей, авторизованных через ВК',
+    role          VARCHAR(255) NOT NULL,
+    city_id       INT UNSIGNED NOT NULL,
+    avatar_path   VARCHAR(255),
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (city_id) REFERENCES city (id)
+);
+
+CREATE TABLE executor_profile
+(
+    user_id                        INT UNSIGNED NOT NULL PRIMARY KEY,
     day_of_birth                   DATE,
     bio                            TEXT,
     phone_number                   CHAR(11),
@@ -49,7 +57,14 @@ CREATE TABLE user
     show_contacts_only_to_customer BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at                     TIMESTAMP             DEFAULT CURRENT_TIMESTAMP,
     updated_at                     TIMESTAMP             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (city_id) REFERENCES city (id)
+    FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE
+);
+
+CREATE TABLE customer_profile
+(
+    user_id    INT UNSIGNED NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
 );
 
 CREATE TABLE user_specialization

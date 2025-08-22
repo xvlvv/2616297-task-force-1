@@ -1,8 +1,8 @@
 <?php
 
+use Xvlvv\Entity\Task;
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
-use Xvlvv\Models\Task;
 use Xvlvv\Services\TaskStateManager;
 
 require_once __DIR__ . '/vendor/autoload.php';

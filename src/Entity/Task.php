@@ -1,7 +1,10 @@
 <?php
 
-namespace Xvlvv\Models;
+namespace Xvlvv\Entity;
 
+use Xvlvv\Domain\ValueObject\Coordinates;
+use Xvlvv\Entity\City;
+use Xvlvv\DTO\CreateTaskDTO;
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use Xvlvv\Services\TaskStateManager;
@@ -11,25 +14,36 @@ use Xvlvv\Services\TaskStateManager;
  */
 final class Task
 {
-    /**
-     * Текущий статус задания
-     *
-     * @var Status
-     */
-    private Status $currentStatus = Status::NEW;
-
+    private int $id;
     /**
      * Инициализирует ID заказчика и исполнителя
      *
      * @param int $customerId
-     * @param int $workerId
      * @param TaskStateManager $taskStateManager
+     * @param int|null $workerId
+     * @param Status $currentStatus
+     * @param City|null $city
      */
     public function __construct(
         private int $customerId,
-        private int $workerId,
         private readonly TaskStateManager $taskStateManager,
+        private ?int $workerId = null,
+        private Status $currentStatus = Status::NEW,
+        private ?City $city = null,
     ) {
+    }
+
+    public static function create(
+        string $name,
+        string $description,
+        int $customerId,
+        Category $category,
+        \DateTimeImmutable $end_date,
+        ?Coordinates $coordinates = null,
+       ?int $id = null,
+    ): self
+    {
+
     }
 
     /**
