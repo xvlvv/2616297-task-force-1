@@ -2,7 +2,7 @@
 
 namespace Xvlvv\Services\Application;
 
-class TaskFileService
+final class TaskFileService
 {
     public function save()
     {

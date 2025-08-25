@@ -1,65 +1,81 @@
 <?php
 
+use Xvlvv\Domain\Task\CancelAction;
+use Xvlvv\Domain\Task\CompleteAction;
+use Xvlvv\Domain\Task\FailAction;
+use Xvlvv\Domain\Task\ApplyAction;
 use Xvlvv\Entity\Task;
-use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
+use Xvlvv\Exception\InvalidActionForTaskException;
 use Xvlvv\Services\TaskStateManager;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$taskStateManager = new TaskStateManager();
+$stateManager = new TaskStateManager();
 $customerId = 1;
 $workerId = 2;
+$anotherUserId = 3;
 
-// Проверка начального статуса новой задачи
-$task = new Task($customerId, $workerId, $taskStateManager);
-assert(Status::NEW === $task->getCurrentStatus(), 'New task should have status NEW');
+echo "Running tests...\n";
 
-// Проверка доступных действий для статуса NEW
-$availableActions = $task->getAvailableActions();
-assert(true === in_array(Action::APPLY->value, $availableActions), 'APPLY action should be available for NEW status');
-assert(true === in_array(Action::REJECT->value, $availableActions), 'REJECT action should be available for NEW status');
+// Тест 1: Проверяет, что для заказчика у новой задачи доступно только действие "Отменить".
+$task = new Task($stateManager, $customerId);
+$actionsForCustomer = $task->getAvailableActions($customerId);
+assert(count($actionsForCustomer) === 1);
+assert($actionsForCustomer[0] instanceof CancelAction);
+echo "Test 1 PASSED\n";
 
-// Проверка применения действия APPLY (NEW → IN_PROGRESS)
-$result = $task->applyAction(Action::APPLY);
-assert(true === $result, 'APPLY action should succeed');
-assert(Status::IN_PROGRESS === $task->getCurrentStatus(), 'Status should change to IN_PROGRESS after APPLY');
+// Тест 2: Проверяет, что для постороннего пользователя (исполнителя) у новой задачи доступно только действие "Откликнуться".
+$task = new Task($stateManager, $customerId);
+$actionsForOtherUser = $task->getAvailableActions($anotherUserId);
+assert(count($actionsForOtherUser) === 1);
+assert($actionsForOtherUser[0] instanceof ApplyAction);
+echo "Test 2 PASSED\n";
 
-// Проверка недопустимого действия COMPLETE для NEW статуса
-$task = new Task($customerId, $workerId, $taskStateManager);
-$result = $task->applyAction(Action::COMPLETE);
-assert(false === $result, 'COMPLETE action should fail for NEW status');
-assert(Status::NEW === $task->getCurrentStatus(), 'Status should remain NEW after invalid action');
+// Тест 3: Проверяет переход задачи из статуса "Новое" в "В работе" при назначении исполнителя.
+$task = new Task($stateManager, $customerId);
+$task->start($workerId);
+assert($task->getCurrentStatus() === Status::IN_PROGRESS);
+assert($task->getWorkerId() === $workerId);
+echo "Test 3 PASSED\n";
 
-// Проверка перехода IN_PROGRESS → COMPLETED
-$task = new Task($customerId, $workerId, $taskStateManager);
-$task->applyAction(Action::APPLY);
-$result = $task->applyAction(Action::COMPLETE);
-assert(true === $result, 'COMPLETE action should succeed for IN_PROGRESS status');
-assert(Status::COMPLETED === $task->getCurrentStatus(), 'Status should change to COMPLETED after COMPLETE');
+// Тест 4: Проверяет, что система выбрасывает исключение при попытке выполнить недопустимое действие (завершить новую задачу).
+$task = new Task($stateManager, $customerId);
+try {
+    $task->finish();
+    assert(false, 'Test 4 FAILED: finish() on a NEW task should throw an exception.');
+} catch (InvalidActionForTaskException $e) {
+    assert(true);
+}
+echo "Test 4 PASSED\n";
 
-// Проверка перехода IN_PROGRESS → CANCELLED
-$task = new Task($customerId, $workerId, $taskStateManager);
-$task->applyAction(Action::APPLY);
-$result = $task->applyAction(Action::REJECT);
-assert(true === $result, 'REJECT action should succeed for IN_PROGRESS status');
-assert(Status::CANCELLED === $task->getCurrentStatus(), 'Status should change to CANCELLED after REJECT');
+// Тест 5: Проверяет, что для исполнителя у задачи в статусе "В работе" доступно только действие "Отказаться".
+$task = new Task($stateManager, $customerId);
+$task->start($workerId);
+$actionsForWorker = $task->getAvailableActions($workerId);
+assert(count($actionsForWorker) === 1);
+assert($actionsForWorker[0] instanceof FailAction);
+echo "Test 5 PASSED\n";
 
-// Проверка отсутствия действий для завершенного статуса COMPLETED
-$task = new Task($customerId, $workerId, $taskStateManager);
-$task->applyAction(Action::APPLY);
-$task->applyAction(Action::COMPLETE);
-$availableActions = $task->getAvailableActions();
-assert(true === empty($availableActions), 'No actions should be available for COMPLETED status');
-$result = $task->applyAction(Action::APPLY);
-assert(false === $result, 'No actions should succeed for COMPLETED status');
+// Тест 6: Проверяет, что для заказчика у задачи в статусе "В работе" доступно только действие "Выполнено".
+$task = new Task($stateManager, $customerId);
+$task->start($workerId);
+$actionsForCustomer = $task->getAvailableActions($customerId);
+assert(count($actionsForCustomer) === 1);
+assert($actionsForCustomer[0] instanceof CompleteAction);
+echo "Test 6 PASSED\n";
 
-// Проверка русских названий статусов
-assert('Новое' === Status::NEW->getName(), 'Incorrect Russian translation for NEW status');
-assert('Отменено' === Status::CANCELLED->getName(), 'Incorrect Russian translation for CANCELLED status');
+// Тест 7: Проверяет переход задачи в статус "Провалено" после отказа исполнителя.
+$task = new Task($stateManager, $customerId);
+$task->start($workerId);
+$task->fail();
+assert($task->getCurrentStatus() === Status::FAILED);
+echo "Test 7 PASSED\n";
 
-// Проверка русских названий действий
-assert('Откликнуться' === Action::APPLY->getName(), 'Incorrect Russian translation for APPLY action');
-assert('Отменить' === Action::REJECT->getName(), 'Incorrect Russian translation for REJECT action');
+// Тест 8: Проверяет переход новой задачи в статус "Отменено" после отмены заказчиком.
+$task = new Task($stateManager, $customerId);
+$task->cancel();
+assert($task->getCurrentStatus() === Status::CANCELLED);
+echo "Test 8 PASSED\n";
 
-echo 'test result OK';
+echo "\nAll tests completed successfully!\n";

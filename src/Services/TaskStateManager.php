@@ -11,34 +11,54 @@ final class TaskStateManager
     {
         $transitionMap = [
             Status::NEW->value => [
-                Action::APPLY->value => Status::IN_PROGRESS,
-                Action::REJECT->value => Status::CANCELLED,
+                Action::START->value => Status::IN_PROGRESS,
+                Action::CANCEL->value => Status::CANCELLED,
             ],
             Status::IN_PROGRESS->value => [
                 Action::COMPLETE->value => Status::COMPLETED,
-                Action::REJECT->value => Status::CANCELLED,
+                Action::FAIL->value => Status::FAILED,
             ],
         ];
 
         return $transitionMap[$status->value][$action->value] ?? null;
     }
 
-    public function getAvailableActions(Status $status): ?array
+    public function getPublicAvailableActions(Status $status): array
     {
         $availableActions = [
             Status::NEW->value => [
                 Action::APPLY,
-                Action::REJECT,
+                Action::CANCEL,
             ],
             Status::CANCELLED->value => [],
             Status::IN_PROGRESS->value => [
                 Action::COMPLETE,
-                Action::REJECT,
+                Action::FAIL,
             ],
             Status::COMPLETED->value => [],
             Status::FAILED->value => [],
         ];
 
-        return $availableActions[$status->value] ?? null;
+        return $availableActions[$status->value];
+    }
+
+    public function getAllAvailableActions(Status $status): array
+    {
+        $availableActions = [
+            Status::NEW->value => [
+                Action::START,
+                Action::APPLY,
+                Action::CANCEL,
+            ],
+            Status::CANCELLED->value => [],
+            Status::IN_PROGRESS->value => [
+                Action::COMPLETE,
+                Action::FAIL,
+            ],
+            Status::COMPLETED->value => [],
+            Status::FAILED->value => [],
+        ];
+
+        return $availableActions[$status->value];
     }
 }

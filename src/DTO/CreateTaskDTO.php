@@ -2,7 +2,7 @@
 
 namespace Xvlvv\DTO;
 
-readonly class CreateTaskDTO
+readonly final class CreateTaskDTO
 {
     public function __construct(
         public string $name,

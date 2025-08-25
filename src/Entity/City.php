@@ -2,7 +2,7 @@
 
 namespace Xvlvv\Entity;
 
-readonly class City
+readonly final class City
 {
     public function __construct(
         private int $id,
