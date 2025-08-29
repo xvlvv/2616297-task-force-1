@@ -12,6 +12,16 @@ use Xvlvv\Services\TaskStateManager;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+echo 'Converting CSV files... <br>';
+
+$cityFile = new SplFileObject('data/cities.csv');
+$converter = new \Xvlvv\Util\CsvSqlConverter();
+$converter->toSQL($cityFile, 'city', 'task_force');
+$categoryFile = new SplFileObject('data/categories.csv');
+$converter->toSQL($categoryFile, 'category', 'task_force');
+
+echo 'SQL dump complete! <br>';
+
 $stateManager = new TaskStateManager();
 $customerId = 1;
 $workerId = 2;
