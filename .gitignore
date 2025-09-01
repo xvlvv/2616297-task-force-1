@@ -7,3 +7,13 @@
 *.sublime*
 Thumbs.db
 vendor
+nbproject
+.buildpath
+.project
+.settings
+composer.phar
+phpunit.phar
+/phpunit.xml
+tests/_output/*
+tests/_support/_generated
+/.vagrant
