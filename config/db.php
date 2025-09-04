@@ -2,9 +2,9 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=mysql_db;dbname=yii2basic',
-    'username' => 'user',
-    'password' => 'pw',
+    'dsn' => $_ENV['DB_DSN'] ?? 'mysql:host=mysql_db;dbname=yii2basic',
+    'username' => $_ENV['DB_USERNAME'] ?? 'user',
+    'password' => $_ENV['DB_PASSWORD'] ?? 'pw',
     'charset' => 'utf8',
     'tablePrefix' => 'taskforce_'
 

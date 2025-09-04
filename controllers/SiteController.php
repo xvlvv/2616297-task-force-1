@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use Yii;
+use yii\db\Connection;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
