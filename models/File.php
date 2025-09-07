@@ -52,12 +52,12 @@ class File extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'original_name' => 'Original Name',
-            'path' => 'Path',
-            'mime_type' => 'Mime Type',
-            'size_bytes' => 'Size Bytes',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'original_name' => 'Оригинальное имя',
+            'path' => 'Путь',
+            'mime_type' => 'Mime тип',
+            'size_bytes' => 'Размер',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлён',
         ];
     }
 

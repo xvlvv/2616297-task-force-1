@@ -49,11 +49,11 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'latitude' => 'Latitude',
-            'longitude' => 'Longitude',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'name' => 'Имя',
+            'latitude' => 'Широта',
+            'longitude' => 'Долгота',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлён',
         ];
     }
 

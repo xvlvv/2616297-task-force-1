@@ -56,13 +56,13 @@ class Review extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'task_id' => 'Task ID',
-            'customer_id' => 'Customer ID',
-            'worker_id' => 'Worker ID',
-            'comment' => 'Comment',
-            'rating' => 'Rating',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'task_id' => 'ID задания',
+            'customer_id' => 'ID клиента',
+            'worker_id' => 'ID исполнителя',
+            'comment' => 'Комментарий',
+            'rating' => 'Рейтинг',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлён',
         ];
     }
 

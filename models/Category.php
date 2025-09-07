@@ -50,10 +50,10 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'icon' => 'Icon',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'name' => 'Название',
+            'icon' => 'Иконка',
+            'created_at' => 'Создана',
+            'updated_at' => 'Обновлена',
         ];
     }
 

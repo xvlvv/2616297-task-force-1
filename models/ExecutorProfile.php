@@ -41,7 +41,8 @@ class ExecutorProfile extends \yii\db\ActiveRecord
             [['show_contacts_only_to_customer'], 'default', 'value' => 0],
             [['day_of_birth', 'created_at', 'updated_at'], 'safe'],
             [['bio'], 'string'],
-            [['failed_tasks_count', 'show_contacts_only_to_customer'], 'integer'],
+            [['show_contacts_only_to_customer'], 'boolean'],
+            [['failed_tasks_count'], 'integer'],
             [['phone_number'], 'string', 'max' => 11],
             [['telegram_username'], 'string', 'max' => 64],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -54,15 +55,15 @@ class ExecutorProfile extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'user_id' => 'User ID',
-            'day_of_birth' => 'Day Of Birth',
-            'bio' => 'Bio',
-            'phone_number' => 'Phone Number',
-            'telegram_username' => 'Telegram Username',
-            'failed_tasks_count' => 'Failed Tasks Count',
-            'show_contacts_only_to_customer' => 'Show Contacts Only To Customer',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'user_id' => 'ID пользователя',
+            'day_of_birth' => 'День рождения',
+            'bio' => 'О себе',
+            'phone_number' => 'Номер телефона',
+            'telegram_username' => '@ в Telegram',
+            'failed_tasks_count' => 'Количество проваленных заданий',
+            'show_contacts_only_to_customer' => 'Показывать контакты только клиенту',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлён',
         ];
     }
 

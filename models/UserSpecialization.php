@@ -50,10 +50,10 @@ class UserSpecialization extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_id' => 'User ID',
-            'category_id' => 'Category ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'user_id' => 'ID пользователя',
+            'category_id' => 'ID категории',
+            'created_at' => 'Создана',
+            'updated_at' => 'Обновлена',
         ];
     }
 

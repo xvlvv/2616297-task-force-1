@@ -50,10 +50,10 @@ class TaskFile extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'task_id' => 'Task ID',
-            'file_id' => 'File ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'task_id' => 'ID задания',
+            'file_id' => 'ID файла',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлён',
         ];
     }
 

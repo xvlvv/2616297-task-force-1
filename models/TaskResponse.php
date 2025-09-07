@@ -55,13 +55,13 @@ class TaskResponse extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'task_id' => 'Task ID',
-            'worker_id' => 'Worker ID',
-            'comment' => 'Comment',
-            'price' => 'Price',
-            'is_rejected' => 'Is Rejected',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'task_id' => 'ID задания',
+            'worker_id' => 'ID исполнителя',
+            'comment' => 'Комментарий',
+            'price' => 'Цена',
+            'is_rejected' => 'Отклонён',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлён',
         ];
     }
 
