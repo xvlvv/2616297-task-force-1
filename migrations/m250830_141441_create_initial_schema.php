@@ -41,8 +41,8 @@ class m250830_141441_create_initial_schema extends Migration
             array_merge(
                 [
                     'id' => $this->primaryKey()->unsigned(),
-                    'name' => $this->string(128)->notNull()->unique(),
-                    'icon' => $this->string(128),
+                    'name' => $this->string(128)->notNull(),
+                    'icon' => $this->string(255),
                 ],
                 $timestampColumns
             ),

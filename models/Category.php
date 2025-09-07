@@ -38,8 +38,8 @@ class Category extends \yii\db\ActiveRecord
             [['icon'], 'default', 'value' => null],
             [['name'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'icon'], 'string', 'max' => 128],
-            [['name'], 'unique'],
+            [['icon'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 128],
         ];
     }
 
