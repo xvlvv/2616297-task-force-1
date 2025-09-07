@@ -10,8 +10,9 @@ class m250830_141441_create_initial_schema extends Migration
     public function safeUp()
     {
         $tableOptions = null;
+        $isMySql = $this->db->driverName === 'mysql';
 
-        if ($this->db->driverName === 'mysql') {
+        if ($isMySql) {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci';
         }
 
@@ -188,7 +189,9 @@ class m250830_141441_create_initial_schema extends Migration
                     'id' => $this->primaryKey()->unsigned(),
                     'original_name' => $this->string(255)->notNull(),
                     'path' => $this->string(255)->notNull()->unique(),
-                    'mime_type' => $this->string(128)->notNull(),
+                    'mime_type' => $isMySql ? "ENUM('image/jpeg', 'image/png', 'image/webp')" : $this->string(
+                        128
+                    )->notNull(),
                     'size_bytes' => $this->integer()->notNull()->unsigned(),
                 ],
                 $timestampColumns
@@ -301,7 +304,7 @@ class m250830_141441_create_initial_schema extends Migration
             ]
         );
 
-        if ($this->db->driverName === 'mysql') {
+        if ($isMySql) {
             $this->execute('CREATE FULLTEXT INDEX ft_task_name_description ON {{%task}} (name, description)');
         }
 
@@ -483,6 +486,8 @@ class m250830_141441_create_initial_schema extends Migration
      */
     public function safeDown()
     {
+        $isMySql = $this->db->driverName === 'mysql';
+
         $this->dropCheck('chk_rating_range', '{{%review}}');
         $this->dropForeignKey('fk-review-worker_id', '{{%review}}');
         $this->dropIndex('idx-review-worker_id', '{{%review}}');
@@ -506,7 +511,7 @@ class m250830_141441_create_initial_schema extends Migration
         $this->dropIndex('idx-task_file-task_id', '{{%task_file}}');
         $this->dropTable('{{%task_file}}');
 
-        if ($this->db->driverName === 'mysql') {
+        if ($isMySql) {
             $this->execute('ALTER TABLE {{%task}} DROP INDEX ft_task_name_description');
         }
 

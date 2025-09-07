@@ -41,6 +41,7 @@ class File extends \yii\db\ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
             [['original_name', 'path'], 'string', 'max' => 255],
             [['mime_type'], 'string', 'max' => 128],
+            [['mime_type'], 'in', 'range' => ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']],
             [['path'], 'unique'],
         ];
     }
