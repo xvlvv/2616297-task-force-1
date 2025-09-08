@@ -17,3 +17,6 @@ phpunit.phar
 tests/_output/*
 tests/_support/_generated
 /.vagrant
+web/assets/*
+!web/assets/.gitkeep
+.env

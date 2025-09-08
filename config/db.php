@@ -2,10 +2,11 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=yii2basic',
-    'username' => 'root',
-    'password' => '',
+    'dsn' => $_ENV['DB_DSN'] ?? 'mysql:host=mysql_db;dbname=yii2basic',
+    'username' => $_ENV['DB_USERNAME'] ?? 'user',
+    'password' => $_ENV['DB_PASSWORD'] ?? 'pw',
     'charset' => 'utf8',
+    'tablePrefix' => 'taskforce_'
 
     // Schema cache options (for production environment)
     //'enableSchemaCache' => true,

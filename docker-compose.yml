@@ -1,9 +1,18 @@
-version: '2'
 services:
   php:
-    image: yiisoftware/yii2-php:8.2-apache
+    image: yiisoftware/yii2-php:8.2-fpm-nginx
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
     ports:
       - '8000:80'
+  mysql_db:
+    image: mysql:8
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: yii2basic
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pw
