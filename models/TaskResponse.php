@@ -38,9 +38,9 @@ class TaskResponse extends \yii\db\ActiveRecord
     {
         return [
             [['comment', 'price'], 'default', 'value' => null],
-            [['is_rejected'], 'default', 'value' => 0],
             [['task_id', 'worker_id'], 'required'],
-            [['task_id', 'worker_id', 'price', 'is_rejected'], 'integer'],
+            [['task_id', 'worker_id', 'price'], 'integer', 'min' => 1],
+            [['is_rejected'], 'boolean'],
             [['comment'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],

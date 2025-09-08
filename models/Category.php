@@ -76,15 +76,4 @@ class Category extends \yii\db\ActiveRecord
     {
         return $this->hasMany(UserSpecialization::class, ['category_id' => 'id']);
     }
-
-    /**
-     * Gets query for [[Users]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUsers()
-    {
-        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('{{%user_specialization}}', ['category_id' => 'id']);
-    }
-
 }

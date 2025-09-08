@@ -99,7 +99,6 @@ class m250830_141441_create_initial_schema extends Migration
             $tableOptions
         );
 
-
         $this->addForeignKey(
             'fk-executor_profile-user_id',
             '{{%executor_profile}}',

@@ -53,7 +53,7 @@ class Task extends \yii\db\ActiveRecord
             [['status'], 'default', 'value' => 'new'],
             [['name', 'description', 'category_id', 'customer_id'], 'required'],
             [['description'], 'string'],
-            [['category_id', 'customer_id', 'worker_id', 'city_id', 'budget'], 'integer'],
+            [['category_id', 'customer_id', 'worker_id', 'city_id', 'budget'], 'integer', 'min' => 1],
             [['latitude', 'longitude'], 'number'],
             [['end_date', 'created_at', 'updated_at'], 'safe'],
             [['name'], 'string', 'max' => 255],

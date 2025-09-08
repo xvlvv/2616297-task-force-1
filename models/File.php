@@ -37,7 +37,7 @@ class File extends \yii\db\ActiveRecord
     {
         return [
             [['original_name', 'path', 'mime_type', 'size_bytes'], 'required'],
-            [['size_bytes'], 'integer'],
+            [['size_bytes'], 'integer', 'min' => 1],
             [['created_at', 'updated_at'], 'safe'],
             [['original_name', 'path'], 'string', 'max' => 255],
             [['mime_type'], 'string', 'max' => 128],
