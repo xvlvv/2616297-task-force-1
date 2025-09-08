@@ -35,9 +35,8 @@ class UserSpecialization extends \yii\db\ActiveRecord
     {
         return [
             [['user_id', 'category_id'], 'required'],
-            [['user_id', 'category_id'], 'integer'],
+            [['user_id', 'category_id'], 'integer', 'min' => 1],
             [['created_at', 'updated_at'], 'safe'],
-            [['user_id', 'category_id'], 'unique', 'targetAttribute' => ['user_id', 'category_id']],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
