@@ -13,7 +13,7 @@ use Yii;
  * @property string|null $phone_number
  * @property string|null $telegram_username
  * @property int $failed_tasks_count
- * @property int|null $show_contacts_only_to_customer
+ * @property bool|null $restrict_contacts
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -38,11 +38,10 @@ class ExecutorProfile extends \yii\db\ActiveRecord
     {
         return [
             [['day_of_birth', 'bio', 'phone_number', 'telegram_username'], 'default', 'value' => null],
-            [['show_contacts_only_to_customer'], 'default', 'value' => 0],
+            [['restrict_contacts'], 'default', 'value' => 0],
             [['day_of_birth', 'created_at', 'updated_at'], 'safe'],
             [['bio'], 'string'],
-            [['show_contacts_only_to_customer'], 'boolean'],
-            [['failed_tasks_count'], 'integer'],
+            [['restrict_contacts'], 'boolean'],
             [['phone_number'], 'string', 'max' => 11],
             [['telegram_username'], 'string', 'max' => 64],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
@@ -60,8 +59,7 @@ class ExecutorProfile extends \yii\db\ActiveRecord
             'bio' => 'О себе',
             'phone_number' => 'Номер телефона',
             'telegram_username' => '@ в Telegram',
-            'failed_tasks_count' => 'Количество проваленных заданий',
-            'show_contacts_only_to_customer' => 'Показывать контакты только клиенту',
+            'restrict_contacts' => 'Показывать контакты только клиенту',
             'created_at' => 'Создан',
             'updated_at' => 'Обновлён',
         ];
