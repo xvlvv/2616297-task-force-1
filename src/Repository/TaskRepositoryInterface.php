@@ -14,4 +14,5 @@ interface TaskRepositoryInterface
     public function isWorker(int $taskId, int $userId): bool;
     public function getWorkerByIdOrFail(int $taskId): int;
     public function getByIdOrFail(int $taskId): Task;
+    public function getNewTasks(int $offset, int $limit): array;
 }

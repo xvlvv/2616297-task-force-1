@@ -6,12 +6,40 @@ use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use Xvlvv\Exception\InvalidActionForTaskException;
 use Xvlvv\Services\TaskStateManager;
+use Yii;
 
 /**
  * Представляет сущность «Задание». Определяет списки действий и статусов, а также выполняет базовую работу с ними
  */
 final class Task
 {
+    /**
+     * Фабричный метод для создания объекта Task с автоматическим резолвом TaskStateManager
+     *
+     * @param int $customerId
+     * @param int|null $workerId
+     * @param int|null $id
+     * @param Status $currentStatus
+     * @param City|null $city
+     * @return self
+     */
+    public static function create(
+        int $customerId,
+        ?int $workerId = null,
+        ?int $id = null,
+        Status $currentStatus = Status::NEW,
+        ?City $city = null
+    ): self {
+        return new self(
+            id: $id,
+            customerId: $customerId,
+            workerId: $workerId,
+            taskStateManager: Yii::$app->taskStateManager,
+            currentStatus: $currentStatus,
+            city: $city
+        );
+    }
+
     /**
      * Инициализирует ID заказчика и исполнителя
      *
@@ -22,11 +50,11 @@ final class Task
      * @param Status $currentStatus
      * @param City|null $city
      */
-    public function __construct(
-        private readonly TaskStateManager $taskStateManager,
+    private function __construct(
+        private ?int $id = null,
         private int $customerId,
         private ?int $workerId = null,
-        private ?int $id = null,
+        private readonly TaskStateManager $taskStateManager,
         private Status $currentStatus = Status::NEW,
         private ?City $city = null,
     ) {
