@@ -1,12 +1,17 @@
 <?php
 
+use app\models\City;
+
+$faker = Faker\Factory::create();
+$cityIds = City::find()->select('id')->column();
+
 return [
     'user0' => [
         'name' => 'Васильев Савва Львович',
         'email' => 'silina.vladlen@hotmail.com',
         'password_hash' => '$2y$13$lx3ezefkQ58xS3PhCLBvIO45WpHCeH/oMf/7gdeM7fQIcgHj3Q4eS',
         'role' => 'customer',
-        'city_id' => 10,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/001199?text=temporibus',
     ],
     'user1' => [
@@ -14,7 +19,7 @@ return [
         'email' => 'ipopov@mail.ru',
         'password_hash' => '$2y$13$dt4MIxaVTrkXpFWbve5uc.awtu/LptmgR1fk57.a7jzyoOY7vNc/e',
         'role' => 'worker',
-        'city_id' => 6,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/004477?text=et',
     ],
     'user2' => [
@@ -22,7 +27,7 @@ return [
         'email' => 'nkuzmin@fedorova.ru',
         'password_hash' => '$2y$13$O95BlhZrLKVR9STn8sjeo.kd0NjqPkp7YZLLHLqpWr/JUgiq3Uuaq',
         'role' => 'customer',
-        'city_id' => 10,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/0044ee?text=doloribus',
     ],
     'user3' => [
@@ -30,7 +35,7 @@ return [
         'email' => 'tatana18@narod.ru',
         'password_hash' => '$2y$13$bbM9SuaqpUEKD7VNcKOYVem8HhJUA05KVMH/g/FbHhGegNvEkNabq',
         'role' => 'worker',
-        'city_id' => 2,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/005577?text=quisquam',
     ],
     'user4' => [
@@ -38,7 +43,7 @@ return [
         'email' => 'bgureva@koselev.net',
         'password_hash' => '$2y$13$Dh8xJ4w6MB/ig02CkBto6OKmWNeB27EDmhVjMkzSp3jy/OhyVzBue',
         'role' => 'customer',
-        'city_id' => 8,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/000066?text=ut',
     ],
     'user5' => [
@@ -46,7 +51,7 @@ return [
         'email' => 'veniamin.vinogradova@sorokina.com',
         'password_hash' => '$2y$13$yKgA8DfW.99NHW3tBEY8H.YCQ7LausKSuIyBRyve7jirrwTVGfO6i',
         'role' => 'customer',
-        'city_id' => 1,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/00ccbb?text=maiores',
     ],
     'user6' => [
@@ -54,7 +59,7 @@ return [
         'email' => 'nelli.gulaev@akovlev.com',
         'password_hash' => '$2y$13$zPQbmXh514L7oVB83c1sceayUn0rPCzgRZ4RMg0tM.r1PB5/sEdQS',
         'role' => 'worker',
-        'city_id' => 7,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/003399?text=aut',
     ],
     'user7' => [
@@ -62,7 +67,7 @@ return [
         'email' => 'eva.vladimirova@list.ru',
         'password_hash' => '$2y$13$cedm8WXDz7b/LXL0RTqovul9uqTp/13eDmvoEPouoZm7NYJcn3Z3K',
         'role' => 'worker',
-        'city_id' => 10,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/0088cc?text=eos',
     ],
     'user8' => [
@@ -70,7 +75,7 @@ return [
         'email' => 'aleksej06@bk.ru',
         'password_hash' => '$2y$13$LRMhpnHhO6yFa2ZPC3AxM.CoRxzM/DQtk81Jp13quPMOFumVVJlqG',
         'role' => 'customer',
-        'city_id' => 5,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/001177?text=quis',
     ],
     'user9' => [
@@ -78,7 +83,7 @@ return [
         'email' => 'suvorov.antonin@rambler.ru',
         'password_hash' => '$2y$13$ts95XB4phcweAitzMh6xsOBxvFj03bwI70KvSD32ToBKxVxqabEi6',
         'role' => 'customer',
-        'city_id' => 7,
+        'city_id' => $faker->randomElement($cityIds),
         'avatar_path' => 'https://via.placeholder.com/640x480.png/008855?text=atque',
     ],
 ];
