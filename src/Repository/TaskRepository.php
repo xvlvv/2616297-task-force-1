@@ -4,32 +4,80 @@ declare(strict_types = 1);
 
 namespace Xvlvv\Repository;
 
+use app\models\TaskResponse;
+use http\Exception\InvalidArgumentException;
+use http\Exception\RuntimeException;
 use Xvlvv\DTO\RenderTaskDTO;
 use Xvlvv\DTO\SaveTaskDTO;
 use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task;
 use \app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
+use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 
 class TaskRepository implements TaskRepositoryInterface
 {
-    /* Пока что не сделал реализацию оставшихся методов,
-    как дойду по заданию то сделаю, пока что для отклика например
-    ещё нет фикстур */
-    public function save(SaveTaskDTO $task): ?int
+    public function save(SaveTaskDTO $taskDTO): ?int
     {
-        // TODO: Implement save() method.
+        $task = new TaskModel();
+        $task->name = $taskDTO->name;
+        $task->status = Status::NEW;
+        $task->description = $taskDTO->description;
+        $task->category_id = $taskDTO->category->getId();
+        $task->customer_id = $taskDTO->customer->getId();
+        $task->end_date = $taskDTO->endDate;
+        $task->budget = $taskDTO->budget;
+        $task->city_id = $taskDTO->city->getId();
+        $task->longitude = $taskDTO->coordinates->longitude;
+        $task->latitude = $taskDTO->coordinates->latitude;
+        try {
+            $task->save();
+        } catch (
+            Exception $exception
+        ) {
+            return null;
+        }
+        return $task->id;
     }
 
-    public function update(Task $task): Task
+    public function update(Task $task): void
     {
-        // TODO: Implement update() method.
+        $taskId = $task->getId();
+        if (null === $taskId) {
+            throw new InvalidArgumentException('Cannot update unsaved task');
+        }
+
+        $taskModel = TaskModel::findOne($taskId);
+
+        if (null === $taskModel) {
+            throw new InvalidArgumentException('Cannot update unsaved task');
+        }
+
+        if ($taskModel->status !== $task->getCurrentStatus()->value) {
+            $taskModel->status = $task->getCurrentStatus();
+        }
+
+        if ($taskModel->worker_id !== $task->getWorkerId()) {
+            $taskModel->worker_id = $task->getWorkerId();
+        }
+
+        try {
+            $taskModel->save();
+        } catch (
+            Exception $exception
+        ) {
+            throw new RuntimeException('Failed to update task');
+        }
     }
 
     public function hasAlreadyResponded(int $taskId, int $userId): bool
     {
-        // TODO: Implement hasAlreadyResponded() method.
+        $taskResponse = TaskResponse::find()
+            ->where(['task_id' => $taskId, 'worker_id' => $userId])
+            ->one();
+
+        return null !== $taskResponse;
     }
 
     public function isAuthor(int $taskId, int $userId): bool

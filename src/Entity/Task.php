@@ -31,10 +31,10 @@ final class Task
         ?City $city = null
     ): self {
         return new self(
-            id: $id,
             customerId: $customerId,
-            workerId: $workerId,
             taskStateManager: Yii::$app->taskStateManager,
+            id: $id,
+            workerId: $workerId,
             currentStatus: $currentStatus,
             city: $city
         );
@@ -51,13 +51,18 @@ final class Task
      * @param City|null $city
      */
     private function __construct(
-        private ?int $id = null,
         private int $customerId,
-        private ?int $workerId = null,
         private readonly TaskStateManager $taskStateManager,
+        private ?int $id = null,
+        private ?int $workerId = null,
         private Status $currentStatus = Status::NEW,
         private ?City $city = null,
     ) {
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     /**
