@@ -3,6 +3,8 @@
 namespace Xvlvv\Services\Application;
 
 use Xvlvv\DTO\SaveTaskResponseDTO;
+use Xvlvv\Entity\TaskResponse;
+use Xvlvv\Entity\User;
 use Xvlvv\Exception\DuplicateTaskResponseException;
 use Xvlvv\Exception\UserCannotApplyToTaskException;
 use Xvlvv\Repository\TaskRepositoryInterface;
@@ -29,6 +31,17 @@ final class TaskResponseService
             throw new DuplicateTaskResponseException('You have already responded to this task');
         }
 
-        return $this->repository->save($dto);
+        $task = $this->taskRepository->getByIdOrFail($dto->taskId);
+
+        $taskResponse = TaskResponse::create(
+            $dto->taskId,
+            $task,
+            $user,
+            $dto->isRejected,
+            $dto->price,
+            $dto->comment
+        );
+
+        return $this->repository->save($taskResponse);
     }
 }

@@ -27,6 +27,7 @@ final class Task
         int $customerId,
         ?int $workerId = null,
         ?int $id = null,
+        private ?int $budget = null,
         Status $currentStatus = Status::NEW,
         ?City $city = null
     ): self {
@@ -35,6 +36,7 @@ final class Task
             taskStateManager: Yii::$app->taskStateManager,
             id: $id,
             workerId: $workerId,
+            budget: $budget,
             currentStatus: $currentStatus,
             city: $city
         );
@@ -55,9 +57,15 @@ final class Task
         private readonly TaskStateManager $taskStateManager,
         private ?int $id = null,
         private ?int $workerId = null,
+        private ?int $budget = null,
         private Status $currentStatus = Status::NEW,
         private ?City $city = null,
     ) {
+    }
+
+    public function getBudget(): ?int
+    {
+        return $this->budget;
     }
 
     public function getId(): ?int
