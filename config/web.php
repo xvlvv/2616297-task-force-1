@@ -15,6 +15,7 @@ $config = [
         'definitions' => [
             \Xvlvv\Repository\TaskRepositoryInterface::class => \Xvlvv\Repository\TaskRepository::class,
             \Xvlvv\Repository\CityRepositoryInterface::class => \Xvlvv\Repository\CityRepository::class,
+            \Xvlvv\Repository\CategoryRepositoryInterface::class => \Xvlvv\Repository\CategoryRepository::class,
         ],
     ],
     'components' => [
