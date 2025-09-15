@@ -2,9 +2,9 @@
 
 namespace Xvlvv\Repository;
 
-use Xvlvv\DTO\SaveTaskResponseDTO;
+use Xvlvv\Entity\TaskResponse;
 
 interface TaskResponseRepositoryInterface
 {
-    public function save(SaveTaskResponseDTO $dto): bool;
+    public function save(TaskResponse $taskResponse): bool;
 }

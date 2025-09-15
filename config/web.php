@@ -11,6 +11,13 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'container' => [
+        'definitions' => [
+            \Xvlvv\Repository\TaskRepositoryInterface::class => \Xvlvv\Repository\TaskRepository::class,
+            \Xvlvv\Repository\CityRepositoryInterface::class => \Xvlvv\Repository\CityRepository::class,
+            \Xvlvv\Repository\CategoryRepositoryInterface::class => \Xvlvv\Repository\CategoryRepository::class,
+        ],
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -42,6 +49,17 @@ $config = [
             ],
         ],
         'db' => $db,
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'locale' => 'ru-RU',
+            'defaultTimeZone' => 'Europe/Moscow',
+            'dateFormat' => 'php:d.m.Y',
+            'datetimeFormat' => 'php:d.m.Y H:i:s',
+            'timeFormat' => 'php:H:i:s',
+        ],
+        'taskStateManager' => [
+            'class' => 'Xvlvv\Services\TaskStateManager',
+        ],
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
