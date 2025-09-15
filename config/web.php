@@ -60,14 +60,12 @@ $config = [
         'taskStateManager' => [
             'class' => 'Xvlvv\Services\TaskStateManager',
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
     ],
     'params' => $params,
 ];
