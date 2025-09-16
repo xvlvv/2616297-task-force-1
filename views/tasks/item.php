@@ -1,5 +1,10 @@
 <?php
-use yii\helpers\Html;
+
+/**
+ * @var Model|null $model DTO c данными задания
+ */
+
+use yii\base\Model;
 
 ?>
 

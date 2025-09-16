@@ -5,15 +5,20 @@ declare(strict_types = 1);
 namespace Xvlvv\Repository;
 
 use app\models\TaskResponse;
+use DateTime;
 use http\Exception\InvalidArgumentException;
 use http\Exception\RuntimeException;
+use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\RenderTaskDTO;
 use Xvlvv\DTO\SaveTaskDTO;
+use Xvlvv\DTO\ViewNewTasksDTO;
 use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task;
 use \app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
+use yii\db\ActiveQuery;
 use yii\db\Exception;
+use yii\db\Query;
 use yii\web\NotFoundHttpException;
 
 class TaskRepository implements TaskRepositoryInterface
@@ -34,7 +39,7 @@ class TaskRepository implements TaskRepositoryInterface
         try {
             $task->save();
         } catch (
-            Exception $exception
+            \Throwable $exception
         ) {
             return null;
         }
@@ -120,20 +125,57 @@ class TaskRepository implements TaskRepositoryInterface
             $task->customer_id,
             $task->worker_id,
             $task->id,
+            $task->budget,
             $status,
             $city,
         );
     }
 
-    public function getNewTasks(int $offset, int $limit): array
+    private function getNewTasksQuery(): ActiveQuery
     {
-        $tasksModels = TaskModel::find()
+        return TaskModel::find()
+            ->where(['status' => Status::NEW]);
+    }
+
+    private function getFilteredTasksQuery(GetNewTasksDTO $dto): ActiveQuery
+    {
+        $query = $this->getNewTasksQuery();
+
+        $query
             ->with('category', 'city')
-            ->where(['status' => Status::NEW])
-            ->offset($offset)
-            ->limit($limit)
+            ->offset($dto->offset)
+            ->limit($dto->limit)
+            ->andFilterWhere(['category_id' => $dto->categories]);
+
+        if (true === $dto->checkWorker) {
+            $query->andWhere(['not', ['worker_id' => null]]);
+        }
+
+        if (!empty($dto->createdAt)) {
+            $pastDate = (new DateTime())
+                ->modify("-{$dto->createdAt} hours")
+                ->format('Y-m-d H:i:s');
+
+            $query->andWhere(['>=', 'created_at', $pastDate]);
+        }
+
+        return $query;
+    }
+
+    public function getNewTasks(GetNewTasksDTO $dto): ViewNewTasksDTO
+    {
+        $categoryQuery = $this->getNewTasksQuery();
+
+        $categories = $categoryQuery
+            ->joinWith('category', false)
+            ->select(['{{%category}}.id', '{{%category}}.name'])
+            ->distinct()
+            ->asArray()
             ->all();
-        return array_map(function ($task) {
+
+        $tasksModels = $this->getFilteredTasksQuery($dto)->all();
+
+        $tasks = array_map(function ($task) {
             return new RenderTaskDTO(
                 $task->id,
                 $task->name,
@@ -144,6 +186,11 @@ class TaskRepository implements TaskRepositoryInterface
                 $task->created_at,
             );
         }, $tasksModels);
+
+        return new ViewNewTasksDTO(
+            $tasks,
+            $categories
+        );
     }
 
     private function getModelByIdOrFail(int $taskId): TaskModel
@@ -153,5 +200,12 @@ class TaskRepository implements TaskRepositoryInterface
             throw new NotFoundHttpException();
         }
         return $task;
+    }
+
+    public function getFilteredTasksQueryCount(GetNewTasksDTO $dto): int
+    {
+        return $this
+            ->getFilteredTasksQuery($dto)
+            ->count();
     }
 }
