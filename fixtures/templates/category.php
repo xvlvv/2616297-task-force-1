@@ -4,6 +4,6 @@
  * @var $index integer
  */
 return [
-    'name' => $faker->sentence(2),
-    'icon' => $faker->file(targetDirectory: __DIR__ . '/../../web/img'),
+    'name' => $faker->words(2),
+    'icon' => $faker->imageUrl(),
 ];
