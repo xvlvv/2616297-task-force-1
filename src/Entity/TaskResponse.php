@@ -27,7 +27,7 @@ final class TaskResponse
     {
         $taskBudget = $task->getBudget();
 
-        if ((int) $taskBudget < $price) {
+        if (((int) $taskBudget) < $price) {
             throw new \LogicException('Price cannot be higher than budget');
         }
 
