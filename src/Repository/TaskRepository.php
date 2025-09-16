@@ -39,7 +39,7 @@ class TaskRepository implements TaskRepositoryInterface
         try {
             $task->save();
         } catch (
-            Exception $exception
+            \Throwable $exception
         ) {
             return null;
         }
