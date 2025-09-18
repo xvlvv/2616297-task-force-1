@@ -7,11 +7,11 @@ namespace Xvlvv\DTO;
 readonly final class GetNewTasksDTO
 {
     public function __construct(
-        public int $offset,
-        public int $limit,
         public string|array $categories,
         public bool $checkWorker,
         public string $createdAt,
+        public int $offset = 0,
+        public int $limit = 0,
     ) {
     }
 }

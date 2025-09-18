@@ -24,8 +24,6 @@ class TaskController extends Controller
 
         $count = $taskRepository->getFilteredTasksQueryCount(
             new GetNewTasksDTO(
-                0,
-                0,
                 $model->categories,
                 $model->checkWorker,
                 $model->createdAt
@@ -39,11 +37,11 @@ class TaskController extends Controller
         ]);
 
         $getNewTasksDTO = new GetNewTasksDTO(
-            $pagination->getOffset(),
-            $pageSize,
             $model->categories,
             $model->checkWorker,
-            $model->createdAt
+            $model->createdAt,
+            $pagination->getOffset(),
+            $pageSize,
         );
 
         $dto = $taskRepository->getNewTasks($getNewTasksDTO);
