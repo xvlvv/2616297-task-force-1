@@ -697,7 +697,9 @@ template {
   display: flex; }
 
 .specialization {
-  max-width: 427px; }
+  max-width: 427px;
+  margin: 0 10px 0 0;
+}
 
 .head-info {
   font-weight: 700;
@@ -780,10 +782,13 @@ template {
   border-radius: 15px;
   margin-bottom: 20px;
   position: relative; }
-  .response-card .feedback-wrapper:last-child {
-    -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-            flex-grow: 1; }
+
+.response-card .feedback-wrapper:last-child {
+  -webkit-box-flex: 1;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  flex-shrink: 0;
+}
 
 .customer-photo {
   border-bottom-left-radius: 15px;
