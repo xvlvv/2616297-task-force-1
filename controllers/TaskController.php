@@ -13,7 +13,7 @@ use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
-class TasksController extends Controller
+class TaskController extends Controller
 {
     public function actionIndex(TaskRepositoryInterface $taskRepository): string
     {
@@ -65,8 +65,15 @@ class TasksController extends Controller
         );
     }
 
-    public function actionView(): string
+    public function actionView(int $id, TaskRepositoryInterface $taskRepository): string
     {
-        return '1';
+        $task = $taskRepository->getTaskForView($id);
+
+        return $this->render(
+            'view',
+            [
+                'task' => $task,
+            ]
+        );
     }
 }

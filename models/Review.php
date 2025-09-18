@@ -2,7 +2,9 @@
 
 namespace app\models;
 
+use Xvlvv\Enums\Status;
 use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "{{%review}}".
@@ -22,7 +24,6 @@ use Yii;
  */
 class Review extends \yii\db\ActiveRecord
 {
-
 
     /**
      * {@inheritdoc}
@@ -70,7 +71,7 @@ class Review extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Customer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCustomer()
     {
@@ -80,7 +81,7 @@ class Review extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Task]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTask()
     {
@@ -90,11 +91,10 @@ class Review extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Worker]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getWorker()
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }
-
 }
