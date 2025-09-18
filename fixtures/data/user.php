@@ -1,89 +1,37 @@
 <?php
 
 use app\models\City;
+use Xvlvv\Enums\UserRole;
+use app\fixtures\UserFixture;
 
-$faker = Faker\Factory::create();
+$faker = Faker\Factory::create('ru_RU');
 $cityIds = City::find()->select('id')->column();
+$avatarsPath = Yii::getAlias('@app/web/img/avatars');
+$avatarFiles = array_diff(scandir($avatarsPath), ['.', '..']);
+$avatarsUrlPath = '/img/avatars/';
 
-return [
-    'user0' => [
-        'name' => 'Васильев Савва Львович',
-        'email' => 'silina.vladlen@hotmail.com',
-        'password_hash' => '$2y$13$lx3ezefkQ58xS3PhCLBvIO45WpHCeH/oMf/7gdeM7fQIcgHj3Q4eS',
-        'role' => 'customer',
+$data = [];
+
+for ($i = 0; $i < UserFixture::WORKER_COUNT; $i++) {
+    $data['worker' . $i] = [
+        'name' => $faker->name(),
+        'email' => $faker->unique()->email,
+        'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('password_123'),
+        'role' => UserRole::WORKER->value,
+        'avatar_path' => $avatarsUrlPath . $faker->randomElement($avatarFiles),
         'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/001199?text=temporibus',
-    ],
-    'user1' => [
-        'name' => 'Комаров Георгий Андреевич',
-        'email' => 'ipopov@mail.ru',
-        'password_hash' => '$2y$13$dt4MIxaVTrkXpFWbve5uc.awtu/LptmgR1fk57.a7jzyoOY7vNc/e',
-        'role' => 'worker',
+    ];
+}
+
+for ($i = 0; $i < UserFixture::CUSTOMER_COUNT; $i++) {
+    $data['customer' . $i] = [
+        'name' => $faker->name,
+        'email' => $faker->unique()->email,
+        'password_hash' => Yii::$app->getSecurity()->generatePasswordHash('password_123'),
+        'role' => UserRole::CUSTOMER->value,
+        'avatar_path' => $avatarsUrlPath . $faker->randomElement($avatarFiles),
         'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/004477?text=et',
-    ],
-    'user2' => [
-        'name' => 'Екатерина Владимировна Моисеева',
-        'email' => 'nkuzmin@fedorova.ru',
-        'password_hash' => '$2y$13$O95BlhZrLKVR9STn8sjeo.kd0NjqPkp7YZLLHLqpWr/JUgiq3Uuaq',
-        'role' => 'customer',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/0044ee?text=doloribus',
-    ],
-    'user3' => [
-        'name' => 'Нонна Львовна Осипова',
-        'email' => 'tatana18@narod.ru',
-        'password_hash' => '$2y$13$bbM9SuaqpUEKD7VNcKOYVem8HhJUA05KVMH/g/FbHhGegNvEkNabq',
-        'role' => 'worker',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/005577?text=quisquam',
-    ],
-    'user4' => [
-        'name' => 'Инна Евгеньевна Ширяева',
-        'email' => 'bgureva@koselev.net',
-        'password_hash' => '$2y$13$Dh8xJ4w6MB/ig02CkBto6OKmWNeB27EDmhVjMkzSp3jy/OhyVzBue',
-        'role' => 'customer',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/000066?text=ut',
-    ],
-    'user5' => [
-        'name' => 'Изольда Владимировна Горшкова',
-        'email' => 'veniamin.vinogradova@sorokina.com',
-        'password_hash' => '$2y$13$yKgA8DfW.99NHW3tBEY8H.YCQ7LausKSuIyBRyve7jirrwTVGfO6i',
-        'role' => 'customer',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/00ccbb?text=maiores',
-    ],
-    'user6' => [
-        'name' => 'Любовь Евгеньевна Соловьёва',
-        'email' => 'nelli.gulaev@akovlev.com',
-        'password_hash' => '$2y$13$zPQbmXh514L7oVB83c1sceayUn0rPCzgRZ4RMg0tM.r1PB5/sEdQS',
-        'role' => 'worker',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/003399?text=aut',
-    ],
-    'user7' => [
-        'name' => 'Татьяна Владимировна Яковлева',
-        'email' => 'eva.vladimirova@list.ru',
-        'password_hash' => '$2y$13$cedm8WXDz7b/LXL0RTqovul9uqTp/13eDmvoEPouoZm7NYJcn3Z3K',
-        'role' => 'worker',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/0088cc?text=eos',
-    ],
-    'user8' => [
-        'name' => 'Соколов Фёдор Алексеевич',
-        'email' => 'aleksej06@bk.ru',
-        'password_hash' => '$2y$13$LRMhpnHhO6yFa2ZPC3AxM.CoRxzM/DQtk81Jp13quPMOFumVVJlqG',
-        'role' => 'customer',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/001177?text=quis',
-    ],
-    'user9' => [
-        'name' => 'Щербакова Валерия Ивановна',
-        'email' => 'suvorov.antonin@rambler.ru',
-        'password_hash' => '$2y$13$ts95XB4phcweAitzMh6xsOBxvFj03bwI70KvSD32ToBKxVxqabEi6',
-        'role' => 'customer',
-        'city_id' => $faker->randomElement($cityIds),
-        'avatar_path' => 'https://via.placeholder.com/640x480.png/008855?text=atque',
-    ],
-];
+    ];
+}
+
+return $data;
