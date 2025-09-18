@@ -1,5 +1,18 @@
 <?php
 
+use Xvlvv\Repository\CategoryRepository;
+use Xvlvv\Repository\CategoryRepositoryInterface;
+use Xvlvv\Repository\CityRepository;
+use Xvlvv\Repository\CityRepositoryInterface;
+use Xvlvv\Repository\ReviewRepository;
+use Xvlvv\Repository\ReviewRepositoryInterface;
+use Xvlvv\Repository\TaskRepository;
+use Xvlvv\Repository\TaskRepositoryInterface;
+use Xvlvv\Repository\TaskResponseRepository;
+use Xvlvv\Repository\TaskResponseRepositoryInterface;
+use Xvlvv\Repository\UserRepository;
+use Xvlvv\Repository\UserRepositoryInterface;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -13,9 +26,23 @@ $config = [
     ],
     'container' => [
         'definitions' => [
-            \Xvlvv\Repository\TaskRepositoryInterface::class => \Xvlvv\Repository\TaskRepository::class,
-            \Xvlvv\Repository\CityRepositoryInterface::class => \Xvlvv\Repository\CityRepository::class,
-            \Xvlvv\Repository\CategoryRepositoryInterface::class => \Xvlvv\Repository\CategoryRepository::class,
+            TaskRepositoryInterface::class => function () {
+                $taskResponseRepo = Yii::$container->get(TaskResponseRepositoryInterface::class);
+                $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
+                return new TaskRepository($taskResponseRepo, $reviewRepo);
+            },
+            CityRepositoryInterface::class => CityRepository::class,
+            CategoryRepositoryInterface::class => CategoryRepository::class,
+            TaskResponseRepositoryInterface::class => function () {
+                $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
+                return new TaskResponseRepository($reviewRepo);
+            },
+            ReviewRepositoryInterface::class => ReviewRepository::class,
+            UserRepositoryInterface::class => function () {
+                $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
+                $taskRepo = Yii::$container->get(TaskRepositoryInterface::class);
+                return new UserRepository($reviewRepo, $taskRepo);
+            },
         ],
     ],
     'components' => [
@@ -63,7 +90,12 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => true,
             'rules' => [
+                '' => 'site/index',
+                'tasks' => 'task/index',
+                'tasks/view/<id:\d+>' => 'task/view',
+                'user/view/<id:\d+>' => 'user/view',
             ],
         ],
     ],

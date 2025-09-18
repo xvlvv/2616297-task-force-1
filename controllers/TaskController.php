@@ -64,4 +64,9 @@ class TasksController extends Controller
             ]
         );
     }
+
+    public function actionView(): string
+    {
+        return '1';
+    }
 }
