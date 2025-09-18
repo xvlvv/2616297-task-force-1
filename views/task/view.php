@@ -35,7 +35,11 @@ use yii\helpers\Html;
         <div class="response-card">
             <img class="customer-photo" src="<?= Html::encode($response->avatarPath) ?>" width="146" height="156" alt="Фото заказчиков">
             <div class="feedback-wrapper">
-                <a href="#" class="link link--block link--big"><?= Html::encode($response->workerName) ?></a>
+                <?= Html::a(
+                    Html::encode($response->workerName),
+                    ['user/view', 'id' => $response->id],
+                    ['class' => 'link link--block link--big']
+                ) ?>
                 <div class="response-wrapper">
                     <div class="stars-rating small">
                         <?php

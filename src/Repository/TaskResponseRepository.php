@@ -54,6 +54,7 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
             }
 
             $result[] = new TaskResponseViewDTO(
+                $worker->id,
                 $worker->name,
                 (float) $worker->rating,
                 $worker->reviewsCount,

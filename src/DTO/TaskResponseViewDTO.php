@@ -5,6 +5,7 @@ namespace Xvlvv\DTO;
 class TaskResponseViewDTO
 {
     public function __construct(
+        public int $id,
         public string $workerName,
         public float $rating,
         public int $reviewCount,
