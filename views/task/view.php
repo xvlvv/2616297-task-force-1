@@ -9,11 +9,6 @@ use yii\helpers\Html;
 
 ?>
 <div class="left-column">
-<!--    <pre>-->
-<!--        --><?php //var_dump($task); ?>
-<!--    </pre>-->
-
-
     <div class="head-wrapper">
         <h3 class="head-main"> <?= Html::encode($task->name) ?> </h3>
         <p class="price price--big"><?= Html::encode($task->budget) ?> ₽</p>
