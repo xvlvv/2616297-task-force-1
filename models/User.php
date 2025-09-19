@@ -2,75 +2,31 @@
 
 namespace app\models;
 
+use Xvlvv\Enums\Status;
+use Xvlvv\Enums\UserRole;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\db\Query;
 
-class User extends ActiveRecord implements \yii\web\IdentityInterface
+class User extends ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
+    public float $rating = 0;
+    public int $reviewsCount = 0;
+    public int $failedTasksCount = 0;
     public static function tableName()
     {
         return '{{%user}}';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function findIdentity($id)
+    public function rules()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function findIdentityByAccessToken($token, $type = null)
-    {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['name', 'email', 'password_hash', 'role'], 'required'],
+            [['email'], 'email'],
+            [['email'], 'unique'],
+            [['role'], 'in', 'range' => ['customer', 'worker']],
+        ];
     }
 
     /**
@@ -106,5 +62,78 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public function validatePassword($password)
     {
         return $this->password === $password;
+    }
+
+    public function getWorkerProfile(): ActiveQuery
+    {
+        return $this->hasOne(ExecutorProfile::class, ['user_id' => 'id']);
+    }
+
+    public function getCustomerProfile(): ActiveQuery
+    {
+        return $this->hasOne(CustomerProfile::class, ['user_id' => 'id']);
+    }
+
+    public function getReviews(): ActiveQuery
+    {
+        return $this->hasMany(Review::class, ['worker_id' => 'id']);
+    }
+
+
+    public static function findWithRating(): ActiveQuery
+    {
+        $ratingSumSubQuery = (new Query())
+            ->select('SUM(rating)')
+            ->from(Review::tableName())
+            ->where('worker_id = u.id');
+
+        $reviewsCountSubQuery = (new Query())
+            ->select('COUNT(*)')
+            ->from(Review::tableName())
+            ->where('worker_id = u.id');
+
+        $failedTasksCountSubQuery = (new Query())
+            ->select('COUNT(*)')
+            ->from(Task::tableName())
+            ->where('worker_id = u.id')
+            ->andWhere(['status' => Status::FAILED]);
+
+        $innerQuery = (new Query())
+            ->select([
+                'u.*',
+                'ratingSum' => $ratingSumSubQuery,
+                'reviewsCount' => $reviewsCountSubQuery,
+                'failedTasksCount' => $failedTasksCountSubQuery,
+            ])
+            ->from(['u' => static::tableName()]);
+
+        $query = new ActiveQuery(static::class);
+
+        $query->select([
+            'derived_table.*',
+            'rating' => new Expression(
+                'IF(
+                    (derived_table.reviewsCount + derived_table.failedTasksCount) > 0,
+                    IFNULL(derived_table.ratingSum, 0) / (derived_table.reviewsCount + derived_table.failedTasksCount),
+                    0
+                )'
+            ),
+            'reviewsCount' => 'derived_table.reviewsCount',
+            'failedTasksCount' => 'derived_table.failedTasksCount',
+        ])
+            ->from(['derived_table' => $innerQuery]);
+
+        return $query;
+    }
+
+    public function getUserSpecializations(): ActiveQuery
+    {
+        return $this->hasMany(UserSpecialization::class, ['user_id' => 'id']);
+    }
+
+    public function getSpecializationCategories(): ActiveQuery
+    {
+        return $this->hasMany(Category::class, ['id' => 'category_id'])
+            ->via('userSpecializations');
     }
 }

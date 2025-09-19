@@ -5,6 +5,8 @@ namespace Xvlvv\Repository;
 use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\SaveTaskDTO;
 use Xvlvv\DTO\ViewNewTasksDTO;
+use Xvlvv\DTO\ViewTaskDTO;
+use Xvlvv\DTO\WorkerActiveTaskDTO;
 use Xvlvv\Entity\Task;
 
 interface TaskRepositoryInterface
@@ -17,6 +19,8 @@ interface TaskRepositoryInterface
     public function getWorkerByIdOrFail(int $taskId): int;
     public function getByIdOrFail(int $taskId): Task;
     public function getNewTasks(GetNewTasksDTO $dto): ViewNewTasksDTO;
-
     public function getFilteredTasksQueryCount(GetNewTasksDTO $dto): int;
+    public function getTaskForView(int $id): ViewTaskDTO;
+    public function workerHasActiveTask(int $id): bool;
+    public function getCompletedTasksCountByWorkerId(int $workerId): int;
 }

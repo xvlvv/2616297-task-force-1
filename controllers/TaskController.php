@@ -13,7 +13,7 @@ use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
-class TasksController extends Controller
+class TaskController extends Controller
 {
     public function actionIndex(TaskRepositoryInterface $taskRepository): string
     {
@@ -24,8 +24,6 @@ class TasksController extends Controller
 
         $count = $taskRepository->getFilteredTasksQueryCount(
             new GetNewTasksDTO(
-                0,
-                0,
                 $model->categories,
                 $model->checkWorker,
                 $model->createdAt
@@ -39,11 +37,11 @@ class TasksController extends Controller
         ]);
 
         $getNewTasksDTO = new GetNewTasksDTO(
-            $pagination->getOffset(),
-            $pageSize,
             $model->categories,
             $model->checkWorker,
-            $model->createdAt
+            $model->createdAt,
+            $pagination->getOffset(),
+            $pageSize,
         );
 
         $dto = $taskRepository->getNewTasks($getNewTasksDTO);
@@ -61,6 +59,18 @@ class TasksController extends Controller
                 'model' => $model,
                 'categories' => $categories,
                 'pagination' => $pagination,
+            ]
+        );
+    }
+
+    public function actionView(int $id, TaskRepositoryInterface $taskRepository): string
+    {
+        $task = $taskRepository->getTaskForView($id);
+
+        return $this->render(
+            'view',
+            [
+                'task' => $task,
             ]
         );
     }

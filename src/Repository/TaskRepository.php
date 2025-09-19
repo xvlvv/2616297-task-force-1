@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Repository;
 
 use app\models\TaskResponse;
+use app\models\User;
 use DateTime;
 use http\Exception\InvalidArgumentException;
 use http\Exception\RuntimeException;
@@ -12,10 +13,13 @@ use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\RenderTaskDTO;
 use Xvlvv\DTO\SaveTaskDTO;
 use Xvlvv\DTO\ViewNewTasksDTO;
+use Xvlvv\DTO\ViewTaskDTO;
+use Xvlvv\DTO\WorkerActiveTaskDTO;
 use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task;
 use \app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
+use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\db\Query;
@@ -23,6 +27,11 @@ use yii\web\NotFoundHttpException;
 
 class TaskRepository implements TaskRepositoryInterface
 {
+    public function __construct(
+        private TaskResponseRepositoryInterface $taskResponseRepo,
+    ) {
+    }
+
     public function save(SaveTaskDTO $taskDTO): ?int
     {
         $task = new TaskModel();
@@ -206,6 +215,38 @@ class TaskRepository implements TaskRepositoryInterface
     {
         return $this
             ->getFilteredTasksQuery($dto)
+            ->count();
+    }
+
+    public function getTaskForView(int $id): ViewTaskDTO
+    {
+        $task = $this->getModelByIdOrFail($id);
+        $responses = $this->taskResponseRepo->findByTaskId($task->id);
+        $status = Status::from($task->status) === Status::NEW ? 'Открыт для новых заказов' : 'Занят';
+
+        return new ViewTaskDTO(
+            $task->name,
+            $task->budget,
+            $task->description,
+            $task->category->name,
+            $task->created_at,
+            $task->end_date,
+            $status,
+            $responses
+        );
+    }
+
+    public function workerHasActiveTask(int $id): bool
+    {
+        $task = TaskModel::find()->where(['worker_id' => $id, 'status' => Status::IN_PROGRESS])->one();
+
+        return null === $task;
+    }
+
+    public function getCompletedTasksCountByWorkerId(int $workerId): int
+    {
+        return (int) TaskModel::find()
+            ->where(['worker_id' => $workerId, 'status' => Status::COMPLETED])
             ->count();
     }
 }
