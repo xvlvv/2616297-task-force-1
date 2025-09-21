@@ -3,41 +3,35 @@
 declare(strict_types=1);
 
 /**
- * @var ViewUserDTO $dto Данные о пользователе
+ * @var ViewUserDTO $user Данные о пользователе
  */
 
+use app\widgets\RatingWidget;
 use Xvlvv\DTO\ViewUserDTO;
 use yii\helpers\Html;
 
 ?>
 
 <div class="left-column">
-    <h3 class="head-main"><?= Html::encode($dto->name) ?></h3>
+    <h3 class="head-main"><?= Html::encode($user->name) ?></h3>
     <div class="user-card">
         <div class="photo-rate">
-            <img class="card-photo" src="<?= Html::encode($dto->avatarPath) ?>" width="191" height="190" alt="Фото пользователя">
+            <img class="card-photo" src="<?= Html::encode($user->avatarPath) ?>" width="191" height="190" alt="Фото пользователя">
             <div class="card-rate">
-                <div class="stars-rating big">
-                    <?php
-                    $maxRating = 5;
-                    $rating = (int) round($dto->rating);
-                    for ($i = 1; $i <= $maxRating; $i++): ?>
-                        <span <?= $rating >= $i ? 'class="fill-star"' : '' ?>>&nbsp;</span>
-                    <?php endfor ?>
-                </div>
-                <span class="current-rate"><?= Html::encode($dto->rating) ?></span>
+                <?= RatingWidget::widget(['rating' => $user->rating, 'wrapperClass' => 'big']) ?>
+                <span class="current-rate"><?= Html::encode($user->rating) ?></span>
             </div>
         </div>
         <p class="user-description">
-            <?= Html::encode($dto->description) ?>
+            <?= Html::encode($user->description) ?>
         </p>
     </div>
     <div class="specialization-bio">
         <div class="specialization">
             <p class="head-info">Специализации</p>
-            <?php if (!empty($dto->specializations)): ?>
+            <?php if (!empty($user->specializations)): ?>
             <ul class="special-list">
-                <?php foreach ($dto->specializations as $specialization): ?>
+                <?php foreach ($user->specializations as $specialization): ?>
                 <li class="special-item">
                     <a href="#" class="link link--regular"><?= Html::encode($specialization->name) ?></a>
                 </li>
@@ -48,12 +42,12 @@ use yii\helpers\Html;
         <div class="bio">
             <p class="head-info">Био</p>
             <p class="bio-info">
-                <?= Html::encode($dto->bio) ?>
+                <?= Html::encode($user->bio) ?>
         </div>
     </div>
-    <?php if (!empty($dto->reviews)): ?>
+    <?php if (!empty($user->reviews)): ?>
     <h4 class="head-regular">Отзывы заказчиков</h4>
-        <?php foreach ($dto->reviews as $review): ?>
+        <?php foreach ($user->reviews as $review): ?>
         <div class="response-card">
             <img class="customer-photo" src="<?= Html::encode($review->avatarPath) ?>" width="120" height="127" alt="Фото заказчиков">
             <div class="feedback-wrapper">
@@ -62,14 +56,8 @@ use yii\helpers\Html;
             </div>
             <div class="feedback-wrapper">
 
-                <div class="stars-rating small">
-                    <?php
-                    $maxRating = 5;
-                    for ($i = 1; $i <= $maxRating; $i++): ?>
-                    <span <?= $review->rating >= $i ? 'class="fill-star"' : '' ?>>&nbsp;</span>
-                    <?php endfor ?>
+                <?= RatingWidget::widget(['rating' => $review->rating, 'wrapperClass' => 'small']) ?>
 
-                </div>
                 <p class="info-text">
                     <?= Yii::$app->formatter->asRelativeTime($review->createdAt) ?>
                 </p>
@@ -83,27 +71,27 @@ use yii\helpers\Html;
         <h4 class="head-card">Статистика исполнителя</h4>
         <dl class="black-list">
             <dt>Всего заказов</dt>
-            <dd><?= Html::encode($dto->completedTasks) ?> выполнено, <?= Html::encode($dto->failedTasks) ?> провалено</dd>
+            <dd><?= Html::encode($user->completedTasks) ?> выполнено, <?= Html::encode($user->failedTasks) ?> провалено</dd>
             <dt>Место в рейтинге</dt>
-            <dd><?= Html::encode($dto->ratingPlacement) ?> место</dd>
+            <dd><?= Html::encode($user->ratingPlacement) ?> место</dd>
             <dt>Дата регистрации</dt>
-            <dd><?= Yii::$app->formatter->asRelativeTime($dto->createdAt) ?></dd>
+            <dd><?= Yii::$app->formatter->asRelativeTime($user->createdAt) ?></dd>
             <dt>Статус</dt>
             <dd>Открыт для новых заказов</dd>
         </dl>
     </div>
-    <?php if (true === $dto->showContacts): ?>
+    <?php if (true === $user->showContacts): ?>
     <div class="right-card white">
         <h4 class="head-card">Контакты</h4>
         <ul class="enumeration-list">
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--phone"><?= Html::encode($dto->phoneNumber) ?></a>
+                <a href="#" class="link link--block link--phone"><?= Html::encode($user->phoneNumber) ?></a>
             </li>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--email"><?= Html::encode($dto->email) ?></a>
+                <a href="#" class="link link--block link--email"><?= Html::encode($user->email) ?></a>
             </li>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--tg">@<?= Html::encode($dto->telegramUsername) ?></a>
+                <a href="#" class="link link--block link--tg">@<?= Html::encode($user->telegramUsername) ?></a>
             </li>
         </ul>
     </div>

@@ -11,8 +11,8 @@ class UserController extends Controller
 {
     public function actionView(int $id, UserRepositoryInterface $userRepository): string
     {
-        $dto = $userRepository->getWorkerForView($id);
+        $user = $userRepository->getWorkerForView($id);
 
-        return $this->render('view', compact('dto'));
+        return $this->render('view', compact('user'));
     }
 }
