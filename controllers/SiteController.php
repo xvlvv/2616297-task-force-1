@@ -2,9 +2,15 @@
 
 namespace app\controllers;
 
+use app\models\City;
+use app\models\RegistrationForm;
+use app\models\User;
+use Xvlvv\DTO\RegisterUserDTO;
+use Xvlvv\Services\Application\AuthService;
 use Yii;
 use yii\db\Connection;
 use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
@@ -60,9 +66,38 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
+        $this->layout = 'index';
         return $this->render('index');
+    }
+
+    public function actionRegister(AuthService $authService): string|Response
+    {
+        $formModel = new RegistrationForm();
+        $formModel->load(Yii::$app->request->post());
+
+        if (Yii::$app->request->isPost && $formModel->validate()) {
+            $registerDTO = new RegisterUserDTO(
+                $formModel->name,
+                $formModel->email,
+                $formModel->cityId,
+                $formModel->password,
+                $formModel->isWorker,
+            );
+
+            $authService->register($registerDTO);
+
+            return $this->redirect(['site/index']);
+        }
+
+        $cities = ArrayHelper::map(
+            City::find()->select(['id', 'name'])->asArray()->all(),
+            'id',
+            'name'
+        );
+
+        return $this->render('register', compact('formModel', 'cities'));
     }
 
     /**

@@ -11,6 +11,7 @@ use Xvlvv\Exception\PermissionDeniedException;
 use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Repository\CityRepositoryInterface;
 use Xvlvv\Repository\UserRepositoryInterface;
+use Yii;
 
 final readonly class AuthService
 {
@@ -51,7 +52,7 @@ final readonly class AuthService
         };
 
         $profile = $profileFactory->createFromDTO($profileDTO);
-        $passwordHash = password_hash($dto->password, PASSWORD_DEFAULT);
+        $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($dto->password);
 
         $user = new User(
             $dto->name,

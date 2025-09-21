@@ -12,6 +12,7 @@ use Xvlvv\Repository\TaskResponseRepository;
 use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Repository\UserRepository;
 use Xvlvv\Repository\UserRepositoryInterface;
+use Xvlvv\Services\Application\AuthService;
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
@@ -43,6 +44,7 @@ $config = [
                 $taskRepo = Yii::$container->get(TaskRepositoryInterface::class);
                 return new UserRepository($reviewRepo, $taskRepo);
             },
+            AuthService::class => AuthService::class,
         ],
     ],
     'components' => [
@@ -96,6 +98,7 @@ $config = [
                 'tasks' => 'task/index',
                 'tasks/view/<id:\d+>' => 'task/view',
                 'user/view/<id:\d+>' => 'user/view',
+                'register' => 'site/register',
             ],
         ],
     ],

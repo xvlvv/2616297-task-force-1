@@ -27,9 +27,17 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
 <header class="page-header">
     <nav class="main-nav">
-        <a href='#' class="header-logo">
-            <img class="logo-image" src="/img/logotype.png" width=227 height=60 alt="taskforce">
-        </a>
+        <?php
+        $logoImage = Html::img(['/img/logotype.png'], [
+            'class' => 'logo-image',
+            'width' => 227,
+            'height' => 60,
+            'alt' => 'taskforce'
+        ]);
+
+        echo Html::a($logoImage, ['/site/index'], ['class' => 'header-logo']);
+        ?>
+        <?php if (!Yii::$app->user->isGuest): ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item list-item--active">
@@ -46,7 +54,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 </li>
             </ul>
         </div>
+        <?php endif ?>
     </nav>
+    <?php if (!Yii::$app->user->isGuest): ?>
     <div class="user-block">
         <a href="#">
             <img class="user-photo" src="/img/man-glasses.png" width="55" height="55" alt="Аватар">
@@ -68,6 +78,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             </div>
         </div>
     </div>
+    <?php endif ?>
 </header>
 
 <main class="main-content container">

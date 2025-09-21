@@ -4,6 +4,7 @@ namespace Xvlvv\Domain\User\Role;
 
 use Xvlvv\Entity\UserRoleInterface;
 use Xvlvv\Entity\UserProfileInterface;
+use Xvlvv\Enums\UserRole;
 
 final class Customer implements UserRoleInterface
 {
@@ -25,5 +26,10 @@ final class Customer implements UserRoleInterface
     public function increaseFailedTasksCount(UserProfileInterface $profile): void
     {
         throw new \DomainException('Customer cannot have tasks.');
+    }
+
+    public function getRole(): string
+    {
+        return UserRole::CUSTOMER->value;
     }
 }

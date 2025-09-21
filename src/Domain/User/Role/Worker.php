@@ -5,6 +5,7 @@ namespace Xvlvv\Domain\User\Role;
 use Xvlvv\Entity\UserProfileInterface;
 use Xvlvv\Entity\UserRoleInterface;
 use Xvlvv\Entity\WorkerProfile;
+use Xvlvv\Enums\UserRole;
 
 class Worker implements UserRoleInterface
 {
@@ -34,5 +35,10 @@ class Worker implements UserRoleInterface
         }
 
         $profile->incrementFailedTasksCount();
+    }
+
+    public function getRole(): string
+    {
+        return UserRole::WORKER->value;
     }
 }

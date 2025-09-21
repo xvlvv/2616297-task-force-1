@@ -4,6 +4,7 @@ namespace Xvlvv\Entity;
 
 interface UserRoleInterface
 {
+    public function getRole(): string;
     public function canApplyToTask(): bool;
     public function canCreateTask(): bool;
     public function getFailedTasksCount(UserProfileInterface $profile): int;

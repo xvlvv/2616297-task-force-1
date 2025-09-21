@@ -2,7 +2,7 @@
 
 namespace Xvlvv\Entity;
 
-use Xvlvv\Entity\UserRoleInterface;
+use LogicException;
 
 class User
 {
@@ -18,9 +18,29 @@ class User
     ) {
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPasswordHash(): string
+    {
+        return $this->password_hash;
+    }
+
+    public function getUserRole(): string
+    {
+        return $this->userRole->getRole();
     }
 
     public function isValidPassword(string $password): bool
@@ -31,6 +51,20 @@ class User
     public function increaseFailedTasksCount(): void
     {
         $this->userRole->increaseFailedTasksCount($this->profile);
+    }
+
+    public function getCity(): City
+    {
+        return $this->city;
+    }
+
+    public function setId(int $id): void
+    {
+        if (null !== $this->getId()) {
+            throw new LogicException('Нельзя обновить уже существующий идентификатор');
+        }
+
+        $this->id = $id;
     }
 
     public function getFailedTasksCount(): int

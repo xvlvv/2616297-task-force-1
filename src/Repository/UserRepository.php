@@ -3,13 +3,14 @@
 namespace Xvlvv\Repository;
 
 use app\models\Review;
+use http\Exception\RuntimeException;
 use LogicException;
+use Throwable;
 use Xvlvv\DTO\UserReviewViewDTO;
 use Xvlvv\DTO\UserSpecializationDTO;
 use Xvlvv\DTO\ViewUserDTO;
 use Xvlvv\Entity\User;
 use \app\models\User as UserModel;
-use Xvlvv\Enums\Status;
 use Xvlvv\Enums\UserRole;
 use yii\db\Expression;
 use yii\db\Query;
@@ -41,17 +42,46 @@ class UserRepository implements UserRepositoryInterface
 
     public function update(User $user): void
     {
-        // TODO: Implement update() method.
+        if (null === $user->getId()) {
+            throw new LogicException('Нельзя обновить несуществующего пользователя');
+        }
+
+        $this->save($user);
     }
 
     public function save(User $user): User
     {
-        // TODO: Implement save() method.
+        $userModel = $this->toActiveRecord($user);
+
+        try {
+            $userModel->save();
+        } catch (Throwable $e) {
+            throw new RuntimeException('Ошибка при сохранении');
+        }
+
+        $user->setId($userModel->id);
+        return $user;
     }
 
     public function isUserExistsByEmail(string $email): bool
     {
-        // TODO: Implement isUserExistsByEmail() method.
+        return UserModel::find()->where(['email' => $email])->exists();
+    }
+
+    private function toActiveRecord(User $user): UserModel
+    {
+        if (null !== $user->getId()) {
+            return UserModel::findOne($user->getId());
+        }
+
+        $userModel = new UserModel();
+        $userModel->name = $user->getName();
+        $userModel->email = $user->getEmail();
+        $userModel->password_hash = $user->getPasswordHash();
+        $userModel->role = $user->getUserRole();
+        $userModel->city_id = $user->getCity()->getId();
+
+        return $userModel;
     }
 
     public function getUserRank(int $userId): int
