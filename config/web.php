@@ -14,6 +14,10 @@ use Xvlvv\Repository\UserRepository;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Xvlvv\Services\Application\AuthService;
 
+/**
+ * @var array $params
+ * @var array $db
+ */
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 

@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace app\widgets;
 
 use yii\base\Widget;
-use yii\helpers\Html;
 
 class RatingWidget extends Widget
 {

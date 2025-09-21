@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Enums;
 
+/**
+ * Перечисление статусов задачи
+ */
 enum Status: string
 {
     case NEW = 'new';
@@ -11,7 +16,7 @@ enum Status: string
     case FAILED = 'failed';
 
     /**
-     * Возвращает перевод статуса на русском
+     * Возвращает название статуса на русском
      *
      * @return string
      */

@@ -2,6 +2,10 @@
 
 use yii\db\Migration;
 
+/**
+ * Class m250830_141441_create_initial_schema
+ * Создает начальную структуру таблиц базы данных для проекта.
+ */
 class m250830_141441_create_initial_schema extends Migration
 {
     /**

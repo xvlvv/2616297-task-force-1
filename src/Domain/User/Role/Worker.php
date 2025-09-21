@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Domain\User\Role;
 
 use Xvlvv\Entity\UserProfileInterface;
@@ -9,16 +11,31 @@ use Xvlvv\Enums\UserRole;
 
 class Worker implements UserRoleInterface
 {
+    /**
+     * {@inheritDoc}
+     *
+     * @return bool
+     */
     public function canApplyToTask(): bool
     {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return bool
+     */
     public function canCreateTask(): bool
     {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return int
+     */
     public function getFailedTasksCount(UserProfileInterface $profile): int
     {
         if (!$profile instanceof WorkerProfile) {
@@ -28,6 +45,11 @@ class Worker implements UserRoleInterface
         return $profile->getFailedTasksCount();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return void
+     */
     public function increaseFailedTasksCount(UserProfileInterface $profile): void
     {
         if (!$profile instanceof WorkerProfile) {
@@ -37,6 +59,11 @@ class Worker implements UserRoleInterface
         $profile->incrementFailedTasksCount();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function getRole(): string
     {
         return UserRole::WORKER->value;

@@ -1,9 +1,26 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\DTO;
 
+/**
+ * DTO для создания нового задания
+ */
 readonly final class CreateTaskDTO
 {
+    /**
+     * @param string $name Название задания
+     * @param string $description Описание задания
+     * @param int $categoryId ID категории
+     * @param int $customerId ID заказчика
+     * @param \DateTimeImmutable|null $endDate Срок выполнения
+     * @param string|null $latitude Широта местоположения
+     * @param string|null $longitude Долгота местоположения
+     * @param int|null $budget Бюджет
+     * @param int|null $cityId ID города
+     * @param array $fileIds Массив ID прикрепленных файлов
+     */
     public function __construct(
         public string $name,
         public string $description,

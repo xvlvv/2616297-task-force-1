@@ -4,6 +4,10 @@ namespace app\assets;
 
 use yii\web\AssetBundle;
 
+/**
+ * Asset bundle для главной (лендинг) страницы.
+ * Регистрирует стили и скрипты, специфичные для лендинга.
+ */
 class LandingAsset extends AssetBundle
 {
     public $basePath = '@webroot';

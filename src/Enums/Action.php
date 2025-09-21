@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Enums;
 
 use Xvlvv\Domain\Task\ApplyAction;
@@ -10,7 +12,7 @@ use Xvlvv\Domain\Task\StartAction;
 use \Xvlvv\Domain\Task\Action as TaskAction;
 
 /**
- *
+ * Перечисление возможных действий над задачей
  */
 enum Action: string
 {
@@ -21,7 +23,7 @@ enum Action: string
     case FAIL = FailAction::class;
 
     /**
-     * Возвращает перевод действия на русском
+     * Возвращает название действия на русском языке
      *
      * @return string
      */
@@ -36,12 +38,22 @@ enum Action: string
         };
     }
 
+    /**
+     * Создает и возвращает объект-действие, соответствующий значению enum
+     *
+     * @return TaskAction
+     */
     public function getActionObject(): TaskAction
     {
         $className = $this->value;
         return new $className($this->getName(), $this->getInternalName());
     }
 
+    /**
+     * Возвращает внутреннее системное имя действия
+     *
+     * @return string
+     */
     private function getInternalName(): string
     {
         return match($this->value) {

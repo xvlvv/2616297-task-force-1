@@ -1,21 +1,36 @@
 <?php
 
-namespace Xvlvv\Domain\Task;
+declare(strict_types = 1);
 
-use Xvlvv\Exception\PermissionDeniedException;
+namespace Xvlvv\Domain\Task;
 
 class FailAction extends Action
 {
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return string
+     */
     public function getInternalName(): string
     {
         return $this->internalName;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return bool
+     */
     public function canMakeAction(int $userId, int $authorId, ?int $workerId = null): bool
     {
         return $userId !== $authorId && $userId === $workerId;

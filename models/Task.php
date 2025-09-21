@@ -2,7 +2,9 @@
 
 namespace app\models;
 
-use Yii;
+use yii\base\InvalidConfigException;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%task}}".
@@ -31,14 +33,12 @@ use Yii;
  * @property TaskResponse[] $taskResponses
  * @property User $worker
  */
-class Task extends \yii\db\ActiveRecord
+class Task extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%task}}';
     }
@@ -46,7 +46,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['worker_id', 'city_id', 'budget', 'latitude', 'longitude', 'end_date'], 'default', 'value' => null],
@@ -68,7 +68,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -91,9 +91,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCategory()
+    public function getCategory(): ActiveQuery
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
@@ -101,9 +101,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCity()
+    public function getCity(): ActiveQuery
     {
         return $this->hasOne(City::class, ['id' => 'city_id']);
     }
@@ -111,9 +111,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Customer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'customer_id']);
     }
@@ -121,9 +121,10 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Files]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
+     * @throws InvalidConfigException
      */
-    public function getFiles()
+    public function getFiles(): ActiveQuery
     {
         return $this->hasMany(File::class, ['id' => 'file_id'])->viaTable('{{%task_file}}', ['task_id' => 'id']);
     }
@@ -131,9 +132,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Review]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getReview()
+    public function getReview(): ActiveQuery
     {
         return $this->hasOne(Review::class, ['task_id' => 'id']);
     }
@@ -141,9 +142,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[TaskFiles]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTaskFiles()
+    public function getTaskFiles(): ActiveQuery
     {
         return $this->hasMany(TaskFile::class, ['task_id' => 'id']);
     }
@@ -151,9 +152,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[TaskResponses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTaskResponses()
+    public function getTaskResponses(): ActiveQuery
     {
         return $this->hasMany(TaskResponse::class, ['task_id' => 'id']);
     }
@@ -161,9 +162,9 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Worker]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getWorker()
+    public function getWorker(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }

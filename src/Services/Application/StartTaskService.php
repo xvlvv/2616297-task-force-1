@@ -1,18 +1,33 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Services\Application;
 
 use Xvlvv\DTO\StartTaskDTO;
 use Xvlvv\Exception\PermissionDeniedException;
 use Xvlvv\Repository\TaskRepositoryInterface;
 
+/**
+ * Сервис для назначения исполнителя и старта задачи
+ */
 final class StartTaskService
 {
+    /**
+     * @param TaskRepositoryInterface $taskRepository
+     */
     public function __construct(
         private TaskRepositoryInterface $taskRepository,
     ) {
     }
 
+    /**
+     * Назначает исполнителя и запускает задачу
+     *
+     * @param StartTaskDTO $dto
+     * @return bool
+     * @throws PermissionDeniedException если пользователь не является автором задачи
+     */
     public function handle(StartTaskDTO $dto): bool
     {
         if (!$this->taskRepository->isAuthor($dto->taskId, $dto->customerId)) {

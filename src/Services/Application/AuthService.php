@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Services\Application;
 
 use Xvlvv\DTO\CustomerProfileDTO;
@@ -12,15 +14,32 @@ use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Repository\CityRepositoryInterface;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Yii;
+use yii\base\Exception;
+use yii\web\NotFoundHttpException;
 
+/**
+ * Сервис для аутентификации и регистрации пользователей
+ */
 final readonly class AuthService
 {
+    /**
+     * @param UserRepositoryInterface $userRepository
+     * @param CityRepositoryInterface $cityRepository
+     */
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private CityRepositoryInterface $cityRepository,
     ) {
     }
 
+    /**
+     * Проверяет учетные данные пользователя
+     *
+     * @param string $email
+     * @param string $password
+     * @return bool
+     * @throws PermissionDeniedException если пароль неверный
+     */
     public function authenticate(string $email, string $password): bool
     {
         $user = $this->userRepository->getByEmailOrFail($email);
@@ -32,6 +51,14 @@ final readonly class AuthService
         return true;
     }
 
+    /**
+     * Регистрирует нового пользователя в системе
+     *
+     * @param RegisterUserDTO $dto DTO с данными для регистрации
+     * @return int ID нового пользователя
+     * @throws UserWithEmailAlreadyExistsException если email уже занят
+     * @throws NotFoundHttpException|Exception если город не найден
+     */
     public function register(RegisterUserDTO $dto): int
     {
         if ($this->userRepository->isUserExistsByEmail($dto->email)) {

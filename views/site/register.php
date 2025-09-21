@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * @var User $formModel Форма регистрации
  * @var array $cities Список городов

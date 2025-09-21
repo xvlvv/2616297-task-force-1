@@ -6,6 +6,7 @@ use app\models\City;
 use app\models\RegistrationForm;
 use app\models\User;
 use Xvlvv\DTO\RegisterUserDTO;
+use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Services\Application\AuthService;
 use Yii;
 use yii\db\Connection;
@@ -17,6 +18,9 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
+/**
+ * Контроллер для обработки основных страниц сайта, таких как главная и регистрация.
+ */
 class SiteController extends Controller
 {
     /**
@@ -72,6 +76,15 @@ class SiteController extends Controller
         return $this->render('index');
     }
 
+    /**
+     * Обрабатывает регистрацию нового пользователя.
+     * При GET-запросе отображает форму, при POST - обрабатывает данные.
+     *
+     * @param AuthService $authService Сервис для регистрации пользователей (внедряется DI-контейнером).
+     * @return string|Response Рендер страницы или редирект на главную в случае успеха.
+     * @throws UserWithEmailAlreadyExistsException Если пользователь с таким email уже существует.
+     * @throws \yii\web\NotFoundHttpException Если указанный город не найден.
+     */
     public function actionRegister(AuthService $authService): string|Response
     {
         $formModel = new RegistrationForm();

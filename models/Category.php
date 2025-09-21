@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%category}}".
@@ -17,14 +19,14 @@ use Yii;
  * @property UserSpecialization[] $userSpecializations
  * @property User[] $users
  */
-class Category extends \yii\db\ActiveRecord
+class Category extends ActiveRecord
 {
 
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%category}}';
     }
@@ -32,7 +34,7 @@ class Category extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['icon'], 'default', 'value' => null],
@@ -46,7 +48,7 @@ class Category extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -60,9 +62,9 @@ class Category extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTasks()
+    public function getTasks(): ActiveQuery
     {
         return $this->hasMany(Task::class, ['category_id' => 'id']);
     }
@@ -70,9 +72,9 @@ class Category extends \yii\db\ActiveRecord
     /**
      * Gets query for [[UserSpecializations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getUserSpecializations()
+    public function getUserSpecializations(): ActiveQuery
     {
         return $this->hasMany(UserSpecialization::class, ['category_id' => 'id']);
     }

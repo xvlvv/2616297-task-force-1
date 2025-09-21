@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%customer_profile}}".
@@ -13,14 +15,14 @@ use Yii;
  *
  * @property User $user
  */
-class CustomerProfile extends \yii\db\ActiveRecord
+class CustomerProfile extends ActiveRecord
 {
 
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%customer_profile}}';
     }
@@ -28,7 +30,7 @@ class CustomerProfile extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['created_at', 'updated_at'], 'safe'],
@@ -39,7 +41,7 @@ class CustomerProfile extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'user_id' => 'ID пользователя',
@@ -51,9 +53,9 @@ class CustomerProfile extends \yii\db\ActiveRecord
     /**
      * Gets query for [[User]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }

@@ -2,7 +2,8 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%task_response}}".
@@ -19,14 +20,12 @@ use Yii;
  * @property Task $task
  * @property User $worker
  */
-class TaskResponse extends \yii\db\ActiveRecord
+class TaskResponse extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%task_response}}';
     }
@@ -34,7 +33,7 @@ class TaskResponse extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['comment', 'price'], 'default', 'value' => null],
@@ -51,7 +50,7 @@ class TaskResponse extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -68,9 +67,9 @@ class TaskResponse extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Task]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
@@ -78,9 +77,9 @@ class TaskResponse extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Worker]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getWorker()
+    public function getWorker(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }

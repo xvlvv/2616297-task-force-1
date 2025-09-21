@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Services\Application;
 
 use Xvlvv\Domain\ValueObject\Coordinates;
@@ -10,9 +12,19 @@ use Xvlvv\Repository\CategoryRepositoryInterface;
 use Xvlvv\Repository\CityRepositoryInterface;
 use Xvlvv\Repository\TaskRepositoryInterface;
 use Xvlvv\Repository\UserRepositoryInterface;
+use yii\web\NotFoundHttpException;
 
+/**
+ * Сервис для публикации новой задачи
+ */
 final class PublishTaskService
 {
+    /**
+     * @param CityRepositoryInterface $cityRepository
+     * @param TaskRepositoryInterface $taskRepository
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param UserRepositoryInterface $userRepository
+     */
     public function __construct(
         private readonly CityRepositoryInterface $cityRepository,
         private readonly TaskRepositoryInterface $taskRepository,
@@ -21,6 +33,14 @@ final class PublishTaskService
     ) {
     }
 
+    /**
+     * Публикует новую задачу
+     *
+     * @param CreateTaskDTO $task DTO с данными для создания задачи
+     * @return int|null ID созданной задачи или null в случае ошибки
+     * @throws PermissionDeniedException если у пользователя нет прав на создание задач
+     * @throws NotFoundHttpException если категория или пользователь не найдены
+     */
     public function publish(CreateTaskDTO $task): ?int
     {
         $city = $this->cityRepository->getById($task->cityId);
