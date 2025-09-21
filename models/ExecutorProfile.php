@@ -2,7 +2,8 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%executor_profile}}".
@@ -19,14 +20,12 @@ use Yii;
  *
  * @property User $user
  */
-class ExecutorProfile extends \yii\db\ActiveRecord
+class ExecutorProfile extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%executor_profile}}';
     }
@@ -34,7 +33,7 @@ class ExecutorProfile extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['day_of_birth', 'bio', 'phone_number', 'telegram_username'], 'default', 'value' => null],
@@ -51,7 +50,7 @@ class ExecutorProfile extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'user_id' => 'ID пользователя',
@@ -68,9 +67,9 @@ class ExecutorProfile extends \yii\db\ActiveRecord
     /**
      * Gets query for [[User]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }

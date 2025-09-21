@@ -3,7 +3,6 @@
 namespace app\models;
 
 use Xvlvv\Enums\Status;
-use Xvlvv\Enums\UserRole;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -14,12 +13,12 @@ class User extends ActiveRecord
     public float $rating = 0;
     public int $reviewsCount = 0;
     public int $failedTasksCount = 0;
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%user}}';
     }
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'email', 'password_hash', 'role'], 'required'],
@@ -29,25 +28,16 @@ class User extends ActiveRecord
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthKey()
     {
         return $this->authKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function validateAuthKey($authKey)
     {
         return $this->authKey === $authKey;

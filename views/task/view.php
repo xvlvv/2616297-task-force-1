@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types = 1);
+
 /**
  * @var ViewTaskDTO $task Данные задания
  */
 
+use app\widgets\RatingWidget;
 use Xvlvv\DTO\ViewTaskDTO;
 use yii\helpers\Html;
 
@@ -36,14 +39,7 @@ use yii\helpers\Html;
                     ['class' => 'link link--block link--big']
                 ) ?>
                 <div class="response-wrapper">
-                    <div class="stars-rating small">
-                        <?php
-                        $maxRating = 5;
-                        $rating = (int) round($response->rating);
-                        for ($i = 1; $i <= $maxRating; $i++): ?>
-                        <span <?= $rating >= $i ? 'class="fill-star"' : '' ?>>&nbsp;
-                        <?php endfor ?>
-                    </div>
+                    <?= RatingWidget::widget(['rating' => $response->rating, 'wrapperClass' => 'small']) ?>
                     <p class="reviews">
                         <?= Yii::t(
                             'app',

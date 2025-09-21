@@ -2,9 +2,8 @@
 
 namespace app\models;
 
-use Xvlvv\Enums\Status;
-use Yii;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%review}}".
@@ -22,13 +21,13 @@ use yii\db\ActiveQuery;
  * @property Task $task
  * @property User $worker
  */
-class Review extends \yii\db\ActiveRecord
+class Review extends ActiveRecord
 {
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%review}}';
     }
@@ -36,7 +35,7 @@ class Review extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['task_id', 'customer_id', 'worker_id', 'comment', 'rating'], 'required'],
@@ -54,7 +53,7 @@ class Review extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -73,7 +72,7 @@ class Review extends \yii\db\ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'customer_id']);
     }
@@ -83,7 +82,7 @@ class Review extends \yii\db\ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
@@ -93,7 +92,7 @@ class Review extends \yii\db\ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getWorker()
+    public function getWorker(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'worker_id']);
     }

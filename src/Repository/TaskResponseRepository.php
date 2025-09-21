@@ -1,20 +1,31 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Repository;
 
 use app\models\User;
 use Xvlvv\DTO\TaskResponseViewDTO;
 use Xvlvv\Entity\TaskResponse;
-use \app\models\TaskResponse as Model;
+use app\models\TaskResponse as Model;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Репозиторий для работы с откликами на задачи
+ */
 class TaskResponseRepository implements TaskResponseRepositoryInterface
 {
+    /**
+     * @param ReviewRepositoryInterface $reviewRepo
+     */
     public function __construct(
         private ReviewRepositoryInterface $reviewRepo,
     ) {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function save(TaskResponse $taskResponse): bool
     {
         $taskResponseModel = new Model();
@@ -25,9 +36,14 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
         $taskResponseModel->is_rejected = $taskResponse->isRejected();
 
         $taskResponseModel->save();
-        return $taskResponseModel->id;
+        return true;
     }
 
+    /**
+     * Находит и формирует DTO откликов для страницы просмотра задачи
+     * @param int $id ID задачи
+     * @return array
+     */
     public function findByTaskId(int $id): array
     {
         $responses = Model::find()

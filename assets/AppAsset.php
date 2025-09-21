@@ -11,6 +11,7 @@ use yii\web\AssetBundle;
 
 /**
  * Main application asset bundle.
+ * Регистрирует основные CSS и JS файлы для всего приложения.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0

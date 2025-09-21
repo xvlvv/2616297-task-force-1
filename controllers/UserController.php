@@ -7,12 +7,23 @@ namespace app\controllers;
 use Xvlvv\Repository\UserRepositoryInterface;
 use yii\web\Controller;
 
+/**
+ * Контроллер для отображения профилей пользователей.
+ */
 class UserController extends Controller
 {
+    /**
+     * Отображает публичный профиль исполнителя.
+     *
+     * @param int $id ID пользователя (исполнителя).
+     * @param UserRepositoryInterface $userRepository Репозиторий для получения данных о пользователе.
+     * @return string Рендер страницы профиля.
+     * @throws \yii\web\NotFoundHttpException Если исполнитель с указанным ID не найден.
+     */
     public function actionView(int $id, UserRepositoryInterface $userRepository): string
     {
-        $dto = $userRepository->getWorkerForView($id);
+        $user = $userRepository->getWorkerForView($id);
 
-        return $this->render('view', compact('dto'));
+        return $this->render('view', compact('user'));
     }
 }

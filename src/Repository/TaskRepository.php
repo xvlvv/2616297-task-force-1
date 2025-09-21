@@ -5,33 +5,40 @@ declare(strict_types = 1);
 namespace Xvlvv\Repository;
 
 use app\models\TaskResponse;
-use app\models\User;
+use DateMalformedStringException;
 use DateTime;
 use http\Exception\InvalidArgumentException;
 use http\Exception\RuntimeException;
+use Throwable;
 use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\RenderTaskDTO;
 use Xvlvv\DTO\SaveTaskDTO;
 use Xvlvv\DTO\ViewNewTasksDTO;
 use Xvlvv\DTO\ViewTaskDTO;
-use Xvlvv\DTO\WorkerActiveTaskDTO;
 use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task;
-use \app\models\Task as TaskModel;
+use app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
-use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
-use yii\db\Query;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Репозиторий для работы с сущностями Task
+ */
 class TaskRepository implements TaskRepositoryInterface
 {
+    /**
+     * @param TaskResponseRepositoryInterface $taskResponseRepo
+     */
     public function __construct(
         private TaskResponseRepositoryInterface $taskResponseRepo,
     ) {
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function save(SaveTaskDTO $taskDTO): ?int
     {
         $task = new TaskModel();
@@ -48,13 +55,16 @@ class TaskRepository implements TaskRepositoryInterface
         try {
             $task->save();
         } catch (
-            \Throwable $exception
+            Throwable
         ) {
             return null;
         }
         return $task->id;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function update(Task $task): void
     {
         $taskId = $task->getId();
@@ -79,12 +89,15 @@ class TaskRepository implements TaskRepositoryInterface
         try {
             $taskModel->save();
         } catch (
-            Exception $exception
+            Exception
         ) {
             throw new RuntimeException('Failed to update task');
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hasAlreadyResponded(int $taskId, int $userId): bool
     {
         $taskResponse = TaskResponse::find()
@@ -94,6 +107,9 @@ class TaskRepository implements TaskRepositoryInterface
         return null !== $taskResponse;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isAuthor(int $taskId, int $userId): bool
     {
         $task = $this->getModelByIdOrFail($taskId);
@@ -102,6 +118,9 @@ class TaskRepository implements TaskRepositoryInterface
         return $userId === $customerId;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isWorker(int $taskId, int $userId): bool
     {
         $task = $this->getModelByIdOrFail($taskId);
@@ -109,6 +128,10 @@ class TaskRepository implements TaskRepositoryInterface
 
         return $userId === $workerId;
     }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getWorkerByIdOrFail(int $taskId): int
     {
         $task = $this->getModelByIdOrFail($taskId);
@@ -119,6 +142,9 @@ class TaskRepository implements TaskRepositoryInterface
         return $workerId;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getByIdOrFail(int $taskId): Task
     {
         $task = $this->getModelByIdOrFail($taskId);
@@ -140,12 +166,25 @@ class TaskRepository implements TaskRepositoryInterface
         );
     }
 
+    /**
+     * Возвращает ActiveQuery списка заданий со статусом NEW
+     *
+     * @return ActiveQuery
+     */
     private function getNewTasksQuery(): ActiveQuery
     {
         return TaskModel::find()
             ->where(['status' => Status::NEW]);
     }
 
+    /**
+     * Возвращает ActiveQuery списка заданий с учётом фильтра
+     *
+     * @param GetNewTasksDTO $dto Фильтр для выборки задач
+     *
+     * @return ActiveQuery
+     * @throws DateMalformedStringException
+     */
     private function getFilteredTasksQuery(GetNewTasksDTO $dto): ActiveQuery
     {
         $query = $this->getNewTasksQuery();
@@ -171,6 +210,9 @@ class TaskRepository implements TaskRepositoryInterface
         return $query;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getNewTasks(GetNewTasksDTO $dto): ViewNewTasksDTO
     {
         $categoryQuery = $this->getNewTasksQuery();
@@ -202,6 +244,12 @@ class TaskRepository implements TaskRepositoryInterface
         );
     }
 
+    /**
+     * Находит задание по ID или выбрасывает исключение
+     * @param int $taskId
+     * @return TaskModel
+     * @throws NotFoundHttpException
+     */
     private function getModelByIdOrFail(int $taskId): TaskModel
     {
         $task = TaskModel::findOne($taskId);
@@ -211,6 +259,10 @@ class TaskRepository implements TaskRepositoryInterface
         return $task;
     }
 
+    /**
+     * {@inheritdoc}
+     * @throws DateMalformedStringException
+     */
     public function getFilteredTasksQueryCount(GetNewTasksDTO $dto): int
     {
         return $this
@@ -218,6 +270,9 @@ class TaskRepository implements TaskRepositoryInterface
             ->count();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTaskForView(int $id): ViewTaskDTO
     {
         $task = $this->getModelByIdOrFail($id);

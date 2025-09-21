@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\Entity;
 
+use DomainException;
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use Xvlvv\Exception\InvalidActionForTaskException;
@@ -19,6 +22,7 @@ final class Task
      * @param int $customerId
      * @param int|null $workerId
      * @param int|null $id
+     * @param int|null $budget
      * @param Status $currentStatus
      * @param City|null $city
      * @return self
@@ -27,7 +31,7 @@ final class Task
         int $customerId,
         ?int $workerId = null,
         ?int $id = null,
-        private ?int $budget = null,
+        ?int $budget = null,
         Status $currentStatus = Status::NEW,
         ?City $city = null
     ): self {
@@ -45,10 +49,11 @@ final class Task
     /**
      * Инициализирует ID заказчика и исполнителя
      *
-     * @param TaskStateManager $taskStateManager
      * @param int $customerId
-     * @param int|null $workerId
+     * @param TaskStateManager $taskStateManager
      * @param int|null $id
+     * @param int|null $workerId
+     * @param int|null $budget
      * @param Status $currentStatus
      * @param City|null $city
      */
@@ -63,11 +68,18 @@ final class Task
     ) {
     }
 
+    /**
+     * @return int|null
+     */
     public function getBudget(): ?int
     {
         return $this->budget;
     }
 
+
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +107,12 @@ final class Task
         return $this->taskStateManager->getNextStatus($this->getCurrentStatus(), $action);
     }
 
+    /**
+     * Применяет действие к заданию и изменяет его статус
+     * @param Action $action
+     * @return bool
+     * @throws InvalidActionForTaskException
+     */
     private function applyAction(Action $action): bool
     {
         $actions = $this->taskStateManager->getAllAvailableActions($this->getCurrentStatus());
@@ -107,36 +125,62 @@ final class Task
         return true;
     }
 
+    /**
+     * Проваливает задание
+     * @return bool
+     */
     public function fail(): bool
     {
         return $this->applyAction(Action::FAIL);
     }
 
+    /**
+     * Завершает задание
+     * @return bool
+     */
     public function finish(): bool
     {
         return $this->applyAction(Action::COMPLETE);
     }
 
+    /**
+     * Отменяет задание
+     * @return bool
+     */
     public function cancel(): bool
     {
         return $this->applyAction(Action::CANCEL);
     }
 
+    /**
+     * Назначает исполнителя и переводит задание в статус 'в работе'
+     * @param int $workerId ID исполнителя
+     * @return bool
+     * @throws DomainException
+     */
     public function start(int $workerId): bool
     {
         if (null !== $this->getWorkerId()) {
-            throw new \DomainException('Worker already set for this task');
+            throw new DomainException('Worker already set for this task');
         }
         $this->setWorkerId($workerId);
         $this->applyAction(Action::START);
         return true;
     }
 
+    /**
+     * Устанавливает новый статус
+     * @param Status $status
+     */
     private function setStatus(Status $status): void
     {
         $this->currentStatus = $status;
     }
 
+    /**
+     * Устанавливает ID исполнителя
+     * @param int $workerId
+     */
     private function setWorkerId(int $workerId): void
     {
         $this->workerId = $workerId;
@@ -170,6 +214,9 @@ final class Task
         return array_values($availableActionObjects);
     }
 
+    /**
+     * @return int|null
+     */
     public function getWorkerId(): ?int
     {
         return $this->workerId;

@@ -1,15 +1,30 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Xvlvv\DTO;
 
-use Xvlvv\Domain\User\Role\Customer;
 use Xvlvv\Domain\ValueObject\Coordinates;
 use Xvlvv\Entity\Category;
 use Xvlvv\Entity\City;
 use Xvlvv\Entity\User;
 
+/**
+ * DTO для сохранения задачи в хранилище
+ */
 readonly final class SaveTaskDTO
 {
+    /**
+     * @param string $name Название задания
+     * @param string $description Описание
+     * @param Category $category Объект категории
+     * @param User $customer Объект пользователя-заказчика
+     * @param \DateTimeImmutable|null $endDate Срок выполнения
+     * @param Coordinates|null $coordinates Координаты
+     * @param int|null $budget Бюджет
+     * @param City|null $city Объект города
+     * @param array $fileIds Массив ID файлов
+     */
     public function __construct(
         public string $name,
         public string $description,

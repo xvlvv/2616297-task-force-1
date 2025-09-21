@@ -13,8 +13,17 @@ use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
+/**
+ * Контроллер для управления заданиями (просмотр списка и детальной страницы).
+ */
 class TaskController extends Controller
 {
+    /**
+     * Отображает страницу со списком новых заданий с фильтрацией и пагинацией.
+     *
+     * @param TaskRepositoryInterface $taskRepository Репозиторий для получения данных о заданиях.
+     * @return string Рендер страницы списка заданий.
+     */
     public function actionIndex(TaskRepositoryInterface $taskRepository): string
     {
         $pageSize = 1;
@@ -63,6 +72,14 @@ class TaskController extends Controller
         );
     }
 
+    /**
+     * Отображает детальную страницу одного задания.
+     *
+     * @param int $id ID задания.
+     * @param TaskRepositoryInterface $taskRepository Репозиторий для получения данных о задании.
+     * @return string Рендер страницы задания.
+     * @throws \yii\web\NotFoundHttpException Если задание с указанным ID не найдено.
+     */
     public function actionView(int $id, TaskRepositoryInterface $taskRepository): string
     {
         $task = $taskRepository->getTaskForView($id);
