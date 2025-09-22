@@ -69,6 +69,11 @@ class User extends ActiveRecord
         return $this->hasMany(Review::class, ['worker_id' => 'id']);
     }
 
+    public function getCity(): ActiveQuery
+    {
+        return $this->hasOne(City::class, ['id' => 'city_id']);
+    }
+
 
     public static function findWithRating(): ActiveQuery
     {

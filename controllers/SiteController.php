@@ -5,18 +5,21 @@ namespace app\controllers;
 use app\models\City;
 use app\models\RegistrationForm;
 use app\models\User;
+use app\models\UserIdentity;
 use Xvlvv\DTO\RegisterUserDTO;
 use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Services\Application\AuthService;
 use Yii;
+use yii\base\Exception;
 use yii\db\Connection;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
+use yii\widgets\ActiveForm;
 
 /**
  * Контроллер для обработки основных страниц сайта, таких как главная и регистрация.
@@ -26,33 +29,32 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['register', 'login', 'logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        'actions' => ['register', 'login'],
+                        'roles' => ['?']
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['logout'],
+                        'roles' => ['@']
                     ],
                 ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
+            ]
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function actions()
+    public function actions(): array
     {
         return [
             'error' => [
@@ -68,12 +70,33 @@ class SiteController extends Controller
     /**
      * Displays homepage.
      *
-     * @return string
+     * @param AuthService $authService
+     * @return Response|string|array
      */
-    public function actionIndex(): string
+    public function actionIndex(AuthService $authService): Response|string|array
     {
+        if (!Yii::$app->user->isGuest) {
+            $this->layout = 'main';
+            return $this->redirect('/tasks');
+        }
+
         $this->layout = 'index';
-        return $this->render('index');
+        $loginForm = new LoginForm($authService);
+
+        if (Yii::$app->request->isAjax && $loginForm->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($loginForm);
+        }
+
+        if ($loginForm->load(Yii::$app->request->post()) && $loginForm->validate()) {
+            $user = $loginForm->getUser();
+            $identity = new UserIdentity($user);
+            Yii::$app->user->login($identity, 3600 * 24 * 30);
+
+            return $this->refresh();
+        }
+
+        return $this->render('index', compact('loginForm'));
     }
 
     /**
@@ -83,7 +106,7 @@ class SiteController extends Controller
      * @param AuthService $authService Сервис для регистрации пользователей (внедряется DI-контейнером).
      * @return string|Response Рендер страницы или редирект на главную в случае успеха.
      * @throws UserWithEmailAlreadyExistsException Если пользователь с таким email уже существует.
-     * @throws \yii\web\NotFoundHttpException Если указанный город не найден.
+     * @throws NotFoundHttpException|Exception Если указанный город не найден.
      */
     public function actionRegister(AuthService $authService): string|Response
     {
@@ -114,64 +137,14 @@ class SiteController extends Controller
     }
 
     /**
-     * Login action.
-     *
-     * @return Response|string
-     */
-    public function actionLogin()
-    {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-
-        $model->password = '';
-        return $this->render('login', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Logout action.
+     * Обрабатывает выход из системы
      *
      * @return Response
      */
-    public function actionLogout()
+    public function actionLogout(): Response
     {
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    /**
-     * Displays contact page.
-     *
-     * @return Response|string
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
-
-            return $this->refresh();
-        }
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return string
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
     }
 }

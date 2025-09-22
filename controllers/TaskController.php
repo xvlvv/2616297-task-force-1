@@ -10,6 +10,7 @@ use Xvlvv\Repository\TaskRepositoryInterface;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
@@ -18,6 +19,22 @@ use yii\web\Controller;
  */
 class TaskController extends Controller
 {
+    public function behaviors(): array
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view'],
+                        'roles' => ['@']
+                    ],
+                ],
+            ]
+        ];
+    }
+
     /**
      * Отображает страницу со списком новых заданий с фильтрацией и пагинацией.
      *
@@ -78,7 +95,6 @@ class TaskController extends Controller
      * @param int $id ID задания.
      * @param TaskRepositoryInterface $taskRepository Репозиторий для получения данных о задании.
      * @return string Рендер страницы задания.
-     * @throws \yii\web\NotFoundHttpException Если задание с указанным ID не найдено.
      */
     public function actionView(int $id, TaskRepositoryInterface $taskRepository): string
     {

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Entity;
 
 use LogicException;
+use Yii;
 
 /**
  * Сущность Пользователь
@@ -67,6 +68,11 @@ class User
         return $this->password_hash;
     }
 
+    public function getAvatarPath(): ?string
+    {
+        return $this->avatarPath;
+    }
+
     /**
      * @return string
      */
@@ -83,7 +89,7 @@ class User
      */
     public function isValidPassword(string $password): bool
     {
-        return password_verify($password, $this->password_hash);
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
     /**

@@ -37,6 +37,14 @@ interface UserRepositoryInterface
     public function getByEmailOrFail(string $email): User;
 
     /**
+     * Находит пользователя по email
+     *
+     * @param string $email
+     * @return User|null
+     */
+    public function getByEmail(string $email): ?User;
+
+    /**
      * Обновляет данные пользователя
      *
      * @param User $user
