@@ -5,9 +5,10 @@ namespace app\models;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Yii;
 use yii\web\IdentityInterface;
-use \Xvlvv\Entity\User;
+use Xvlvv\Entity\User;
+use app\models\User as UserModel;
 
-class UserIdentity implements IdentityInterface
+final class UserIdentity implements IdentityInterface
 {
     public function __construct(
         private User $user
@@ -32,9 +33,9 @@ class UserIdentity implements IdentityInterface
     /**
      * @inheritDoc
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public static function findIdentityByAccessToken($token, $type = null): ?string
     {
-        // TODO: Implement findIdentityByAccessToken() method.
+        return UserModel::find()->where(['access_token' => $token])->one() ?? null;
     }
 
     /**
@@ -42,7 +43,7 @@ class UserIdentity implements IdentityInterface
      */
     public function getId(): int|string
     {
-        return $this->user->getId();
+        return $this->getUser()->getId();
     }
 
     /**
@@ -50,14 +51,14 @@ class UserIdentity implements IdentityInterface
      */
     public function getAuthKey()
     {
-        // TODO: Implement getAuthKey() method.
+        return $this->getUser()->getAccessToken();
     }
 
     /**
      * @inheritDoc
      */
-    public function validateAuthKey($authKey)
+    public function validateAuthKey($authKey): bool
     {
-        // TODO: Implement validateAuthKey() method.
+        return $this->getUser()->getAccessToken() === $authKey;
     }
 }

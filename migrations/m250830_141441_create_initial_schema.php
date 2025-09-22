@@ -11,7 +11,7 @@ class m250830_141441_create_initial_schema extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $tableOptions = null;
         $isMySql = $this->db->driverName === 'mysql';
@@ -487,7 +487,7 @@ class m250830_141441_create_initial_schema extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $isMySql = $this->db->driverName === 'mysql';
 
@@ -553,19 +553,4 @@ class m250830_141441_create_initial_schema extends Migration
         $this->dropTable('{{%category}}');
         $this->dropTable('{{%city}}');
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m250830_141441_create_initial_schema cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

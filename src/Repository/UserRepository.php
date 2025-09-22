@@ -116,11 +116,13 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $userModel = new UserModel();
+        $userModel->id = $user->getId();
         $userModel->name = $user->getName();
         $userModel->email = $user->getEmail();
         $userModel->password_hash = $user->getPasswordHash();
         $userModel->role = $user->getUserRole();
         $userModel->city_id = $user->getCity()->getId();
+        $userModel->access_token = $user->getAccessToken();
 
         return $userModel;
     }

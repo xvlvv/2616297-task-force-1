@@ -32,24 +32,22 @@ class LoginForm extends Model
     /**
      * Валидирует пароль, используя AuthService
      * @param string $attribute
+     * @param $params
      */
-    public function validatePassword($attribute, $params): void
+    public function validatePassword(string $attribute, $params): void
     {
         if ($this->hasErrors()) {
             return;
         }
 
-        // Проверяем учетные данные через сервис
         $user = $this->authService->authenticate($this->email, $this->password);
 
         if ($user === null) {
-            // Аутентификация не прошла. Добавляем ошибку к обоим полям.
-            $this->addError('password', 'Неправильный email или пароль');
-            $this->addError('email', 'Неправильный email или пароль');
-        } else {
-            // Если все хорошо, сохраняем пользователя для последующего использования
-            $this->_user = $user;
+            $this->addError($attribute, 'Неправильный email или пароль');
+            return;
         }
+
+        $this->_user = $user;
     }
 
     /**

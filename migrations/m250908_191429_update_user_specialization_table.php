@@ -7,7 +7,7 @@ class m250908_191429_update_user_specialization_table extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->dropIndex(
             'uk_user_category',
@@ -18,7 +18,7 @@ class m250908_191429_update_user_specialization_table extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->createIndex(
             'uk_user_category',
@@ -30,19 +30,4 @@ class m250908_191429_update_user_specialization_table extends Migration
             true
         );
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m250908_191429_update_user_specialization_table cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

@@ -91,7 +91,7 @@ class SiteController extends Controller
         if ($loginForm->load(Yii::$app->request->post()) && $loginForm->validate()) {
             $user = $loginForm->getUser();
             $identity = new UserIdentity($user);
-            Yii::$app->user->login($identity, 3600 * 24 * 30);
+            Yii::$app->user->login($identity);
 
             return $this->refresh();
         }

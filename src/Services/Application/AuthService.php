@@ -78,6 +78,7 @@ final readonly class AuthService
 
         $profile = $profileFactory->createFromDTO($profileDTO);
         $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($dto->password);
+        $authKey = Yii::$app->getSecurity()->generateRandomString();
 
         $user = new User(
             $dto->name,
@@ -85,7 +86,8 @@ final readonly class AuthService
             $passwordHash,
             $userRole,
             $profile,
-            $city
+            $city,
+            $authKey,
         );
 
         $user = $this->userRepository->save($user);

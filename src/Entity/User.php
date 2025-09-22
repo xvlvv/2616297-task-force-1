@@ -31,6 +31,7 @@ class User
         private readonly UserRoleInterface $userRole,
         private readonly UserProfileInterface $profile,
         private City $city,
+        private readonly ?string $accessToken,
         private ?string $avatarPath = null,
         private ?int $id = null,
     ) {
@@ -108,6 +109,10 @@ class User
         return $this->city;
     }
 
+    public function getAccessToken(): ?string
+    {
+        return $this->accessToken;
+    }
 
     /**
      * Устанавливает ID для нового пользователя

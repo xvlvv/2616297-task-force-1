@@ -48,6 +48,7 @@ final class UserMapper
             $userRole,
             $profile,
             $city,
+            $arUser->access_token,
             $arUser->avatar_path ?? null,
             $arUser->id
         );
