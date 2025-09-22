@@ -2,11 +2,15 @@
 
 declare(strict_types = 1);
 
-/** @var yii\web\View $this */
-/** @var string $content */
+/**
+ * @var yii\web\View $this
+ * @var string $content
+ */
 
 use app\assets\LandingAsset;
+use app\models\LoginForm;
 use yii\bootstrap5\Html;
+use yii\widgets\ActiveForm;
 
 LandingAsset::register($this);
 
@@ -70,70 +74,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             </div>
         </div>
     </header>
-    <main>
-        <?= $content ?>
-    </main>
-    <footer class="page-footer">
-        <div class="main-container page-footer__container">
-            <div class="page-footer__info">
-                <p class="page-footer__info-copyright">
-                    © 2021, ООО «ТаскФорс»
-                    Все права защищены
-                </p>
-                <p class="page-footer__info-use">
-                    «TaskForce» — это сервис для поиска исполнителей на разовые задачи.
-                    mail@taskforce.com
-                </p>
-            </div>
-            <div class="page-footer__links">
-                <ul class="links__list">
-                    <li class="links__item">
-                        <a href="">Задания</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Мой профиль</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Исполнители</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Регистрация</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Создать задание</a>
-                    </li>
-                    <li class="links__item">
-                        <a href="">Справка</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="page-footer__copyright">
-                <a href="https://htmlacademy.ru">
-                    <img class="copyright-logo"
-                         src="./img/academy-logo.png"
-                         width="185" height="63"
-                         alt="Логотип HTML Academy">
-                </a>
-            </div>
-        </div>
-    </footer>
-    <section class="modal enter-form form-modal" id="enter-form">
-        <h2>Вход на сайт</h2>
-        <form action="#" method="post">
-            <p>
-                <label class="form-modal-description" for="enter-email">Email</label>
-                <input class="enter-form-email input input-middle" type="email" name="enter-email" id="enter-email">
-            </p>
-            <p>
-                <label class="form-modal-description" for="enter-password">Пароль</label>
-                <input class="enter-form-email input input-middle" type="password" name="enter-email" id="enter-password">
-            </p>
-            <button class="button" type="submit">Войти</button>
-        </form>
-        <button class="form-modal-close" type="button">Закрыть</button>
-    </section>
-</div>
-<div class="overlay"></div>
+    <?= $content ?>
 <?php $this->endBody() ?>
 </body>
 </html>

@@ -9,7 +9,6 @@ use Xvlvv\DTO\RegisterUserDTO;
 use Xvlvv\DTO\WorkerProfileDTO;
 use Xvlvv\Entity\User;
 use Xvlvv\Enums\UserRole;
-use Xvlvv\Exception\PermissionDeniedException;
 use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Repository\CityRepositoryInterface;
 use Xvlvv\Repository\UserRepositoryInterface;
@@ -37,18 +36,17 @@ final readonly class AuthService
      *
      * @param string $email
      * @param string $password
-     * @return bool
-     * @throws PermissionDeniedException если пароль неверный
+     * @return User|null
      */
-    public function authenticate(string $email, string $password): bool
+    public function authenticate(string $email, string $password): ?User
     {
-        $user = $this->userRepository->getByEmailOrFail($email);
+        $user = $this->userRepository->getByEmail($email);
 
-        if (!$user->isValidPassword($password)) {
-            throw new PermissionDeniedException('Password is incorrect');
+        if ($user === null || !$user->isValidPassword($password)) {
+            return null;
         }
 
-        return true;
+        return $user;
     }
 
     /**
@@ -80,6 +78,7 @@ final readonly class AuthService
 
         $profile = $profileFactory->createFromDTO($profileDTO);
         $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($dto->password);
+        $authKey = Yii::$app->getSecurity()->generateRandomString();
 
         $user = new User(
             $dto->name,
@@ -87,7 +86,8 @@ final readonly class AuthService
             $passwordHash,
             $userRole,
             $profile,
-            $city
+            $city,
+            $authKey,
         );
 
         $user = $this->userRepository->save($user);

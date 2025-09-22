@@ -54,7 +54,7 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
             return [];
         }
 
-        $workerIds = array_unique(ArrayHelper::getColumn($responses, 'worker_id',));
+        $workerIds = array_unique(ArrayHelper::getColumn($responses, 'worker_id'));
         $workers = User::findWithRating()
             ->where(['id' => $workerIds])
             ->indexBy('id')

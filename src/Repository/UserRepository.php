@@ -8,6 +8,7 @@ use app\models\Review;
 use http\Exception\RuntimeException;
 use LogicException;
 use Throwable;
+use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\DTO\UserReviewViewDTO;
 use Xvlvv\DTO\UserSpecializationDTO;
 use Xvlvv\DTO\ViewUserDTO;
@@ -26,10 +27,12 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @param ReviewRepositoryInterface $reviewRepo
      * @param TaskRepositoryInterface $taskRepo
+     * @param UserMapper $userMapper
      */
     public function __construct(
         private ReviewRepositoryInterface $reviewRepo,
         private TaskRepositoryInterface $taskRepo,
+        private UserMapper $userMapper,
     ) {
     }
 
@@ -38,7 +41,13 @@ class UserRepository implements UserRepositoryInterface
      */
     public function getById(int $id): ?User
     {
-        // TODO: Implement getById() method.
+        $userModel = UserModel::findOne($id);
+
+        if (null === $userModel) {
+            return null;
+        }
+
+        return $this->userMapper->toDomainEntity($userModel);
     }
 
     /**
@@ -107,11 +116,13 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $userModel = new UserModel();
+        $userModel->id = $user->getId();
         $userModel->name = $user->getName();
         $userModel->email = $user->getEmail();
         $userModel->password_hash = $user->getPasswordHash();
         $userModel->role = $user->getUserRole();
         $userModel->city_id = $user->getCity()->getId();
+        $userModel->access_token = $user->getAccessToken();
 
         return $userModel;
     }
@@ -224,5 +235,21 @@ class UserRepository implements UserRepositoryInterface
             true,
             $reviews
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getByEmail(string $email): ?User
+    {
+        $userModel = UserModel::find()
+            ->with('city')
+            ->where(['email' => $email])->one();
+
+        if (null === $userModel) {
+            return null;
+        }
+
+        return $this->userMapper->toDomainEntity($userModel);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use app\models\LoginForm;
+use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\Repository\CategoryRepository;
 use Xvlvv\Repository\CategoryRepositoryInterface;
 use Xvlvv\Repository\CityRepository;
@@ -43,10 +45,12 @@ $config = [
                 return new TaskResponseRepository($reviewRepo);
             },
             ReviewRepositoryInterface::class => ReviewRepository::class,
+            UserMapper::class => UserMapper::class,
             UserRepositoryInterface::class => function () {
                 $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
                 $taskRepo = Yii::$container->get(TaskRepositoryInterface::class);
-                return new UserRepository($reviewRepo, $taskRepo);
+                $userMapper = Yii::$container->get(UserMapper::class);
+                return new UserRepository($reviewRepo, $taskRepo, $userMapper);
             },
             AuthService::class => AuthService::class,
         ],
@@ -60,8 +64,9 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'app\models\UserIdentity',
             'enableAutoLogin' => true,
+            'loginUrl' => ['site/index'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -96,14 +101,18 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'enableStrictParsing' => true,
             'rules' => [
                 '' => 'site/index',
                 'tasks' => 'task/index',
                 'tasks/view/<id:\d+>' => 'task/view',
                 'user/view/<id:\d+>' => 'user/view',
                 'register' => 'site/register',
+                'logout' => 'site/logout',
             ],
+        ],
+        'session' => [
+            'class' => 'yii\web\Session',
+            'cookieParams' => ['lifetime' => 7 * 24 *60 * 60]
         ],
     ],
     'params' => $params,

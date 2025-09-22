@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Xvlvv\Enums\Status;
+use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -28,30 +29,9 @@ class User extends ActiveRecord
         ];
     }
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
     }
 
     public function getWorkerProfile(): ActiveQuery
@@ -67,6 +47,11 @@ class User extends ActiveRecord
     public function getReviews(): ActiveQuery
     {
         return $this->hasMany(Review::class, ['worker_id' => 'id']);
+    }
+
+    public function getCity(): ActiveQuery
+    {
+        return $this->hasOne(City::class, ['id' => 'city_id']);
     }
 
 
@@ -125,5 +110,21 @@ class User extends ActiveRecord
     {
         return $this->hasMany(Category::class, ['id' => 'category_id'])
             ->via('userSpecializations');
+    }
+
+    /**
+     * @param $insert
+     * @return bool
+     * @throws Exception
+     */
+    public function beforeSave($insert): bool
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->access_token = \Yii::$app->security->generateRandomString();
+            }
+            return true;
+        }
+        return false;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Entity;
 
 use LogicException;
+use Yii;
 
 /**
  * Сущность Пользователь
@@ -30,6 +31,7 @@ class User
         private readonly UserRoleInterface $userRole,
         private readonly UserProfileInterface $profile,
         private City $city,
+        private readonly ?string $accessToken,
         private ?string $avatarPath = null,
         private ?int $id = null,
     ) {
@@ -67,6 +69,11 @@ class User
         return $this->password_hash;
     }
 
+    public function getAvatarPath(): ?string
+    {
+        return $this->avatarPath;
+    }
+
     /**
      * @return string
      */
@@ -83,7 +90,7 @@ class User
      */
     public function isValidPassword(string $password): bool
     {
-        return password_verify($password, $this->password_hash);
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
     /**
@@ -102,6 +109,10 @@ class User
         return $this->city;
     }
 
+    public function getAccessToken(): ?string
+    {
+        return $this->accessToken;
+    }
 
     /**
      * Устанавливает ID для нового пользователя

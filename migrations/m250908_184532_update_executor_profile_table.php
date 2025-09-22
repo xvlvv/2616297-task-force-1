@@ -7,7 +7,7 @@ class m250908_184532_update_executor_profile_table extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->renameColumn(
             '{{%executor_profile}}',
@@ -21,7 +21,7 @@ class m250908_184532_update_executor_profile_table extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeDown()
+    public function safeDown(): void
     {
         $this->addColumn(
             '{{%executor_profile}}',
@@ -35,19 +35,4 @@ class m250908_184532_update_executor_profile_table extends Migration
             'show_contacts_only_to_customer'
         );
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m250908_184532_update_executor_profile_table cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }
