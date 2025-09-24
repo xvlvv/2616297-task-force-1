@@ -12,9 +12,9 @@ use yii\db\ActiveRecord;
  *
  * @property int $id
  * @property string $original_name
+ * @property int $task_id
  * @property string $path
  * @property string $mime_type
- * @property int $size_bytes
  * @property string|null $created_at
  * @property string|null $updated_at
  *
@@ -37,8 +37,7 @@ class File extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['original_name', 'path', 'mime_type', 'size_bytes'], 'required'],
-            [['size_bytes'], 'integer', 'min' => 1],
+            [['original_name', 'path', 'mime_type'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
             [['original_name', 'path'], 'string', 'max' => 255],
             [['mime_type'], 'string', 'max' => 128],
@@ -64,24 +63,13 @@ class File extends ActiveRecord
     }
 
     /**
-     * Gets query for [[TaskFiles]].
-     *
-     * @return ActiveQuery
-     */
-    public function getTaskFiles(): ActiveQuery
-    {
-        return $this->hasMany(TaskFile::class, ['file_id' => 'id']);
-    }
-
-    /**
      * Gets query for [[Tasks]].
      *
      * @return ActiveQuery
-     * @throws InvalidConfigException
      */
-    public function getTasks(): ActiveQuery
+    public function getTask(): ActiveQuery
     {
-        return $this->hasMany(Task::class, ['id' => 'task_id'])->viaTable('{{%task_file}}', ['file_id' => 'id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
 }

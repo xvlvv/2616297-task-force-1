@@ -11,7 +11,6 @@ use Xvlvv\DTO\WorkerProfileDTO;
  */
 class WorkerProfile implements UserProfileInterface
 {
-    private int $failedTasksCount;
     private bool $showContactsOnlyToCustomers;
     private ?string $dayOfBirth;
     private ?string $bio;
@@ -25,28 +24,11 @@ class WorkerProfile implements UserProfileInterface
     public function __construct(
         WorkerProfileDTO $dto
     ) {
-        $this->failedTasksCount = $dto->failedTasksCount;
         $this->showContactsOnlyToCustomers = $dto->showContactsOnlyToCustomers;
         $this->dayOfBirth = $dto->dayOfBirth;
         $this->bio = $dto->bio;
         $this->phoneNumber = $dto->phoneNumber;
         $this->telegramUsername = $dto->telegramUsername;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFailedTasksCount(): int
-    {
-        return $this->failedTasksCount;
-    }
-
-    /**
-     * Увеличивает счетчик проваленных задач на единицу
-     */
-    public function incrementFailedTasksCount(): void
-    {
-        $this->failedTasksCount++;
     }
 
     /**

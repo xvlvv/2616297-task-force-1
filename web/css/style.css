@@ -364,19 +364,29 @@ template {
   color: #ffffff;
   cursor: pointer; }
 
+.action-btn {
+  border: none;
+}
+
+.button--apply,
 .button--blue {
   background-color: #4d38f5; }
+  .button--apply:hover,
   .button--blue:hover {
     background-color: #4130cc; }
 
+.button--fail,
 .button--orange {
   background-color: #fa6400; }
-  .button--orange:hover {
+  .button--fail:hover,
+  .button--orange:hover{
     background-color: #f46200; }
 
+.button--complete,
 .button--pink {
   background-color: #fd306e; }
-  .button--pink:hover {
+  .button--complete:hover,
+  .button--pink:hover{
     background-color: #d52057; }
 
 .button--yellow {
@@ -1409,9 +1419,14 @@ input[type=date] {
   margin-top: 11px;
   font-size: 16px;
   color: #989898;
+  cursor: pointer;
   background-image: url("../img/upload-icon.svg");
   background-position: center 25px;
   background-repeat: no-repeat; }
+
+.new-file:hover {
+  background-color: #e6e6e6;
+}
 
 input[type=submit] {
   border: none;

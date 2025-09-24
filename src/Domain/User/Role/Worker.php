@@ -34,38 +34,10 @@ class Worker implements UserRoleInterface
     /**
      * {@inheritDoc}
      *
-     * @return int
-     */
-    public function getFailedTasksCount(UserProfileInterface $profile): int
-    {
-        if (!$profile instanceof WorkerProfile) {
-            throw new \LogicException('Profile should be an instance of WorkerProfile');
-        }
-
-        return $profile->getFailedTasksCount();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return void
-     */
-    public function increaseFailedTasksCount(UserProfileInterface $profile): void
-    {
-        if (!$profile instanceof WorkerProfile) {
-            throw new \LogicException('Profile should be an instance of WorkerProfile');
-        }
-
-        $profile->incrementFailedTasksCount();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @return string
      */
-    public function getRole(): string
+    public function getRole(): UserRole
     {
-        return UserRole::WORKER->value;
+        return UserRole::WORKER;
     }
 }

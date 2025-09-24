@@ -71,7 +71,6 @@ final readonly class AuthService
         $profileDTO = match ($userRoleEnum) {
             UserRole::CUSTOMER => new CustomerProfileDTO(),
             UserRole::WORKER => new WorkerProfileDTO(
-                failedTasksCount: 0,
                 showContactsOnlyToCustomers: true,
             ),
         };

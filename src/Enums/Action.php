@@ -31,10 +31,10 @@ enum Action: string
     {
         return match($this->value) {
             self::START->value => 'Принять',
-            self::APPLY->value => 'Откликнуться',
+            self::APPLY->value => 'Откликнуться на задание',
             self::CANCEL->value => 'Отменить',
-            self::COMPLETE->value => 'Выполнено',
-            self::FAIL->value => 'Отказаться',
+            self::COMPLETE->value => 'Завершить задание',
+            self::FAIL->value => 'Отказаться от задания',
         };
     }
 
@@ -57,11 +57,11 @@ enum Action: string
     private function getInternalName(): string
     {
         return match($this->value) {
-            self::START->value => 'act_start',
-            self::APPLY->value => 'act_apply',
-            self::CANCEL->value => 'act_cancel',
-            self::COMPLETE->value => 'act_complete',
-            self::FAIL->value => 'act_fail',
+            self::START->value => 'start',
+            self::APPLY->value => 'apply',
+            self::CANCEL->value => 'cancel',
+            self::COMPLETE->value => 'complete',
+            self::FAIL->value => 'fail',
         };
     }
 }

@@ -42,16 +42,26 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <?php if (!Yii::$app->user->isGuest): ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
-                <li class="list-item list-item--active">
-                    <a class="link link--nav" >Новое</a>
+                <li class="list-item <?= 'task/index' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+                    <?= Html::a(
+                        'Новое',
+                        ['task/index'],
+                        ['class' => 'link link--nav']
+                    ) ?>
                 </li>
-                <li class="list-item">
-                    <a href="#" class="link link--nav" >Мои задания</a>
+                <li class="list-item <?= 'task/something' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+                    <a href="#" class="link link--nav">Мои задания</a>
                 </li>
-                <li class="list-item">
-                    <a href="#" class="link link--nav" >Создать задание</a>
-                </li>
-                <li class="list-item">
+                <?php if (Yii::$app->user->can('publishTask')): ?>
+                    <li class="list-item <?= 'task/publish' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+                        <?= Html::a(
+                            'Создать задание',
+                            ['task/publish'],
+                            ['class' => 'link link--nav']
+                        ) ?>
+                    </li>
+                <?php endif ?>
+                <li class="list-item <?= 'site/something' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
                     <a href="#" class="link link--nav" >Настройки</a>
                 </li>
             </ul>
@@ -62,7 +72,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <?php $user = Yii::$app->user->identity->getUser() ?>
     <div class="user-block">
         <a href="#">
-            <?= Html::img(
+            <?= $user->getAvatarPath() ? Html::img(
                 $user->getAvatarPath(),
                 [
                     'class' => 'user-photo',
@@ -70,7 +80,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     'height' => 55,
                     'alt' => 'Аватар'
                 ]
-            ) ?>
+            ) : '' ?>
         </a>
         <div class="user-menu">
             <p class="user-name"><?= Html::encode($user->getName()) ?></p>

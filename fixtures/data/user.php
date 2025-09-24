@@ -20,6 +20,7 @@ for ($i = 0; $i < UserFixture::WORKER_COUNT; $i++) {
         'role' => UserRole::WORKER->value,
         'avatar_path' => $avatarsUrlPath . $faker->randomElement($avatarFiles),
         'city_id' => $faker->randomElement($cityIds),
+        'access_token' => Yii::$app->getSecurity()->generateRandomString(),
     ];
 }
 
@@ -31,6 +32,7 @@ for ($i = 0; $i < UserFixture::CUSTOMER_COUNT; $i++) {
         'role' => UserRole::CUSTOMER->value,
         'avatar_path' => $avatarsUrlPath . $faker->randomElement($avatarFiles),
         'city_id' => $faker->randomElement($cityIds),
+        'access_token' => Yii::$app->getSecurity()->generateRandomString(),
     ];
 }
 

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Xvlvv\Enums\Status;
+use Yii;
 use yii\base\Exception;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -121,7 +122,7 @@ class User extends ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
-                $this->access_token = \Yii::$app->security->generateRandomString();
+                $this->access_token = Yii::$app->security->generateRandomString();
             }
             return true;
         }

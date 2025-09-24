@@ -83,4 +83,6 @@ interface UserRepositoryInterface
      * @return int
      */
     public function getUserRank(int $userId): int;
+
+    public function isAuthor(int $userId): bool;
 }

@@ -33,30 +33,10 @@ final class Customer implements UserRoleInterface
     /**
      * {@inheritDoc}
      *
-     * @return int
-     */
-    public function getFailedTasksCount(UserProfileInterface $profile): int
-    {
-        throw new \DomainException('Customer cannot have tasks.');
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return void
-     */
-    public function increaseFailedTasksCount(UserProfileInterface $profile): void
-    {
-        throw new \DomainException('Customer cannot have tasks.');
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @return string
      */
-    public function getRole(): string
+    public function getRole(): UserRole
     {
-        return UserRole::CUSTOMER->value;
+        return UserRole::CUSTOMER;
     }
 }

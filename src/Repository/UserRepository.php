@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Xvlvv\Repository;
 
+use app\models\ExecutorProfile;
 use app\models\Review;
 use http\Exception\RuntimeException;
 use LogicException;
@@ -12,9 +13,13 @@ use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\DTO\UserReviewViewDTO;
 use Xvlvv\DTO\UserSpecializationDTO;
 use Xvlvv\DTO\ViewUserDTO;
+use Xvlvv\Entity\CustomerProfile;
+use app\models\CustomerProfile as CustomerProfileModel;
 use Xvlvv\Entity\User;
-use \app\models\User as UserModel;
+use app\models\User as UserModel;
+use Xvlvv\Entity\WorkerProfile;
 use Xvlvv\Enums\UserRole;
+use Yii;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\web\NotFoundHttpException;
@@ -55,7 +60,13 @@ class UserRepository implements UserRepositoryInterface
      */
     public function getByIdOrFail(int $id): User
     {
-        // TODO: Implement getByIdOrFail() method.
+        $user = $this->getById($id);
+
+        if (null === $user) {
+            throw new NotFoundHttpException('');
+        }
+
+        return $user;
     }
 
     /**
@@ -92,6 +103,25 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $user->setId($userModel->id);
+
+        $profileEntity = $user->getProfile();
+
+        $profileModelClass = match (get_class($profileEntity)) {
+            WorkerProfile::class => ExecutorProfile::class,
+            CustomerProfile::class => CustomerProfileModel::class,
+            default => throw new LogicException('Неизвестный тип профиля'),
+        };
+
+        $profileModel = new $profileModelClass();
+        $profileModel->user_id = $user->getId();
+
+        if (!$profileModel->save()) {
+            throw new RuntimeException('Ошибка сохранения профиля пользователя');
+        }
+
+        $auth = Yii::$app->authManager;
+        $authorRole = $auth->getRole($user->getUserRole()->value);
+        $auth->assign($authorRole, $user->getId());
         return $user;
     }
 
@@ -120,7 +150,7 @@ class UserRepository implements UserRepositoryInterface
         $userModel->name = $user->getName();
         $userModel->email = $user->getEmail();
         $userModel->password_hash = $user->getPasswordHash();
-        $userModel->role = $user->getUserRole();
+        $userModel->role = $user->getUserRole()->value;
         $userModel->city_id = $user->getCity()->getId();
         $userModel->access_token = $user->getAccessToken();
 
@@ -243,7 +273,13 @@ class UserRepository implements UserRepositoryInterface
     public function getByEmail(string $email): ?User
     {
         $userModel = UserModel::find()
-            ->with('city')
+            ->with(
+                [
+                    'city',
+                    'workerProfile',
+                    'customerProfile',
+                ]
+            )
             ->where(['email' => $email])->one();
 
         if (null === $userModel) {
@@ -251,5 +287,19 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return $this->userMapper->toDomainEntity($userModel);
+    }
+
+    public function isAuthor(int $userId): bool
+    {
+        $user = $this->getByIdOrFail($userId);
+
+        return $user->getUserRole() === UserRole::CUSTOMER;
+    }
+
+    public function isWorker(int $userId): bool
+    {
+        $user = $this->getByIdOrFail($userId);
+
+        return $user->getUserRole() === UserRole::WORKER;
     }
 }

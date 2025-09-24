@@ -10,7 +10,6 @@ namespace Xvlvv\DTO;
 readonly final class WorkerProfileDTO implements ProfileDataInterface
 {
     /**
-     * @param int $failedTasksCount Счетчик проваленных заданий
      * @param bool $showContactsOnlyToCustomers Флаг приватности контактов
      * @param string|null $dayOfBirth День рождения
      * @param string|null $bio Описание
@@ -18,7 +17,6 @@ readonly final class WorkerProfileDTO implements ProfileDataInterface
      * @param string|null $telegramUsername Имя в Telegram
      */
     public function __construct(
-        public int $failedTasksCount,
         public bool $showContactsOnlyToCustomers,
         public ?string $dayOfBirth = null,
         public ?string $bio = null,

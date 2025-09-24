@@ -4,6 +4,9 @@ declare(strict_types = 1);
 
 namespace Xvlvv\Repository;
 
+use app\models\Category;
+use Xvlvv\Entity\Category as CategoryEntity;
+use app\models\File;
 use app\models\TaskResponse;
 use DateMalformedStringException;
 use DateTime;
@@ -19,6 +22,7 @@ use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task;
 use app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
 use yii\web\NotFoundHttpException;
@@ -43,23 +47,47 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $task = new TaskModel();
         $task->name = $taskDTO->name;
-        $task->status = Status::NEW;
+        $task->status = Status::NEW->value;
         $task->description = $taskDTO->description;
         $task->category_id = $taskDTO->category->getId();
         $task->customer_id = $taskDTO->customer->getId();
-        $task->end_date = $taskDTO->endDate;
+        $task->end_date = $taskDTO->endDate->format('Y-m-d');
         $task->budget = $taskDTO->budget;
         $task->city_id = $taskDTO->city->getId();
-        $task->longitude = $taskDTO->coordinates->longitude;
-        $task->latitude = $taskDTO->coordinates->latitude;
+        $task->longitude = $taskDTO->coordinates->longitude ?? null;
+        $task->latitude = $taskDTO->coordinates->latitude ?? null;
+
+        $transaction = Yii::$app->db->beginTransaction();
+
         try {
-            $task->save();
+            if (!$task->save()) {
+                throw new \Exception();
+            }
+
+            $taskId = $task->id;
+
+            foreach ($taskDTO->files as $file) {
+                $fileModel = new File();
+                $fileModel->task_id = $taskId;
+                $fileModel->original_name = $file->originalName;
+                $fileModel->path = $file->filePath;
+                $fileModel->mime_type = mime_content_type($file->filePath);
+
+                if (!$fileModel->save()) {
+                    throw new \Exception();
+                }
+            }
+
+            $transaction->commit();
+            return $taskId;
         } catch (
-            Throwable
+        Throwable $e
         ) {
+            $transaction->rollBack();
             return null;
         }
-        return $task->id;
+
+
     }
 
     /**
@@ -155,9 +183,24 @@ class TaskRepository implements TaskRepositoryInterface
         );
 
         $status = Status::from($task->status);
+        $category = Category::find()->where(['id' => $task->category->id])->one();
+
+        $categoryEntity = new CategoryEntity(
+            $task->category->id,
+            $task->category->name
+        );
+
+        if (null === $category) {
+            throw new NotFoundHttpException('Отсутствует категория у задачи');
+        }
 
         return Task::create(
             $task->customer_id,
+            $task->name,
+            $task->description,
+            $task->created_at,
+            $categoryEntity,
+            $task->end_date,
             $task->worker_id,
             $task->id,
             $task->budget,
@@ -252,7 +295,7 @@ class TaskRepository implements TaskRepositoryInterface
      */
     private function getModelByIdOrFail(int $taskId): TaskModel
     {
-        $task = TaskModel::findOne($taskId);
+        $task = TaskModel::find()->with('category', 'city')->where(['id' => $taskId])->one();
         if ($task === null) {
             throw new NotFoundHttpException();
         }
@@ -273,21 +316,25 @@ class TaskRepository implements TaskRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getTaskForView(int $id): ViewTaskDTO
+    public function getTaskForView(int $id, int $userId): ViewTaskDTO
     {
-        $task = $this->getModelByIdOrFail($id);
-        $responses = $this->taskResponseRepo->findByTaskId($task->id);
-        $status = Status::from($task->status) === Status::NEW ? 'Открыт для новых заказов' : 'Занят';
+        $task = $this->getByIdOrFail($id);
+        $responses = $this->taskResponseRepo->findByTaskId($task->getId());
+        $status = $task->getCurrentStatus() === Status::NEW ? 'Открыт для новых заказов' : 'Занят';
+        $files = File::find()->where(['task_id' => $task->getId()])->all();
 
         return new ViewTaskDTO(
-            $task->name,
-            $task->budget,
-            $task->description,
-            $task->category->name,
-            $task->created_at,
-            $task->end_date,
+            $task->getId(),
+            $task->getName(),
+            $task->getBudget(),
+            $task->getDescription(),
+            $task->getCategory()->getName(),
+            $task->getCreatedDate(),
+            $task->getEndDate(),
             $status,
-            $responses
+            $task->getAvailableActions($userId),
+            $responses,
+            $files,
         );
     }
 
