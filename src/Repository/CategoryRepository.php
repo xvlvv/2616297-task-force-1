@@ -43,4 +43,9 @@ class CategoryRepository implements CategoryRepositoryInterface
 
         return $category;
     }
+
+    public function getAll(): array
+    {
+        return Model::find()->select(['id', 'name'])->all();
+    }
 }

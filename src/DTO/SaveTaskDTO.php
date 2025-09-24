@@ -23,7 +23,7 @@ readonly final class SaveTaskDTO
      * @param Coordinates|null $coordinates Координаты
      * @param int|null $budget Бюджет
      * @param City|null $city Объект города
-     * @param array $fileIds Массив ID файлов
+     * @param array $files Массив ID файлов
      */
     public function __construct(
         public string $name,
@@ -34,7 +34,7 @@ readonly final class SaveTaskDTO
         public ?Coordinates $coordinates = null,
         public ?int $budget = null,
         public ?City $city = null,
-        public array $fileIds = []
+        public array $files = []
     ) {
     }
 }

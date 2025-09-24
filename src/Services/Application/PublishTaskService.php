@@ -43,7 +43,7 @@ final class PublishTaskService
      */
     public function publish(CreateTaskDTO $task): ?int
     {
-        $city = $this->cityRepository->getById($task->cityId);
+        $city = $this->cityRepository->getById(1);
         $category = $this->categoryRepository->getByIdOrFail($task->categoryId);
         $user = $this->userRepository->getByIdOrFail($task->customerId);
 
@@ -68,7 +68,7 @@ final class PublishTaskService
                 $coordinates ?? null,
                 $task->budget,
                 $city,
-                $task->fileIds
+                $task->files
             )
         );
     }
