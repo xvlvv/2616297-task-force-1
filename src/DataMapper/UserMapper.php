@@ -63,7 +63,6 @@ final class UserMapper
     private function createWorkerProfile(?WorkerProfileModel $arProfile): UserProfileInterface
     {
         $dto = new WorkerProfileDTO(
-            failedTasksCount: $arProfile->failed_tasks_count,
             showContactsOnlyToCustomers: (bool)$arProfile->restrict_contacts,
             dayOfBirth: $arProfile->day_of_birth,
             bio: $arProfile->bio,

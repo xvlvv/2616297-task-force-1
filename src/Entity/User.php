@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Entity;
 
 use LogicException;
+use Xvlvv\Enums\UserRole;
 use Yii;
 
 /**
@@ -74,10 +75,15 @@ class User
         return $this->avatarPath;
     }
 
+    public function getProfile(): UserProfileInterface
+    {
+        return $this->profile;
+    }
+
     /**
      * @return string
      */
-    public function getUserRole(): string
+    public function getUserRole(): UserRole
     {
         return $this->userRole->getRole();
     }
@@ -91,14 +97,6 @@ class User
     public function isValidPassword(string $password): bool
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
-    }
-
-    /**
-     * Увеличивает счетчик проваленных заданий через объект роли
-     */
-    public function increaseFailedTasksCount(): void
-    {
-        $this->userRole->increaseFailedTasksCount($this->profile);
     }
 
     /**
@@ -127,16 +125,6 @@ class User
         }
 
         $this->id = $id;
-    }
-
-
-    /**
-     * Получает счетчик проваленных заданий через объект роли
-     * @return int
-     */
-    public function getFailedTasksCount(): int
-    {
-        return $this->userRole->getFailedTasksCount($this->profile);
     }
 
     /**

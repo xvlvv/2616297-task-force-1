@@ -13,7 +13,6 @@ use yii\db\ActiveRecord;
  * @property string|null $bio
  * @property string|null $phone_number
  * @property string|null $telegram_username
- * @property int $failed_tasks_count
  * @property bool|null $restrict_contacts
  * @property string|null $created_at
  * @property string|null $updated_at

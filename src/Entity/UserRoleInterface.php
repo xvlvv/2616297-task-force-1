@@ -6,6 +6,7 @@ namespace Xvlvv\Entity;
 
 use DomainException;
 use LogicException;
+use Xvlvv\Enums\UserRole;
 
 /**
  * Интерфейс для определения роли пользователя в системе
@@ -15,9 +16,9 @@ interface UserRoleInterface
     /**
      * Возвращает строковый идентификатор роли
      *
-     * @return string Имя роли (например, 'worker' или 'customer')
+     * @return UserRole Имя роли (например, 'worker' или 'customer')
      */
-    public function getRole(): string;
+    public function getRole(): UserRole;
 
 
     /**
@@ -33,22 +34,4 @@ interface UserRoleInterface
      * @return bool true, если пользователь может быть заказчиком, иначе false
      */
     public function canCreateTask(): bool;
-
-    /**
-     * Получает количество проваленных задач для данного профиля пользователя
-     *
-     * @param UserProfileInterface $profile Профиль пользователя
-     * @return int Количество проваленных задач
-     * @throws LogicException|DomainException Если операция неприменима к данной роли
-     */
-    public function getFailedTasksCount(UserProfileInterface $profile): int;
-
-    /**
-     * Увеличивает счетчик проваленных задач для данного профиля пользователя
-     *
-     * @param UserProfileInterface $profile Профиль пользователя
-     * @return void
-     * @throws LogicException|DomainException Если операция неприменима к данной роли
-     */
-    public function increaseFailedTasksCount(UserProfileInterface $profile): void;
 }
