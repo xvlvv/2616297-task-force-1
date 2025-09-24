@@ -20,6 +20,11 @@ final class Task
      * Фабричный метод для создания объекта Task с автоматическим резолвом TaskStateManager
      *
      * @param int $customerId
+     * @param string $name
+     * @param string $description
+     * @param string $createdAt
+     * @param Category $category
+     * @param string $endDate
      * @param int|null $workerId
      * @param int|null $id
      * @param int|null $budget
@@ -29,6 +34,11 @@ final class Task
      */
     public static function create(
         int $customerId,
+        string $name,
+        string $description,
+        string $createdAt,
+        Category $category,
+        string $endDate,
         ?int $workerId = null,
         ?int $id = null,
         ?int $budget = null,
@@ -37,6 +47,11 @@ final class Task
     ): self {
         return new self(
             customerId: $customerId,
+            name: $name,
+            description: $description,
+            createdAt: $createdAt,
+            endDate: $endDate,
+            category: $category,
             taskStateManager: Yii::$app->taskStateManager,
             id: $id,
             workerId: $workerId,
@@ -50,6 +65,11 @@ final class Task
      * Инициализирует ID заказчика и исполнителя
      *
      * @param int $customerId
+     * @param string $name
+     * @param string $description
+     * @param string $createdAt
+     * @param string $endDate
+     * @param Category $category
      * @param TaskStateManager $taskStateManager
      * @param int|null $id
      * @param int|null $workerId
@@ -59,6 +79,11 @@ final class Task
      */
     private function __construct(
         private int $customerId,
+        private string $name,
+        private string $description,
+        private string $createdAt,
+        private string $endDate,
+        private Category $category,
         private readonly TaskStateManager $taskStateManager,
         private ?int $id = null,
         private ?int $workerId = null,
@@ -76,6 +101,15 @@ final class Task
         return $this->budget;
     }
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
 
     /**
      * @return int|null
@@ -83,6 +117,21 @@ final class Task
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCreatedDate(): string
+    {
+        return $this->createdAt;
+    }
+
+    public function getEndDate(): string
+    {
+        return $this->endDate;
+    }
+
+    public function getCategory(): Category
+    {
+        return $this->category;
     }
 
     /**

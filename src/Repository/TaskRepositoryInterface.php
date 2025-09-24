@@ -96,7 +96,7 @@ interface TaskRepositoryInterface
      * @param int $id
      * @return ViewTaskDTO
      */
-    public function getTaskForView(int $id): ViewTaskDTO;
+    public function getTaskForView(int $id, int $userId): ViewTaskDTO;
 
     /**
      * Проверяет, есть ли у исполнителя активное задание

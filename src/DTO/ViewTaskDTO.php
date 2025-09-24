@@ -10,6 +10,7 @@ namespace Xvlvv\DTO;
 readonly final class ViewTaskDTO
 {
     /**
+     * @param int $id Идентификатор
      * @param string $name Название
      * @param int $budget Бюджет
      * @param string $description Описание
@@ -17,9 +18,12 @@ readonly final class ViewTaskDTO
      * @param string $createdAt Дата создания
      * @param string|null $endDate Срок выполнения
      * @param string $status Статус задания
+     * @param array $availableActions Массив возможных действий над задачей
      * @param array $responses Массив откликов
+     * @param array $files Массив файлов
      */
     public function __construct(
+        public int $id,
         public string $name,
         public int $budget,
         public string $description,
@@ -27,7 +31,9 @@ readonly final class ViewTaskDTO
         public string $createdAt,
         public ?string $endDate,
         public string $status,
+        public array $availableActions ,
         public array $responses,
+        public array $files,
     ) {
     }
 }
