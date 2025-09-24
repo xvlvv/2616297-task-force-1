@@ -368,19 +368,25 @@ template {
   border: none;
 }
 
-.button--apply {
+.button--apply,
+.button--blue {
   background-color: #4d38f5; }
-  .button--apply:hover {
+  .button--apply:hover,
+  .button--blue:hover {
     background-color: #4130cc; }
 
-.button--fail {
+.button--fail,
+.button--orange {
   background-color: #fa6400; }
-  .button--fail:hover {
+  .button--fail:hover,
+  .button--orange:hover{
     background-color: #f46200; }
 
-.button--complete {
+.button--complete,
+.button--pink {
   background-color: #fd306e; }
-  .button--complete:hover {
+  .button--complete:hover,
+  .button--pink:hover{
     background-color: #d52057; }
 
 .button--yellow {

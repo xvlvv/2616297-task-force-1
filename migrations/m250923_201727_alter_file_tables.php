@@ -10,6 +10,7 @@ class m250923_201727_alter_file_tables extends Migration
     public function safeUp(): void
     {
         $this->dropColumn('{{%file}}', 'size_bytes');
+        $this->addColumn('{{%file}}', 'task_id', $this->integer()->notNull()->unsigned());
         $this->addForeignKey(
             'fk-file-task_id',
             '{{%file}}',
@@ -18,7 +19,6 @@ class m250923_201727_alter_file_tables extends Migration
             'id',
             'CASCADE'
         );
-        $this->addColumn('{{%file}}', 'task_id', $this->integer()->notNull()->unsigned());
         $this->dropTable('{{%task_file}}');
     }
 
