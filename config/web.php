@@ -1,6 +1,5 @@
 <?php
 
-use app\models\LoginForm;
 use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\Repository\CategoryRepository;
 use Xvlvv\Repository\CategoryRepositoryInterface;
@@ -15,6 +14,7 @@ use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Repository\UserRepository;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Xvlvv\Services\Application\AuthService;
+use Xvlvv\Services\Application\PublishTaskService;
 
 /**
  * @var array $params
@@ -35,8 +35,7 @@ $config = [
         'definitions' => [
             TaskRepositoryInterface::class => function () {
                 $taskResponseRepo = Yii::$container->get(TaskResponseRepositoryInterface::class);
-                $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
-                return new TaskRepository($taskResponseRepo, $reviewRepo);
+                return new TaskRepository($taskResponseRepo);
             },
             CityRepositoryInterface::class => CityRepository::class,
             CategoryRepositoryInterface::class => CategoryRepository::class,
@@ -53,6 +52,8 @@ $config = [
                 return new UserRepository($reviewRepo, $taskRepo, $userMapper);
             },
             AuthService::class => AuthService::class,
+            PublishTaskService::class  => PublishTaskService::class,
+
         ],
     ],
     'components' => [
@@ -86,6 +87,9 @@ $config = [
                 ],
             ],
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
         'db' => $db,
         'formatter' => [
             'class' => 'yii\i18n\Formatter',
@@ -105,9 +109,11 @@ $config = [
                 '' => 'site/index',
                 'tasks' => 'task/index',
                 'tasks/view/<id:\d+>' => 'task/view',
+                'task/apply/<id:\d+>' => 'task/apply',
                 'user/view/<id:\d+>' => 'user/view',
                 'register' => 'site/register',
                 'logout' => 'site/logout',
+                'publish' => 'task/publish',
             ],
         ],
         'session' => [

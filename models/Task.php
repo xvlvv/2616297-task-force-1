@@ -122,11 +122,10 @@ class Task extends ActiveRecord
      * Gets query for [[Files]].
      *
      * @return ActiveQuery
-     * @throws InvalidConfigException
      */
     public function getFiles(): ActiveQuery
     {
-        return $this->hasMany(File::class, ['id' => 'file_id'])->viaTable('{{%task_file}}', ['task_id' => 'id']);
+        return $this->hasMany(File::class, ['task_id' => 'id']);
     }
 
     /**
@@ -137,16 +136,6 @@ class Task extends ActiveRecord
     public function getReview(): ActiveQuery
     {
         return $this->hasOne(Review::class, ['task_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[TaskFiles]].
-     *
-     * @return ActiveQuery
-     */
-    public function getTaskFiles(): ActiveQuery
-    {
-        return $this->hasMany(TaskFile::class, ['task_id' => 'id']);
     }
 
     /**
