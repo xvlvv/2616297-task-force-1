@@ -6,9 +6,9 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\rbac\Rule;
 
-class AuthorRule extends Rule
+class TaskAuthorRule extends Rule
 {
-    public $name = 'isAuthor';
+    public $name = 'isTaskAuthor';
     /**
      * @inheritDoc
      * @throws InvalidConfigException

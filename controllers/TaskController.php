@@ -4,24 +4,30 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\models\ApplyForm;
 use app\models\PublishForm;
+use app\models\TaskResponse;
 use app\models\TaskSearch;
 use DateTimeImmutable;
 use RuntimeException;
 use Xvlvv\DTO\CreateTaskDTO;
 use Xvlvv\DTO\GetNewTasksDTO;
-use Xvlvv\DTO\SaveTaskDTO;
+use Xvlvv\DTO\SaveTaskResponseDTO;
 use Xvlvv\Repository\CategoryRepositoryInterface;
 use Xvlvv\Repository\TaskRepositoryInterface;
+use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Services\Application\PublishTaskService;
+use Xvlvv\Services\Application\TaskResponseService;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\data\Pagination;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Контроллер для управления заданиями (просмотр списка и детальной страницы).
@@ -43,7 +49,29 @@ class TaskController extends Controller
                         'allow' => true,
                         'actions' => ['publish'],
                         'matchCallback' => fn () => Yii::$app->user->can('publishTask')
-                    ]
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['apply'],
+                        'matchCallback' => fn () => Yii::$app->user->can('applyToTask')
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['reject-response'],
+
+                        'matchCallback' => function ($rule, $action) {
+                            $responseId = Yii::$app->request->get('id');
+
+                            if (!$responseId) {
+                                return false;
+                            }
+
+                            $repo = Yii::$container->get(TaskResponseRepositoryInterface::class);
+                            $taskId = $repo->getTaskIdByResponseId((int)$responseId);
+
+                            return Yii::$app->user->can('manageTaskResponses', ['taskId' => $taskId]);
+                        }
+                    ],
                 ],
             ]
         ];
@@ -114,12 +142,11 @@ class TaskController extends Controller
     {
         $userId = Yii::$app->user->identity->getUser()->getId();
         $task = $taskRepository->getTaskForView($id, $userId);
+        $applyForm = new ApplyForm();
 
         return $this->render(
             'view',
-            [
-                'task' => $task,
-            ]
+            compact('task', 'applyForm')
         );
     }
 
@@ -170,8 +197,40 @@ class TaskController extends Controller
         return $this->redirect($newTask);
     }
 
-    public function actionApply(int $id): string
+    public function actionApply(int $id, TaskResponseService $responseService): array|Response
     {
-        return '1';
+        $applyForm = new ApplyForm();
+        $applyForm->load(Yii::$app->request->post());
+
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($applyForm);
+        }
+
+        if (!$applyForm->validate()) {
+            throw new BadRequestHttpException('Ошибка при сохранении отклика');
+        }
+
+        $saveResponseDTO = new SaveTaskResponseDTO(
+            $id,
+            Yii::$app->user->identity->getUser()->getId(),
+            $applyForm->description,
+            (int) $applyForm->price,
+        );
+
+        $responseService->createResponse($saveResponseDTO);
+
+        return $this->redirect(['task/view', 'id' => $id]);
+    }
+
+    public function actionRejectResponse(
+        int $id,
+        TaskResponseService $responseService,
+        TaskResponseRepositoryInterface $taskResponseRepository
+    ): Response {
+        $taskId = $taskResponseRepository->getTaskIdByResponseId($id);
+        $responseService->rejectResponse($id);
+
+        return $this->redirect(['task/view', 'id' => $taskId]);
     }
 }

@@ -94,6 +94,7 @@ interface TaskRepositoryInterface
      * Получает данные для страницы просмотра задания
      *
      * @param int $id
+     * @param int $userId
      * @return ViewTaskDTO
      */
     public function getTaskForView(int $id, int $userId): ViewTaskDTO;

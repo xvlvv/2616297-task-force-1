@@ -10,6 +10,7 @@ use app\widgets\RatingWidget;
 use Xvlvv\DTO\ViewTaskDTO;
 use Xvlvv\Enums\Action;
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 ?>
 <div class="left-column">
@@ -43,7 +44,7 @@ use yii\helpers\Html;
             <div class="feedback-wrapper">
                 <?= Html::a(
                     Html::encode($response->workerName),
-                    ['user/view', 'id' => $response->id],
+                    ['user/view', 'id' => $response->userId],
                     ['class' => 'link link--block link--big']
                 ) ?>
                 <div class="response-wrapper">
@@ -65,12 +66,21 @@ use yii\helpers\Html;
                 <p class="info-text"><?= Yii::$app->formatter->asRelativeTime($response->createdAt) ?></p>
                 <p class="price price--small"><?= Html::encode($response->price) ?>&nbsp;₽</p>
             </div>
-            <div class="button-popup">
-                <a href="#"
-                   class="button button--<?= Action::APPLY->getActionObject()->getInternalName() ?> button--small">Принять</a>
-                <a href="#"
-                   class="button button--<?= Action::FAIL->getActionObject()->getInternalName() ?> button--small">Отказать</a>
-            </div>
+            <?php
+            if (
+                Yii::$app->user->can('manageTaskResponses', ['taskId' => $task->id])
+                && !$response->isRejected
+            ): ?>
+                <div class="button-popup">
+                    <a href="#"
+                       class="button button--<?= Action::APPLY->getActionObject()->getInternalName() ?> button--small">Принять</a>
+                    <?= Html::a(
+                        'Отказать',
+                        ['task/reject-response', 'id' => $response->id],
+                        ['class' => 'button button--orange button--small']
+                    ) ?>
+                </div>
+            <?php endif ?>
         </div>
         <?php endforeach ?>
     <?php endif ?>
@@ -153,17 +163,20 @@ use yii\helpers\Html;
             Пожалуйста, укажите стоимость работы и добавьте комментарий, если необходимо.
         </p>
         <div class="addition-form pop-up--form regular-form">
-            <form>
-                <div class="form-group">
-                    <label class="control-label" for="addition-comment">Ваш комментарий</label>
-                    <textarea id="addition-comment"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="addition-price">Стоимость</label>
-                    <input id="addition-price" type="text">
-                </div>
-                <input type="submit" class="button button--pop-up button--blue" value="Завершить">
-            </form>
+            <?php
+            $form = ActiveForm::begin([
+                'method' => 'post',
+                'action' => ['/task/apply', 'id' => $task->id],
+                'enableAjaxValidation' => true,
+            ]) ?>
+
+            <?= $form->field($applyForm, 'description')->textarea() ?>
+
+            <?= $form->field($applyForm, 'price')->textInput() ?>
+
+            <?= Html::submitInput('Завершить', ['class' => 'button button--pop-up button--blue']) ?>
+
+            <?php ActiveForm::end() ?>
         </div>
         <div class="button-container">
             <button class="button--close" type="button">Закрыть окно</button>
