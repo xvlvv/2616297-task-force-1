@@ -23,7 +23,7 @@ class LoginForm extends Model
     public function rules(): array
     {
         return [
-            [['email', 'password'], 'required'],
+            [['email', 'password'], 'required', 'message' => 'Обязательное поле'],
             [['email', 'password'], 'safe'],
             ['password', 'validatePassword'],
         ];

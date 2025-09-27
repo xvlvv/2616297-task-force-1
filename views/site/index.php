@@ -155,21 +155,45 @@ use yii\widgets\ActiveForm;
 <section class="modal enter-form form-modal" id="enter-form">
     <h2>Вход на сайт</h2>
 
+<!--    --><?php
+//    $form = ActiveForm::begin([
+//        'id' => 'login-form',
+//        'action' => ['site/index'],
+//        'enableAjaxValidation' => true,
+//        'enableClientValidation' => true,
+//        'validationUrl' => ['site/index'],
+//    ]); ?>
+<!---->
+<!--    --><?php //= $form->field($loginForm, 'email')->textInput(['type' => 'email']) ?>
+<!---->
+<!--    --><?php //= $form->field($loginForm, 'password'
+//    )->passwordInput() ?>
+<!---->
+<!--    --><?php //= Html::submitButton('Войти') ?>
+<!---->
+<!--    --><?php //ActiveForm::end(); ?>
+<!---->
+<!--    --><?php //= Html::button('Закрыть', ['class' => 'form-modal-close']) ?>
+
     <?php
     $form = ActiveForm::begin([
         'id' => 'login-form',
         'action' => ['site/index'],
         'enableAjaxValidation' => true,
-        'enableClientValidation' => true,
-        'validationUrl' => ['site/index'],
+        'fieldConfig' => [
+            'template' => "{label}\n{input}\n{error}",
+            'labelOptions' => ['class' => 'form-modal-description'],
+            'inputOptions' => ['class' => 'input input-middle'],
+        ]
     ]); ?>
 
-    <?= $form->field($loginForm, 'email')->textInput(['type' => 'email']) ?>
+    <?= $form->field($loginForm, 'email')->textInput([
+        'type' => 'email',
+    ]) ?>
 
-    <?= $form->field($loginForm, 'password'
-    )->passwordInput() ?>
+    <?= $form->field($loginForm, 'password')->passwordInput() ?>
 
-    <?= Html::submitButton('Войти') ?>
+    <?= Html::submitButton('Войти', ['class' => 'button']) ?>
 
     <?php ActiveForm::end(); ?>
 
