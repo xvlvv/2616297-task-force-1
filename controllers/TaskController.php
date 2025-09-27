@@ -102,9 +102,6 @@ class TaskController extends Controller
                                 return false;
                             }
 
-//                            var_dump(Yii::$app->user->can('failTask', ['taskId' => $taskId]));
-//                            die();
-
                             return Yii::$app->user->can('failTask', ['taskId' => $taskId]);
                         }
                     ],
