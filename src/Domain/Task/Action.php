@@ -47,5 +47,5 @@ abstract class Action
      * @param int|null $workerId ID исполнителя задачи, если он назначен
      * @return bool true, если пользователь может выполнить действие, иначе false
      */
-    public abstract function canMakeAction(int $userId, int $authorId, ?int $workerId = null): bool;
+    public abstract function canMakeAction(int $userId, int $authorId, ?int $workerId = null, int $taskId = null): bool;
 }
