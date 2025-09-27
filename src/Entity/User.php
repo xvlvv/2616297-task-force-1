@@ -27,7 +27,7 @@ class User
      */
     public function __construct(
         private string $name,
-        private string $email,
+        private ?string $email,
         private ?string $password_hash,
         private readonly UserRoleInterface $userRole,
         private readonly UserProfileInterface $profile,

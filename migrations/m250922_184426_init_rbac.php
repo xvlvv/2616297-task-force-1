@@ -45,19 +45,4 @@ class m250922_184426_init_rbac extends Migration
 
         $auth->removeAll();
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m250922_184426_init_rbac cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }
