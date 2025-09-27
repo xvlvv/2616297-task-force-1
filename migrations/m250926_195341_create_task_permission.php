@@ -2,6 +2,7 @@
 
 use app\rbac\AuthorRule;
 use app\rbac\TaskAuthorRule;
+use app\rbac\TaskWorkerRule;
 use Xvlvv\Enums\UserRole;
 use yii\base\InvalidConfigException;
 use yii\db\Migration;
@@ -48,6 +49,14 @@ class m250926_195341_create_task_permission extends Migration
         $manageTaskResponses->ruleName = $taskAuthorRule->name;
         $auth->add($manageTaskResponses);
         $auth->addChild($customerRole, $manageTaskResponses);
+
+        $taskWorkerRule = new TaskWorkerRule();
+        $auth->add($taskWorkerRule);
+
+        $setTaskFailStatus = $auth->createPermission('failTask');
+        $setTaskFailStatus->ruleName = $taskWorkerRule->name;
+        $auth->add($setTaskFailStatus);
+        $auth->addChild($workerRole, $setTaskFailStatus);
 
         $applyToTask = $auth->createPermission('applyToTask');
         $auth->add($applyToTask);
@@ -103,5 +112,21 @@ class m250926_195341_create_task_permission extends Migration
         }
 
         $auth->remove($taskAuthorRule);
+
+        $setTaskFailStatus = $auth->getPermission('failTask');
+
+        if (null === $setTaskFailStatus) {
+            throw new RuntimeException('Permission not found');
+        }
+
+        $auth->remove($setTaskFailStatus);
+
+        $taskWorkerRule = $auth->getRule('isTaskWorker');
+
+        if (null === $taskWorkerRule) {
+            throw new RuntimeException('Rule not found');
+        }
+
+        $auth->remove($taskWorkerRule);
     }
 }

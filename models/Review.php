@@ -38,9 +38,8 @@ class Review extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['task_id', 'customer_id', 'worker_id', 'comment', 'rating'], 'required'],
+            [['task_id', 'customer_id', 'worker_id', 'rating'], 'required'],
             [['task_id', 'customer_id', 'worker_id', 'rating'], 'integer', 'min' => 1],
-            [['is_rejected'], 'boolean'],
             [['comment'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['task_id'], 'unique'],

@@ -107,18 +107,14 @@ class TaskRepository implements TaskRepositoryInterface
         }
 
         if ($taskModel->status !== $task->getCurrentStatus()->value) {
-            $taskModel->status = $task->getCurrentStatus();
+            $taskModel->status = $task->getCurrentStatus()->value;
         }
 
         if ($taskModel->worker_id !== $task->getWorkerId()) {
             $taskModel->worker_id = $task->getWorkerId();
         }
 
-        try {
-            $taskModel->save();
-        } catch (
-            Exception
-        ) {
+        if (!$taskModel->save()) {
             throw new RuntimeException('Failed to update task');
         }
     }
@@ -294,7 +290,6 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $task = $this->getByIdOrFail($id);
         $responses = $this->taskResponseRepo->findByTaskId($task->getId(), $userId);
-        $status = $task->getCurrentStatus() === Status::NEW ? 'Открыт для новых заказов' : 'Занят';
         $files = File::find()->where(['task_id' => $task->getId()])->all();
 
         return new ViewTaskDTO(
@@ -305,7 +300,7 @@ class TaskRepository implements TaskRepositoryInterface
             $task->getCategory()->getName(),
             $task->getCreatedDate(),
             $task->getEndDate(),
-            $status,
+            $task->getCurrentStatus(),
             $task->getAvailableActions($userId),
             $responses,
             $files,

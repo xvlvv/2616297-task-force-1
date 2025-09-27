@@ -17,11 +17,12 @@ class User
      * Конструктор User
      *
      * @param string $name Имя
-     * @param string $email Email
+     * @param string|null $email Email
      * @param string|null $password_hash Хеш пароля
      * @param UserRoleInterface $userRole Роль пользователя
      * @param UserProfileInterface $profile Профиль пользователя
      * @param City $city Город
+     * @param string|null $accessToken
      * @param string|null $avatarPath Путь к аватару
      * @param int|null $id ID пользователя
      */

@@ -15,7 +15,11 @@ use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Repository\UserRepository;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Xvlvv\Services\Application\AuthService;
+use Xvlvv\Services\Application\CancelTaskService;
+use Xvlvv\Services\Application\FailTaskService;
+use Xvlvv\Services\Application\FinishTaskService;
 use Xvlvv\Services\Application\PublishTaskService;
+use Xvlvv\Services\Application\StartTaskService;
 use Xvlvv\Services\Application\TaskResponseService;
 
 /**
@@ -59,8 +63,12 @@ $config = [
             },
             TaskMapper::class => TaskMapper::class,
             AuthService::class => AuthService::class,
+            StartTaskService::class => StartTaskService::class,
             PublishTaskService::class  => PublishTaskService::class,
             TaskResponseService::class => TaskResponseService::class,
+            FinishTaskService::class => FinishTaskService::class,
+            CancelTaskService::class => CancelTaskService::class,
+            FailTaskService::class => FailTaskService::class,
         ],
     ],
     'components' => [
@@ -123,6 +131,9 @@ $config = [
                 'publish' => 'task/publish',
                 'tasks/apply' => 'task/apply',
                 'task/rejectResponse/<id:\d+>' => 'task/reject-response',
+                'task/start/<id:\d+>' => 'task/start',
+                'task/complete/<id:\d+>' => 'task/complete',
+                'task/fail/<id:\d+>' => 'task/fail',
             ],
         ],
         'session' => [

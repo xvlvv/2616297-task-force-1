@@ -40,10 +40,6 @@ class FailTaskService
         $task = $this->taskRepository->getByIdOrFail($dto->taskId);
         $task->fail();
         $this->taskRepository->update($task);
-
-        $user = $this->userRepository->getByIdOrFail($dto->userId);
-        $user->increaseFailedTasksCount();
-        $this->userRepository->update($user);
         return true;
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Repository;
 
 use app\models\Review;
+use RuntimeException;
 use Xvlvv\DTO\CreateReviewDTO;
 
 /**
@@ -18,7 +19,20 @@ class ReviewRepository implements ReviewRepositoryInterface
      */
     public function save(CreateReviewDTO $dto): bool
     {
-        // TODO: Implement save() method.
+        $review = new Review();
+        $review->task_id = $dto->taskId;
+        $review->worker_id = $dto->workerId;
+        $review->customer_id = $dto->authorId;
+        $review->comment = $dto->comment;
+        $review->rating = $dto->rating;
+
+        if (!$review->save()) {
+            var_dump($review->getErrors());
+            die();
+            throw new RuntimeException('Failed to save review');
+        }
+
+        return true;
     }
 
     /**

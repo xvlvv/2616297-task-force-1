@@ -52,7 +52,13 @@ use yii\helpers\Html;
             <img class="customer-photo" src="<?= Html::encode($review->avatarPath) ?>" width="120" height="127" alt="Фото заказчиков">
             <div class="feedback-wrapper">
                 <p class="feedback">«<?= Html::encode($review->comment) ?>»</p>
-                <p class="task">Задание «<a href="#" class="link link--small"><?= Html::encode($review->taskName) ?></a>» выполнено</p>
+                <p class="task">
+                    Задание «<?= Html::a(
+                        Html::encode($review->taskName),
+                        ['task/view', 'id' => $review->taskId],
+                        ['class' => 'link link--small']
+                    ) ?>» выполнено
+                </p>
             </div>
             <div class="feedback-wrapper">
 
