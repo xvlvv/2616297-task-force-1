@@ -73,6 +73,7 @@ class TaskController extends Controller
                                 return false;
                             }
 
+                            /** @var TaskResponseRepositoryInterface $repo */
                             $repo = Yii::$container->get(TaskResponseRepositoryInterface::class);
                             $taskId = $repo->getTaskIdByResponseId((int)$responseId);
 

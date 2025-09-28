@@ -27,8 +27,6 @@ class ReviewRepository implements ReviewRepositoryInterface
         $review->rating = $dto->rating;
 
         if (!$review->save()) {
-            var_dump($review->getErrors());
-            die();
             throw new RuntimeException('Failed to save review');
         }
 

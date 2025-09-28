@@ -31,7 +31,7 @@ class FailAction extends Action
      *
      * @return bool
      */
-    public function canMakeAction(int $userId, int $authorId, ?int $workerId = null, int $taskId = null): bool
+    public function canMakeAction(int $userId, int $authorId, ?int $workerId = null, ?int $taskId = null): bool
     {
         return $userId !== $authorId && $userId === $workerId;
     }

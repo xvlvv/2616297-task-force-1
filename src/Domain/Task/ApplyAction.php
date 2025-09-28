@@ -45,7 +45,7 @@ class ApplyAction extends Action
      *
      * @return bool
      */
-    public function canMakeAction(int $userId, int $authorId, ?int $workerId = null, int $taskId = null): bool
+    public function canMakeAction(int $userId, int $authorId, ?int $workerId = null, ?int $taskId = null): bool
     {
         $isNotAuthor = $userId !== $authorId;
 
