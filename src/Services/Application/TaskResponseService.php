@@ -63,4 +63,16 @@ final class TaskResponseService
 
         return $this->repository->save($taskResponse);
     }
+
+    public function rejectResponse(int $responseId): bool
+    {
+        $responseEntity = $this->repository->getByIdOrFail($responseId);
+        $responseEntity->reject();
+
+        if (false === $this->repository->update($responseEntity)) {
+            throw new \RuntimeException('Error saving task response');
+        }
+
+        return true;
+    }
 }

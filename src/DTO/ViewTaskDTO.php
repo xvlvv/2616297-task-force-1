@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Xvlvv\DTO;
 
+use Xvlvv\Enums\Status;
+
 /**
  * DTO для отображения детальной информации о задании
  */
@@ -17,7 +19,7 @@ readonly final class ViewTaskDTO
      * @param string $category Название категории
      * @param string $createdAt Дата создания
      * @param string|null $endDate Срок выполнения
-     * @param string $status Статус задания
+     * @param Status $status Статус задания
      * @param array $availableActions Массив возможных действий над задачей
      * @param array $responses Массив откликов
      * @param array $files Массив файлов
@@ -30,8 +32,8 @@ readonly final class ViewTaskDTO
         public string $category,
         public string $createdAt,
         public ?string $endDate,
-        public string $status,
-        public array $availableActions ,
+        public Status $status,
+        public array $availableActions,
         public array $responses,
         public array $files,
     ) {

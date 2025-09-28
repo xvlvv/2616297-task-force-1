@@ -38,7 +38,7 @@ class TaskResponse extends ActiveRecord
         return [
             [['comment', 'price'], 'default', 'value' => null],
             [['task_id', 'worker_id'], 'required'],
-            [['task_id', 'worker_id', 'price'], 'integer', 'min' => 1],
+            [['task_id', 'worker_id'], 'integer', 'min' => 1],
             [['is_rejected'], 'boolean'],
             [['comment'], 'string'],
             [['created_at', 'updated_at'], 'safe'],

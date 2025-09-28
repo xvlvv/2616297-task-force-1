@@ -10,7 +10,7 @@ class RatingWidget extends Widget
 {
     public int $maxRating = 5;
     public int $minRating = 0;
-    public ?int $rating;
+    public int|float|null $rating;
     public string $wrapperClass = 'small';
 
     public function init(): void
@@ -23,6 +23,7 @@ class RatingWidget extends Widget
 
     public function run(): string
     {
+        $this->rating = (int) $this->rating;
         $result = "<div class='stars-rating {$this->wrapperClass}'>";
 
         for ($i = $this->minRating + 1; $i <= $this->maxRating; $i++) {

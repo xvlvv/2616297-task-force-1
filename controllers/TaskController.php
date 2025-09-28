@@ -4,24 +4,38 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\models\ApplyForm;
 use app\models\PublishForm;
+use app\models\CompleteForm;
 use app\models\TaskSearch;
 use DateTimeImmutable;
 use RuntimeException;
+use Xvlvv\DTO\CancelTaskDTO;
 use Xvlvv\DTO\CreateTaskDTO;
+use Xvlvv\DTO\FailTaskDTO;
 use Xvlvv\DTO\GetNewTasksDTO;
-use Xvlvv\DTO\SaveTaskDTO;
+use Xvlvv\DTO\SaveReviewDTO;
+use Xvlvv\DTO\SaveTaskResponseDTO;
+use Xvlvv\DTO\StartTaskDTO;
 use Xvlvv\Repository\CategoryRepositoryInterface;
 use Xvlvv\Repository\TaskRepositoryInterface;
+use Xvlvv\Repository\TaskResponseRepositoryInterface;
+use Xvlvv\Services\Application\CancelTaskService;
+use Xvlvv\Services\Application\FailTaskService;
+use Xvlvv\Services\Application\FinishTaskService;
 use Xvlvv\Services\Application\PublishTaskService;
+use Xvlvv\Services\Application\StartTaskService;
+use Xvlvv\Services\Application\TaskResponseService;
 use Yii;
 use yii\data\ArrayDataProvider;
 use yii\data\Pagination;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * Контроллер для управления заданиями (просмотр списка и детальной страницы).
@@ -43,7 +57,55 @@ class TaskController extends Controller
                         'allow' => true,
                         'actions' => ['publish'],
                         'matchCallback' => fn () => Yii::$app->user->can('publishTask')
-                    ]
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['apply'],
+                        'matchCallback' => fn () => Yii::$app->user->can('applyToTask')
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['reject-response', 'start'],
+                        'matchCallback' => function () {
+                            $responseId = Yii::$app->request->get('id');
+
+                            if (!$responseId) {
+                                return false;
+                            }
+
+                            /** @var TaskResponseRepositoryInterface $repo */
+                            $repo = Yii::$container->get(TaskResponseRepositoryInterface::class);
+                            $taskId = $repo->getTaskIdByResponseId((int)$responseId);
+
+                            return Yii::$app->user->can('manageTaskResponses', ['taskId' => $taskId]);
+                        }
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['complete', 'cancel'],
+                        'matchCallback' => function () {
+                            $taskId = Yii::$app->request->get('id');
+
+                            if (!$taskId) {
+                                return false;
+                            }
+
+                            return Yii::$app->user->can('manageTaskResponses', ['taskId' => $taskId]);
+                        }
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['fail'],
+                        'matchCallback' => function () {
+                            $taskId = Yii::$app->request->get('id');
+
+                            if (!$taskId) {
+                                return false;
+                            }
+
+                            return Yii::$app->user->can('failTask', ['taskId' => $taskId]);
+                        }
+                    ],
                 ],
             ]
         ];
@@ -114,12 +176,12 @@ class TaskController extends Controller
     {
         $userId = Yii::$app->user->identity->getUser()->getId();
         $task = $taskRepository->getTaskForView($id, $userId);
+        $applyForm = new ApplyForm();
+        $completeForm = new CompleteForm();
 
         return $this->render(
             'view',
-            [
-                'task' => $task,
-            ]
+            compact('task', 'applyForm', 'completeForm')
         );
     }
 
@@ -170,8 +232,115 @@ class TaskController extends Controller
         return $this->redirect($newTask);
     }
 
-    public function actionApply(int $id): string
+    public function actionApply(int $id, TaskResponseService $responseService): array|Response
     {
-        return '1';
+        $completeForm = new ApplyForm();
+        $completeForm->load(Yii::$app->request->post());
+
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($completeForm);
+        }
+
+        if (!$completeForm->validate()) {
+            throw new BadRequestHttpException('Ошибка при сохранении отклика');
+        }
+
+        $saveResponseDTO = new SaveTaskResponseDTO(
+            $id,
+            Yii::$app->user->identity->getUser()->getId(),
+            $completeForm->description,
+            (int) $completeForm->price,
+        );
+
+        $responseService->createResponse($saveResponseDTO);
+
+        return $this->redirect(['task/view', 'id' => $id]);
+    }
+
+    public function actionRejectResponse(
+        int $id,
+        TaskResponseService $responseService,
+        TaskResponseRepositoryInterface $taskResponseRepository
+    ): Response {
+        $taskId = $taskResponseRepository->getTaskIdByResponseId($id);
+        $responseService->rejectResponse($id);
+
+        return $this->redirect(['task/view', 'id' => $taskId]);
+    }
+
+    public function actionStart(
+        int $id,
+        StartTaskService $service,
+        TaskResponseRepositoryInterface $taskResponseRepository
+    ): Response {
+        $responseEntity = $taskResponseRepository->getByIdOrFail($id);
+        $taskId = $responseEntity->getTaskId();
+
+        $startTaskDTO = new StartTaskDTO(
+            $taskId,
+            Yii::$app->user->identity->getUser()->getId(),
+            $responseEntity->getWorkerId(),
+        );
+
+        $service->handle($startTaskDTO);
+
+        return $this->redirect(['task/view', 'id' => $taskId]);
+    }
+
+    public function actionComplete(
+        int $id,
+        FinishTaskService $service,
+    ): array|Response {
+        $completeForm = new CompleteForm();
+        $completeForm->load(Yii::$app->request->post());
+
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($completeForm);
+        }
+
+        if (!$completeForm->validate()) {
+            throw new BadRequestHttpException('Ошибка при сохранении отклика');
+        }
+
+        $saveReviewDTO = new SaveReviewDTO(
+            (int) $completeForm->rating,
+            $completeForm->comment,
+            $id,
+            Yii::$app->user->identity->getUser()->getId(),
+        );
+
+        $service->handle($saveReviewDTO);
+
+        return $this->redirect(['task/view', 'id' => $id]);
+    }
+
+    public function actionCancel(
+        int $id,
+        CancelTaskService $service,
+    ): array|Response {
+        $cancelTaskDTO = new CancelTaskDTO(
+            $id,
+            Yii::$app->user->identity->getUser()->getId(),
+        );
+
+        $service->handle($cancelTaskDTO);
+
+        return $this->redirect(['task/view', 'id' => $id]);
+    }
+
+    public function actionFail(
+        int $id,
+        FailTaskService $service,
+    ): array|Response {
+        $failTaskDTO = new FailTaskDTO(
+            Yii::$app->user->identity->getUser()->getId(),
+            $id,
+        );
+
+        $service->handle($failTaskDTO);
+
+        return $this->redirect(['task/view', 'id' => $id]);
     }
 }

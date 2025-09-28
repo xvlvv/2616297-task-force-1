@@ -1,5 +1,6 @@
 <?php
 
+use Xvlvv\DataMapper\TaskMapper;
 use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\Repository\CategoryRepository;
 use Xvlvv\Repository\CategoryRepositoryInterface;
@@ -14,7 +15,12 @@ use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Repository\UserRepository;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Xvlvv\Services\Application\AuthService;
+use Xvlvv\Services\Application\CancelTaskService;
+use Xvlvv\Services\Application\FailTaskService;
+use Xvlvv\Services\Application\FinishTaskService;
 use Xvlvv\Services\Application\PublishTaskService;
+use Xvlvv\Services\Application\StartTaskService;
+use Xvlvv\Services\Application\TaskResponseService;
 
 /**
  * @var array $params
@@ -35,13 +41,17 @@ $config = [
         'definitions' => [
             TaskRepositoryInterface::class => function () {
                 $taskResponseRepo = Yii::$container->get(TaskResponseRepositoryInterface::class);
-                return new TaskRepository($taskResponseRepo);
+                $mapper = Yii::$container->get(TaskMapper::class);
+                return new TaskRepository($taskResponseRepo, $mapper);
             },
             CityRepositoryInterface::class => CityRepository::class,
             CategoryRepositoryInterface::class => CategoryRepository::class,
             TaskResponseRepositoryInterface::class => function () {
+                $userMapper = Yii::$container->get(UserMapper::class);
                 $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
-                return new TaskResponseRepository($reviewRepo);
+                $taskMapper = Yii::$container->get(TaskMapper::class);
+
+                return new TaskResponseRepository($reviewRepo, $userMapper, $taskMapper);
             },
             ReviewRepositoryInterface::class => ReviewRepository::class,
             UserMapper::class => UserMapper::class,
@@ -51,9 +61,14 @@ $config = [
                 $userMapper = Yii::$container->get(UserMapper::class);
                 return new UserRepository($reviewRepo, $taskRepo, $userMapper);
             },
+            TaskMapper::class => TaskMapper::class,
             AuthService::class => AuthService::class,
+            StartTaskService::class => StartTaskService::class,
             PublishTaskService::class  => PublishTaskService::class,
-
+            TaskResponseService::class => TaskResponseService::class,
+            FinishTaskService::class => FinishTaskService::class,
+            CancelTaskService::class => CancelTaskService::class,
+            FailTaskService::class => FailTaskService::class,
         ],
     ],
     'components' => [
@@ -114,6 +129,11 @@ $config = [
                 'register' => 'site/register',
                 'logout' => 'site/logout',
                 'publish' => 'task/publish',
+                'tasks/apply' => 'task/apply',
+                'task/rejectResponse/<id:\d+>' => 'task/reject-response',
+                'task/start/<id:\d+>' => 'task/start',
+                'task/complete/<id:\d+>' => 'task/complete',
+                'task/fail/<id:\d+>' => 'task/fail',
             ],
         ],
         'session' => [

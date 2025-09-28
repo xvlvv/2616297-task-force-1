@@ -615,7 +615,7 @@ footer {
   padding-bottom: 14px;
   padding-right: 16px;
   padding-left: 16px;
-  margin-bottom: 35px; }
+  margin-bottom: 20px; }
 
 .multiple-select {
   padding-top: 14px;
@@ -2444,6 +2444,14 @@ footer {
     margin-bottom: 7px; }
   .form-modal button {
     float: right; }
+
+.form-modal form .form-group.has-error {
+  margin: 0 0 15px;
+}
+
+.form-modal .help-block:empty {
+  display: none;
+}
 
 .enter-form {
   display: none; }

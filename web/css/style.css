@@ -389,6 +389,15 @@ template {
   .button--pink:hover{
     background-color: #d52057; }
 
+.button--cancel,
+.button--red{
+  background-color: #c00;
+}
+.button--cancel:hover,
+.button--red:hover {
+  background-color: #900;
+}
+
 .button--yellow {
   background-color: #f5c644; }
   .button--yellow:hover {
@@ -1570,6 +1579,10 @@ form .has-error textarea:hover {
     max-width: 424px;
     min-height: 96px; }
 
+.pop-up--form .help-block:empty {
+  display: none;
+}
+
 .pop-up--refusal {
   display: none; }
   .pop-up--refusal .button--pop-up {
@@ -1599,5 +1612,43 @@ form .has-error textarea:hover {
 
 .pop-up--open {
   display: block; }
+
+/* Контейнер для нашего рейтинга */
+.stars-rating-form {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin: 8px 0 5px;
+}
+
+.stars-rating-form .star-input {
+  display: none;
+}
+
+.stars-rating-form .star-label {
+  font-size: 32px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.stars-rating-form .star-label::before {
+  content: '★';
+}
+
+.stars-rating-form .star-label:hover,
+.stars-rating-form .star-label:hover ~ .star-label {
+  color: #f2b000;
+}
+
+.stars-rating-form .star-input:checked ~ .star-label {
+  color: #f2b000;
+}
+
+.stars-rating-form > div {
+  display: flex;
+  gap: 5px;
+  flex-direction: row-reverse;
+}
 
 /*# sourceMappingURL=style.css.map */

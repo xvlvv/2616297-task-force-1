@@ -249,7 +249,7 @@ final class Task
             $actions,
             function (Action $actionEnum) use ($userId) {
                 $actionObject = $actionEnum->getActionObject();
-                return $actionObject->canMakeAction($userId, $this->customerId, $this->workerId);
+                return $actionObject->canMakeAction($userId, $this->customerId, $this->workerId, $this->getId());
             }
         );
 

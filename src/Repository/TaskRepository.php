@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Xvlvv\Repository;
 
-use app\models\Category;
-use Xvlvv\Entity\Category as CategoryEntity;
 use app\models\File;
 use app\models\TaskResponse;
 use DateMalformedStringException;
@@ -13,12 +11,12 @@ use DateTime;
 use http\Exception\InvalidArgumentException;
 use http\Exception\RuntimeException;
 use Throwable;
+use Xvlvv\DataMapper\TaskMapper;
 use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\RenderTaskDTO;
 use Xvlvv\DTO\SaveTaskDTO;
 use Xvlvv\DTO\ViewNewTasksDTO;
 use Xvlvv\DTO\ViewTaskDTO;
-use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task;
 use app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
@@ -34,9 +32,11 @@ class TaskRepository implements TaskRepositoryInterface
 {
     /**
      * @param TaskResponseRepositoryInterface $taskResponseRepo
+     * @param TaskMapper $mapper
      */
     public function __construct(
         private TaskResponseRepositoryInterface $taskResponseRepo,
+        private TaskMapper $mapper,
     ) {
     }
 
@@ -107,18 +107,14 @@ class TaskRepository implements TaskRepositoryInterface
         }
 
         if ($taskModel->status !== $task->getCurrentStatus()->value) {
-            $taskModel->status = $task->getCurrentStatus();
+            $taskModel->status = $task->getCurrentStatus()->value;
         }
 
         if ($taskModel->worker_id !== $task->getWorkerId()) {
             $taskModel->worker_id = $task->getWorkerId();
         }
 
-        try {
-            $taskModel->save();
-        } catch (
-            Exception
-        ) {
+        if (!$taskModel->save()) {
             throw new RuntimeException('Failed to update task');
         }
     }
@@ -177,36 +173,7 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $task = $this->getModelByIdOrFail($taskId);
 
-        $city = new City(
-            $task->city->id,
-            $task->city->name
-        );
-
-        $status = Status::from($task->status);
-        $category = Category::find()->where(['id' => $task->category->id])->one();
-
-        $categoryEntity = new CategoryEntity(
-            $task->category->id,
-            $task->category->name
-        );
-
-        if (null === $category) {
-            throw new NotFoundHttpException('Отсутствует категория у задачи');
-        }
-
-        return Task::create(
-            $task->customer_id,
-            $task->name,
-            $task->description,
-            $task->created_at,
-            $categoryEntity,
-            $task->end_date,
-            $task->worker_id,
-            $task->id,
-            $task->budget,
-            $status,
-            $city,
-        );
+        return $this->mapper->toDomainEntity($task);
     }
 
     /**
@@ -267,7 +234,10 @@ class TaskRepository implements TaskRepositoryInterface
             ->asArray()
             ->all();
 
-        $tasksModels = $this->getFilteredTasksQuery($dto)->all();
+        $tasksModels = $this
+            ->getFilteredTasksQuery($dto)
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
 
         $tasks = array_map(function ($task) {
             return new RenderTaskDTO(
@@ -319,8 +289,7 @@ class TaskRepository implements TaskRepositoryInterface
     public function getTaskForView(int $id, int $userId): ViewTaskDTO
     {
         $task = $this->getByIdOrFail($id);
-        $responses = $this->taskResponseRepo->findByTaskId($task->getId());
-        $status = $task->getCurrentStatus() === Status::NEW ? 'Открыт для новых заказов' : 'Занят';
+        $responses = $this->taskResponseRepo->findByTaskId($task->getId(), $userId);
         $files = File::find()->where(['task_id' => $task->getId()])->all();
 
         return new ViewTaskDTO(
@@ -331,7 +300,7 @@ class TaskRepository implements TaskRepositoryInterface
             $task->getCategory()->getName(),
             $task->getCreatedDate(),
             $task->getEndDate(),
-            $status,
+            $task->getCurrentStatus(),
             $task->getAvailableActions($userId),
             $responses,
             $files,

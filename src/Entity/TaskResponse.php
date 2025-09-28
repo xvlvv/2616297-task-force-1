@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Xvlvv\Entity;
 
+use LogicException;
+
 /**
  * Сущность Отклик на задание
  */
@@ -17,11 +19,10 @@ final class TaskResponse
         private Task $task,
         private User $user,
         private bool $isRejected,
-        private int $price,
+        private ?int $price = null,
         private ?string $comment = null,
     ) {
     }
-
 
     /**
      * Фабричный метод для создания отклика
@@ -30,17 +31,16 @@ final class TaskResponse
      * @param Task $task Сущность задания
      * @param User $user Сущность пользователя
      * @param bool $isRejected Флаг, отклонен ли отклик
-     * @param int $price Предложенная цена
+     * @param int|null $price Предложенная цена
      * @param string|null $comment Комментарий
      * @return TaskResponse
-     * @throws \LogicException если цена выше бюджета
      */
     public static function create(
         int $id,
         Task $task,
         User $user,
         bool $isRejected,
-        int $price,
+        ?int $price = null,
         ?string $comment = null,
     ): TaskResponse
     {
@@ -52,6 +52,11 @@ final class TaskResponse
             $price,
             $comment
         );
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     /**
@@ -76,6 +81,14 @@ final class TaskResponse
     public function getComment(): ?string
     {
         return $this->comment;
+    }
+
+    public function reject(): void
+    {
+        if ($this->isRejected) {
+            throw new LogicException('Cannot reject already rejected task response.');
+        }
+        $this->isRejected = true;
     }
 
     /**

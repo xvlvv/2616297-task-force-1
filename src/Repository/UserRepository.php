@@ -82,6 +82,7 @@ class UserRepository implements UserRepositoryInterface
      */
     public function update(User $user): void
     {
+
         if (null === $user->getId()) {
             throw new LogicException('Нельзя обновить несуществующего пользователя');
         }
@@ -231,6 +232,7 @@ class UserRepository implements UserRepositoryInterface
         $reviews = array_map(
             function ($reviewModel) {
                 return new UserReviewViewDTO(
+                    $reviewModel->task->id,
                     $reviewModel->task->name,
                     $reviewModel->comment,
                     $reviewModel->rating,

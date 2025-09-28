@@ -160,32 +160,23 @@ use yii\widgets\ActiveForm;
         'id' => 'login-form',
         'action' => ['site/index'],
         'enableAjaxValidation' => true,
-        'enableClientValidation' => true,
-        'validationUrl' => ['site/index'],
+        'fieldConfig' => [
+            'template' => "{label}\n{input}\n{error}",
+            'labelOptions' => ['class' => 'form-modal-description'],
+            'inputOptions' => ['class' => 'input input-middle'],
+        ]
     ]); ?>
 
-    <?= $form->field($loginForm, 'email')->textInput(['type' => 'email']) ?>
+    <?= $form->field($loginForm, 'email')->textInput([
+        'type' => 'email',
+    ]) ?>
 
-    <?= $form->field($loginForm, 'password'
-    )->passwordInput() ?>
+    <?= $form->field($loginForm, 'password')->passwordInput() ?>
 
-    <?= Html::submitButton('Войти') ?>
+    <?= Html::submitButton('Войти', ['class' => 'button']) ?>
 
     <?php ActiveForm::end(); ?>
 
     <?= Html::button('Закрыть', ['class' => 'form-modal-close']) ?>
-
-    <!--        <form action="#" method="post">-->
-    <!--            <p>-->
-    <!--                <label class="form-modal-description" for="enter-email">Email</label>-->
-    <!--                <input class="enter-form-email input input-middle" type="email" name="enter-email" id="enter-email">-->
-    <!--            </p>-->
-    <!--            <p>-->
-    <!--                <label class="form-modal-description" for="enter-password">Пароль</label>-->
-    <!--                <input class="enter-form-email input input-middle" type="password" name="enter-email" id="enter-password">-->
-    <!--            </p>-->
-    <!--            <button class="button" type="submit">Войти</button>-->
-    <!--        </form>-->
-    <!--        <button class="form-modal-close" type="button">Закрыть</button>-->
 </section>
 <div class="overlay"></div>

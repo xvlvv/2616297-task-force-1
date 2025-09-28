@@ -17,4 +17,23 @@ interface TaskResponseRepositoryInterface
      * @return bool
      */
     public function save(TaskResponse $taskResponse): bool;
+
+    /**
+     * Сохраняет обновлённый отклик на задачу
+     * @param TaskResponse $taskResponse
+     * @return bool
+     */
+    public function update(TaskResponse $taskResponse): bool;
+
+    public function getByIdOrFail(int $id): TaskResponse;
+
+    public function getTaskIdByResponseId(int $id): int;
+
+    /**
+     * Находит и формирует DTO откликов для страницы просмотра задачи
+     * @param int $id ID задачи
+     * @param int $currentUserId
+     * @return array
+     */
+    public function findByTaskId(int $id, int $currentUserId): array;
 }

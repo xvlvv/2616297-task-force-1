@@ -4,12 +4,18 @@ declare(strict_types = 1);
 
 /**
  * @var ViewTaskDTO $task Данные задания
+ * @var ApplyForm $applyForm Форма отклика на задание
+ * @var CompleteForm $completeForm Форма завершения задания
  */
 
+use app\models\ApplyForm;
+use app\models\CompleteForm;
 use app\widgets\RatingWidget;
 use Xvlvv\DTO\ViewTaskDTO;
 use Xvlvv\Enums\Action;
+use Xvlvv\Enums\Status;
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 ?>
 <div class="left-column">
@@ -43,7 +49,7 @@ use yii\helpers\Html;
             <div class="feedback-wrapper">
                 <?= Html::a(
                     Html::encode($response->workerName),
-                    ['user/view', 'id' => $response->id],
+                    ['user/view', 'id' => $response->userId],
                     ['class' => 'link link--block link--big']
                 ) ?>
                 <div class="response-wrapper">
@@ -65,12 +71,25 @@ use yii\helpers\Html;
                 <p class="info-text"><?= Yii::$app->formatter->asRelativeTime($response->createdAt) ?></p>
                 <p class="price price--small"><?= Html::encode($response->price) ?>&nbsp;₽</p>
             </div>
-            <div class="button-popup">
-                <a href="#"
-                   class="button button--<?= Action::APPLY->getActionObject()->getInternalName() ?> button--small">Принять</a>
-                <a href="#"
-                   class="button button--<?= Action::FAIL->getActionObject()->getInternalName() ?> button--small">Отказать</a>
-            </div>
+            <?php
+            if (
+                Yii::$app->user->can('manageTaskResponses', ['taskId' => $task->id])
+                && !$response->isRejected
+                && $task->status === Status::NEW
+            ): ?>
+                <div class="button-popup">
+                    <?= Html::a(
+                        'Принять',
+                        ['task/start', 'id' => $response->id],
+                        ['class' => 'button button--blue button--small']
+                    ) ?>
+                    <?= Html::a(
+                        'Отказать',
+                        ['task/reject-response', 'id' => $response->id],
+                        ['class' => 'button button--orange button--small']
+                    ) ?>
+                </div>
+            <?php endif ?>
         </div>
         <?php endforeach ?>
     <?php endif ?>
@@ -86,7 +105,7 @@ use yii\helpers\Html;
             <dt>Срок выполнения</dt>
             <dd><?= Yii::$app->formatter->asDatetime($task->endDate, 'd MMMM, H:m') ?></dd>
             <dt>Статус</dt>
-            <dd><?= Html::encode($task->status) ?></dd>
+            <dd><?= Html::encode($task->status === Status::NEW ? 'Открыт для новых заказов' : 'Занят') ?></dd>
         </dl>
     </div>
     <?php if (!empty($task->files)): ?>
@@ -116,9 +135,13 @@ use yii\helpers\Html;
             Вы собираетесь отказаться от выполнения этого задания.<br>
             Это действие плохо скажется на вашем рейтинге и увеличит счетчик проваленных заданий.
         </p>
-        <a class="button button--pop-up button--orange">Отказаться</a>
+        <?= Html::a(
+            Action::FAIL->getActionObject()->getName(),
+            ['task/fail', 'id' => $task->id],
+            ['class' => 'button button--pop-up button--orange']
+        ) ?>
         <div class="button-container">
-            <button class="button--close" type="button">Закрыть окно</button>
+            <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
         </div>
     </div>
 </section>
@@ -130,18 +153,39 @@ use yii\helpers\Html;
             Пожалуйста, оставьте отзыв об исполнителе и отметьте отдельно, если возникли проблемы.
         </p>
         <div class="completion-form pop-up--form regular-form">
-            <form>
-                <div class="form-group">
-                    <label class="control-label" for="completion-comment">Ваш комментарий</label>
-                    <textarea id="completion-comment"></textarea>
-                </div>
-                <p class="completion-head control-label">Оценка работы</p>
-                <div class="stars-rating big active-stars"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div>
-                <input type="submit" class="button button--pop-up button--blue" value="Завершить">
-            </form>
+            <?php $form = ActiveForm::begin([
+                'method' => 'post',
+                'action' => ['/task/complete', 'id' => $task->id],
+                'enableAjaxValidation' => true,
+            ]) ?>
+
+            <?= $form->field($completeForm, 'comment')->textarea() ?>
+
+            <p class="completion-head control-label">Оценка работы</p>
+
+            <?= $form->field($completeForm, 'rating', [
+                'template' => '{input}{error}',
+                'options' => ['class' => 'stars-rating-form'],
+            ])->radioList(
+                [5 => '', 4 => '', 3 => '', 2 => '', 1 => ''],
+                [
+                    'item' => function ($index, $label, $name, $checked, $value) {
+                        $return = '<input class="star-input" id="star-' . $value . '" type="radio" name="' . $name
+                                  . '" value="' . $value . '" ' . ($checked ? 'checked' : '') . '>';
+                        $return .= '<label class="star-label" for="star-' . $value . '"></label>';
+                        return $return;
+                    },
+                    'encode' => false,
+                ]
+            )->label(false)
+            ?>
+
+            <?= Html::submitInput('Завершить', ['class' => 'button button--pop-up button--blue']) ?>
+
+            <?php ActiveForm::end() ?>
         </div>
         <div class="button-container">
-            <button class="button--close" type="button">Закрыть окно</button>
+            <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
         </div>
     </div>
 </section>
@@ -153,20 +197,40 @@ use yii\helpers\Html;
             Пожалуйста, укажите стоимость работы и добавьте комментарий, если необходимо.
         </p>
         <div class="addition-form pop-up--form regular-form">
-            <form>
-                <div class="form-group">
-                    <label class="control-label" for="addition-comment">Ваш комментарий</label>
-                    <textarea id="addition-comment"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="control-label" for="addition-price">Стоимость</label>
-                    <input id="addition-price" type="text">
-                </div>
-                <input type="submit" class="button button--pop-up button--blue" value="Завершить">
-            </form>
+            <?php
+            $form = ActiveForm::begin([
+                'method' => 'post',
+                'action' => ['/task/apply', 'id' => $task->id],
+                'enableAjaxValidation' => true,
+            ]) ?>
+
+            <?= $form->field($applyForm, 'description')->textarea() ?>
+
+            <?= $form->field($applyForm, 'price')->textInput() ?>
+
+            <?= Html::submitInput('Завершить', ['class' => 'button button--pop-up button--blue']) ?>
+
+            <?php ActiveForm::end() ?>
         </div>
         <div class="button-container">
-            <button class="button--close" type="button">Закрыть окно</button>
+            <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
+        </div>
+    </div>
+</section>
+<section class="pop-up pop-up--<?= Action::CANCEL->getActionObject()->getInternalName() ?> pop-up--close">
+    <div class="pop-up--wrapper">
+        <h4>Отменить задание</h4>
+        <p class="pop-up-text">
+            Вы собираетесь отменить опубликованное задание.
+            Пожалуйста, подтвердите действие.
+        </p>
+        <?= Html::a(
+            Action::CANCEL->getActionObject()->getName(),
+            ['task/cancel', 'id' => $task->id],
+            ['class' => 'button button--pop-up button--red']
+        ) ?>
+        <div class="button-container">
+            <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
         </div>
     </div>
 </section>
