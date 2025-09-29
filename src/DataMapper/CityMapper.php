@@ -22,7 +22,23 @@ final class CityMapper
     {
         return new City(
             $arCity->id,
-            $arCity->name
+            $arCity->name,
+            $arCity->bounding_box,
         );
+    }
+
+    public function toActiveRecord(City $city): CityModel
+    {
+        $cityModel = CityModel::findOne($city->getId());
+
+        if (null === $cityModel) {
+            $cityModel = new CityModel();
+            $cityModel->id = $city->getId();
+        }
+
+        $cityModel->name = $city->getName();
+        $cityModel->bounding_box = $city->getBoundingBox();
+
+        return $cityModel;
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Xvlvv\DTO;
 
+use Couchbase\Coordinate;
+use Xvlvv\Domain\ValueObject\Coordinates;
 use Xvlvv\Enums\Status;
 
 /**
@@ -36,6 +38,9 @@ readonly final class ViewTaskDTO
         public array $availableActions,
         public array $responses,
         public array $files,
+        public ?string $cityName,
+        public ?Coordinates $coordinates,
+        public ?string $additionalInfo,
     ) {
     }
 }

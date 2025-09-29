@@ -1,5 +1,10 @@
 <?php
 
+use Xvlvv\DataMapper\CityMapper;
+use Xvlvv\Services\Application\GeocoderInterface;
+use Xvlvv\Services\Application\LocationService;
+use Xvlvv\Services\Application\YandexGeocoderService;
+use yii\httpclient\Client;
 use Xvlvv\DataMapper\TaskMapper;
 use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\Repository\CategoryRepository;
@@ -44,7 +49,11 @@ $config = [
                 $mapper = Yii::$container->get(TaskMapper::class);
                 return new TaskRepository($taskResponseRepo, $mapper);
             },
-            CityRepositoryInterface::class => CityRepository::class,
+            CityRepositoryInterface::class => function () {
+                $mapper = Yii::$container->get(CityMapper::class);
+                return new CityRepository($mapper);
+            },
+            CityMapper::class => CityMapper::class,
             CategoryRepositoryInterface::class => CategoryRepository::class,
             TaskResponseRepositoryInterface::class => function () {
                 $userMapper = Yii::$container->get(UserMapper::class);
@@ -69,6 +78,16 @@ $config = [
             FinishTaskService::class => FinishTaskService::class,
             CancelTaskService::class => CancelTaskService::class,
             FailTaskService::class => FailTaskService::class,
+            Client::class => Client::class,
+            LocationService::class => function () {
+                $geocoder = Yii::$container->get(GeocoderInterface::class);
+                return new LocationService($geocoder);
+            },
+            GeocoderInterface::class => function () {
+                $client = Yii::$container->get(Client::class);
+                $cityRepo = Yii::$container->get(CityRepositoryInterface::class);
+                return new YandexGeocoderService($client, $cityRepo);
+            },
         ],
     ],
     'components' => [
@@ -134,6 +153,7 @@ $config = [
                 'task/start/<id:\d+>' => 'task/start',
                 'task/complete/<id:\d+>' => 'task/complete',
                 'task/fail/<id:\d+>' => 'task/fail',
+                'GET api/locations' => 'api/location/search',
             ],
         ],
         'session' => [

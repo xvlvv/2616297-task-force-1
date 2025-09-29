@@ -26,4 +26,6 @@ interface CityRepositoryInterface
      * @throws NotFoundHttpException
      */
     public function getByIdOrFail(int $id): City;
+
+    public function update(City $city): void;
 }

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Entity;
 
 use DomainException;
+use Xvlvv\Domain\ValueObject\Coordinates;
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use Xvlvv\Exception\InvalidActionForTaskException;
@@ -30,6 +31,8 @@ final class Task
      * @param int|null $budget
      * @param Status $currentStatus
      * @param City|null $city
+     * @param Coordinates|null $coordinates
+     * @param string|null $locationInfo
      * @return self
      */
     public static function create(
@@ -43,7 +46,9 @@ final class Task
         ?int $id = null,
         ?int $budget = null,
         Status $currentStatus = Status::NEW,
-        ?City $city = null
+        ?City $city = null,
+        ?Coordinates $coordinates = null,
+        ?string $locationInfo = null,
     ): self {
         return new self(
             customerId: $customerId,
@@ -57,7 +62,9 @@ final class Task
             workerId: $workerId,
             budget: $budget,
             currentStatus: $currentStatus,
-            city: $city
+            city: $city,
+            coordinates: $coordinates,
+            locationInfo: $locationInfo
         );
     }
 
@@ -76,6 +83,8 @@ final class Task
      * @param int|null $budget
      * @param Status $currentStatus
      * @param City|null $city
+     * @param Coordinates|null $coordinates
+     * @param string|null $locationInfo
      */
     private function __construct(
         private int $customerId,
@@ -90,6 +99,8 @@ final class Task
         private ?int $budget = null,
         private Status $currentStatus = Status::NEW,
         private ?City $city = null,
+        private ?Coordinates $coordinates = null,
+        private ?string $locationInfo = null,
     ) {
     }
 
@@ -142,6 +153,21 @@ final class Task
     public function getCurrentStatus(): Status
     {
         return $this->currentStatus;
+    }
+
+    public function getCoordinates(): ?Coordinates
+    {
+        return $this->coordinates;
+    }
+
+    public function getLocationInfo(): ?string
+    {
+        return $this->locationInfo;
+    }
+
+    public function getCityName(): ?string
+    {
+        return $this->city?->getName();
     }
 
     /**

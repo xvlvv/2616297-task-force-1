@@ -16,6 +16,9 @@ use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\assets\YandexMapAsset;
+
+YandexMapAsset::register($this);
 
 ?>
 <div class="left-column">
@@ -36,11 +39,17 @@ use yii\widgets\ActiveForm;
             ]
         );
     } ?>
+    <?php if (null !== $task->coordinates): ?>
     <div class="task-map">
-        <img class="map" src="img/map.png"  width="725" height="346" alt="Новый арбат, 23, к. 1">
-        <p class="map-address town">Москва</p>
-        <p class="map-address">Новый арбат, 23, к. 1</p>
+        <div id="map-container"
+             style="width: 100%; height: 346px;"
+             data-latitude="<?= $task->coordinates->latitude ?>"
+             data-longitude="<?= $task->coordinates->longitude ?>">
+        </div>
+        <p class="map-address town"><?= Html::encode($task->cityName) ?></p>
+        <?= Html::tag('p', Html::encode($task->additionalInfo), ['class' => 'map-address']) ?>
     </div>
+    <?php endif ?>
     <?php if (!empty($task->responses)): ?>
     <h4 class="head-regular">Отклики на задание</h4>
         <?php foreach ($task->responses as $response): ?>
@@ -235,3 +244,38 @@ use yii\widgets\ActiveForm;
     </div>
 </section>
 <div class="overlay"></div>
+
+<?php
+$js = <<<JS
+
+ymaps.ready(init);
+
+function init() {
+    
+    const mapElement = document.getElementById('map-container');
+    
+    if (!mapElement) {
+        return;
+    }
+
+    const latitude = parseFloat(mapElement.dataset.latitude);
+    const longitude = parseFloat(mapElement.dataset.longitude);
+    
+    if (isNaN(latitude) || isNaN(longitude)) {
+        return;
+    }
+    
+    const centerCoordinates = [latitude, longitude];
+
+    const myMap = new ymaps.Map('map-container', {
+            center: centerCoordinates,
+            zoom: 15
+    });
+    
+    const location = new ymaps.Placemark(centerCoordinates);
+    myMap.geoObjects.add(location);
+}
+
+JS;
+
+$this->registerJs($js, \yii\web\View::POS_END);

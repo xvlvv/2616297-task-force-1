@@ -7,7 +7,7 @@ namespace Xvlvv\Entity;
 /**
  * Сущность Город
  */
-readonly final class City
+final class City
 {
     /**
      * @param int $id ID города
@@ -16,6 +16,7 @@ readonly final class City
     public function __construct(
         private int $id,
         private string $name,
+        private ?string $boundingBox,
     ) {
     }
 
@@ -33,5 +34,17 @@ readonly final class City
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getBoundingBox(): ?string
+    {
+        return $this->boundingBox;
+    }
+
+    public function updateBoundingBox(?string $boundingBox): void
+    {
+        if (null !== $boundingBox) {
+            $this->boundingBox = $boundingBox;
+        }
     }
 }

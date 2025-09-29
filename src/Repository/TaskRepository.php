@@ -56,6 +56,7 @@ class TaskRepository implements TaskRepositoryInterface
         $task->city_id = $taskDTO->city->getId();
         $task->longitude = $taskDTO->coordinates->longitude ?? null;
         $task->latitude = $taskDTO->coordinates->latitude ?? null;
+        $task->location_info = $taskDTO->locationAdditionalInfo ?? null;
 
         $transaction = Yii::$app->db->beginTransaction();
 
@@ -304,6 +305,9 @@ class TaskRepository implements TaskRepositoryInterface
             $task->getAvailableActions($userId),
             $responses,
             $files,
+            $task->getCityName(),
+            $task->getCoordinates(),
+            $task->getLocationInfo(),
         );
     }
 
