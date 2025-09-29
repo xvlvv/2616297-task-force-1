@@ -66,6 +66,7 @@ final class PublishTaskService
                 $user,
                 $task->endDate,
                 $coordinates ?? null,
+                $task->locationAdditionalInfo ?? null,
                 $task->budget,
                 $city,
                 $task->files

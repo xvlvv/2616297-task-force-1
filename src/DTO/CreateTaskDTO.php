@@ -31,6 +31,7 @@ readonly final class CreateTaskDTO
         public ?DateTimeImmutable $endDate = null,
         public ?string $latitude = null,
         public ?string $longitude = null,
+        public ?string $locationAdditionalInfo = null,
         public ?int $budget = null,
         public ?int $cityId = null,
         public array $files = []

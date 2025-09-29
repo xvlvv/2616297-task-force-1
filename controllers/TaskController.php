@@ -10,6 +10,7 @@ use app\models\CompleteForm;
 use app\models\TaskSearch;
 use DateTimeImmutable;
 use RuntimeException;
+use Xvlvv\DataMapper\CityMapper;
 use Xvlvv\DTO\CancelTaskDTO;
 use Xvlvv\DTO\CreateTaskDTO;
 use Xvlvv\DTO\FailTaskDTO;
@@ -18,6 +19,7 @@ use Xvlvv\DTO\SaveReviewDTO;
 use Xvlvv\DTO\SaveTaskResponseDTO;
 use Xvlvv\DTO\StartTaskDTO;
 use Xvlvv\Repository\CategoryRepositoryInterface;
+use Xvlvv\Repository\CityRepository;
 use Xvlvv\Repository\TaskRepositoryInterface;
 use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Services\Application\CancelTaskService;
@@ -218,8 +220,12 @@ class TaskController extends Controller
             $formModel->categoryId,
             Yii::$app->user->identity->getUser()->getId(),
             DateTimeImmutable::createFromFormat('Y-m-d', $formModel->endDate),
-            budget: $formModel->budget,
-            files: $files,
+            $formModel->latitude,
+            $formModel->longitude,
+            $formModel->additionalInfo,
+            $formModel->budget,
+            Yii::$app->user->identity->getUser()->getCity()->getId(),
+            $files,
         );
 
         $id = $publishTaskService->publish($saveTaskDTO);

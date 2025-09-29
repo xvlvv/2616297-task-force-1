@@ -4,14 +4,12 @@ namespace app\controllers;
 
 use app\models\City;
 use app\models\RegistrationForm;
-use app\models\User;
 use app\models\UserIdentity;
 use Xvlvv\DTO\RegisterUserDTO;
 use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Services\Application\AuthService;
 use Yii;
 use yii\base\Exception;
-use yii\db\Connection;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;

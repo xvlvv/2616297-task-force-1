@@ -32,6 +32,7 @@ readonly final class SaveTaskDTO
         public User $customer,
         public ?\DateTimeImmutable $endDate = null,
         public ?Coordinates $coordinates = null,
+        public ?string $locationAdditionalInfo = null,
         public ?int $budget = null,
         public ?City $city = null,
         public array $files = []

@@ -2,14 +2,18 @@
 
 declare(strict_types = 1);
 
+use app\assets\AutocompleteAsset;
 use app\models\PublishForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
  * @var PublishForm $formModel Модель формы публикации задания
  * @var array $categories Список категорий [идентификатор => название]
  */
+
+AutocompleteAsset::register($this);
 
 ?>
 <div class="add-task-form regular-form center-block">
@@ -20,31 +24,26 @@ use yii\widgets\ActiveForm;
     ]) ?>
 
     <h3 class="head-main head-main">Публикация нового задания</h3>
-    <div class="form-group">
-        <?= $form->field($formModel, 'name')->textInput() ?>
-    </div>
+    <?= $form->field($formModel, 'name')->textInput() ?>
 
-    <div class="form-group">
-        <?= $form->field($formModel, 'description')->textarea() ?>
-    </div>
+    <?= $form->field($formModel, 'description')->textarea() ?>
 
-    <div class="form-group">
-        <?= $form->field($formModel, 'categoryId')->dropDownList($categories) ?>
-    </div>
+    <?= $form->field($formModel, 'categoryId')->dropDownList($categories) ?>
 
-<!--    <div class="form-group">-->
-<!--        <label class="control-label" for="location">Локация</label>-->
-<!--        <input class="location-icon" id="location" type="text">-->
-<!--        <span class="help-block">Error description is here</span>-->
-<!--    </div>-->
+    <?= $form->field($formModel, 'location')->textInput(
+        ['class' => 'location-input location-icon', 'data-autocomplete' => 'location']
+    ) ?>
+
+    <?= Html::activeHiddenInput($formModel, 'latitude', ['data-publish-hidden' => 'latitude']) ?>
+
+    <?= Html::activeHiddenInput($formModel, 'longitude', ['data-publish-hidden' => 'longitude']) ?>
+
+    <?= Html::activeHiddenInput($formModel, 'additionalInfo', ['data-publish-hidden' => 'additionalInfo']) ?>
 
     <div class="half-wrapper">
-        <div class="form-group">
-            <?= $form->field($formModel, 'budget')->textInput() ?>
-        </div>
-        <div class="form-group">
-            <?= $form->field($formModel, 'endDate')->input('date') ?>
-        </div>
+        <?= $form->field($formModel, 'budget')->textInput(['class' => 'budget-icon']) ?>
+
+        <?= $form->field($formModel, 'endDate')->input('date') ?>
     </div>
 
     <?= $form->field($formModel, 'files[]', [
@@ -67,3 +66,59 @@ use yii\widgets\ActiveForm;
 
     <?php ActiveForm::end() ?>
 </div>
+
+<?php
+$searchUrl = Url::to(['api/locations']);
+$modelId = $formModel->formName();
+
+$js = <<<JS
+
+const autoCompleteJS = new autoComplete({
+    placeHolder: 'Введите город',
+    selector: '[data-autocomplete="location"]',
+    data: {
+        src: async (query) => {
+            try {
+                const source = await fetch(`{$searchUrl}?query=\${query}`);
+                return await source.json();
+            } catch (error) {
+                return error;
+            }
+        },
+        keys: ['fullAddress'],
+        cache: false
+    },
+    threshold: 2,
+    debounce: 500,
+    searchEngine: 'loose',
+    resultsList: {
+        noResults: true,
+        maxResults: 10,
+        element: (list, data) => {
+            if (!data.results.length) {
+                const message = document.createElement('li');
+                message.setAttribute('class', 'no-results-message');
+                message.textContent = 'Ничего не найдено';
+                list.appendChild(message);
+            }
+        }
+    },
+    resultItem: {
+        highlight: true
+    },
+    events: {
+        input: {
+            selection: (event) => {
+                const selection = event.detail.selection.value;
+                autoCompleteJS.input.value = selection.fullAddress;
+                document.querySelector('[data-publish-hidden="latitude"]').value = selection.latitude;
+                document.querySelector('[data-publish-hidden="longitude"]').value = selection.longitude;
+                document.querySelector('[data-publish-hidden="additionalInfo"]').value = selection.additional || '';
+            }
+        }
+    }
+});
+
+JS;
+
+$this->registerJs($js);

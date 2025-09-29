@@ -4,20 +4,23 @@ namespace Xvlvv\DataMapper;
 
 use app\models\Category;
 use app\models\Task;
+use Xvlvv\Domain\ValueObject\Coordinates;
 use Xvlvv\Entity\Category as CategoryEntity;
 use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task as TaskEntity;
 use Xvlvv\Enums\Status;
+use Xvlvv\Repository\CityRepository;
+use Xvlvv\Repository\TaskRepository;
+use Yii;
 use yii\web\NotFoundHttpException;
 
 class TaskMapper
 {
     public function toDomainEntity(Task $task): TaskEntity
     {
-        $city = new City(
-            $task->city->id,
-            $task->city->name
-        );
+        $repo = Yii::$container->get(CityRepository::class);
+
+        $city = $repo->getById($task->customer->city_id);
 
         $status = Status::from($task->status);
         $category = Category::find()->where(['id' => $task->category->id])->one();
@@ -31,7 +34,12 @@ class TaskMapper
             throw new NotFoundHttpException('Отсутствует категория у задачи');
         }
 
-        return \Xvlvv\Entity\Task::create(
+        if (null !== $task->latitude
+        && null !== $task->longitude) {
+            $coordinates = new Coordinates($task->latitude, $task->longitude);
+        }
+
+        return TaskEntity::create(
             $task->customer_id,
             $task->name,
             $task->description,
@@ -43,6 +51,8 @@ class TaskMapper
             $task->budget,
             $status,
             $city,
+            $coordinates ?? null,
+            $task->location_info,
         );
     }
 }
