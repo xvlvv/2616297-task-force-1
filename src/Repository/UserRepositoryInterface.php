@@ -39,10 +39,10 @@ interface UserRepositoryInterface
     /**
      * Находит пользователя по email
      *
-     * @param string $email
+     * @param string|null $email
      * @return User|null
      */
-    public function getByEmail(string $email): ?User;
+    public function getByEmail(?string $email): ?User;
 
     /**
      * Обновляет данные пользователя
@@ -85,4 +85,6 @@ interface UserRepositoryInterface
     public function getUserRank(int $userId): int;
 
     public function isAuthor(int $userId): bool;
+
+    public function getByVkId(int $vkId): ?User;
 }

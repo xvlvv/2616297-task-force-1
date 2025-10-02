@@ -6,7 +6,8 @@ namespace Xvlvv\Repository;
 
 use app\models\ExecutorProfile;
 use app\models\Review;
-use http\Exception\RuntimeException;
+use Exception;
+use RuntimeException;
 use LogicException;
 use Throwable;
 use Xvlvv\DataMapper\UserMapper;
@@ -74,7 +75,13 @@ class UserRepository implements UserRepositoryInterface
      */
     public function getByEmailOrFail(string $email): User
     {
-        // TODO: Implement getByEmailOrFail() method.
+        $user = $this->getByEmail($email);
+
+        if (null === $user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $user;
     }
 
     /**
@@ -82,7 +89,6 @@ class UserRepository implements UserRepositoryInterface
      */
     public function update(User $user): void
     {
-
         if (null === $user->getId()) {
             throw new LogicException('Нельзя обновить несуществующего пользователя');
         }
@@ -113,16 +119,30 @@ class UserRepository implements UserRepositoryInterface
             default => throw new LogicException('Неизвестный тип профиля'),
         };
 
-        $profileModel = new $profileModelClass();
-        $profileModel->user_id = $user->getId();
+        $profileModel = $profileModelClass::findOne(['user_id' => $user->getId()]);
+
+        if ($profileModel === null) {
+            $profileModel = new $profileModelClass();
+            $profileModel->user_id = $user->getId();
+        }
 
         if (!$profileModel->save()) {
-            throw new RuntimeException('Ошибка сохранения профиля пользователя');
+            throw new Exception();
         }
 
         $auth = Yii::$app->authManager;
-        $authorRole = $auth->getRole($user->getUserRole()->value);
-        $auth->assign($authorRole, $user->getId());
+        $roleName = $user->getUserRole()->value;
+        $userId = $user->getId();
+
+        if ($auth->getAssignment($roleName, $userId)) {
+            return $user;
+        }
+
+        $authorRole = $auth->getRole($roleName);
+        if ($authorRole) {
+            $auth->assign($authorRole, $userId);
+        }
+
         return $user;
     }
 
@@ -142,11 +162,14 @@ class UserRepository implements UserRepositoryInterface
      */
     private function toActiveRecord(User $user): UserModel
     {
-        if (null !== $user->getId()) {
-            return UserModel::findOne($user->getId());
+        $userModel = null !== $user->getId()
+            ? UserModel::findOne($user->getId())
+            : new UserModel();
+
+        if (!$userModel) {
+            throw new \RuntimeException('Cannot update user that don\'t exists');
         }
 
-        $userModel = new UserModel();
         $userModel->id = $user->getId();
         $userModel->name = $user->getName();
         $userModel->email = $user->getEmail();
@@ -154,6 +177,8 @@ class UserRepository implements UserRepositoryInterface
         $userModel->role = $user->getUserRole()->value;
         $userModel->city_id = $user->getCity()->getId();
         $userModel->access_token = $user->getAccessToken();
+        $userModel->vk_id = $user->getVkId();
+        $userModel->avatar_path = $user->getAvatarPath();
 
         return $userModel;
     }
@@ -272,8 +297,12 @@ class UserRepository implements UserRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getByEmail(string $email): ?User
+    public function getByEmail(string|null $email): ?User
     {
+        if (null === $email) {
+            return null;
+        }
+
         $userModel = UserModel::find()
             ->with(
                 [
@@ -303,5 +332,18 @@ class UserRepository implements UserRepositoryInterface
         $user = $this->getByIdOrFail($userId);
 
         return $user->getUserRole() === UserRole::WORKER;
+    }
+
+    public function getByVkId(int $vkId): ?User
+    {
+        $userModel = UserModel::find()
+            ->with(['city', 'workerProfile', 'customerProfile'])
+            ->where(['vk_id' => $vkId])->one();
+
+        if (null === $userModel) {
+            return null;
+        }
+
+        return $this->userMapper->toDomainEntity($userModel);
     }
 }
