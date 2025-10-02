@@ -6,6 +6,9 @@ use yii\base\Model;
 
 class RegistrationForm extends Model
 {
+    public const SCENARIO_DEFAULT_REGISTER = 'default_register';
+    public const SCENARIO_VK_REGISTER = 'vk_register';
+
     public string $name = '';
     public string $email = '';
     public int $cityId = 0;
@@ -15,14 +18,22 @@ class RegistrationForm extends Model
     public string $city = '';
     public bool $isWorker = false;
 
+    public function scenarios(): array
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_DEFAULT_REGISTER] = ['name', 'email', 'cityId', 'password', 'passwordRepeat', 'isWorker'];
+        $scenarios[self::SCENARIO_VK_REGISTER] = ['name', 'email', 'cityId', 'isWorker'];
+        return $scenarios;
+    }
+
     public function rules(): array
     {
         return [
             ['name', 'required', 'message' => 'Введите имя'],
             ['email', 'required', 'message' => 'Введите адрес электронной почты'],
-            ['password', 'required', 'message' => 'Введите пароль'],
+            [['password', 'passwordRepeat'], 'required', 'message' => 'Введите пароль', 'on' => self::SCENARIO_DEFAULT_REGISTER],
             ['cityId', 'required', 'message' => 'Укажите ваш город'],
-            ['password', 'compare', 'compareAttribute' => 'passwordRepeat', 'message' => 'Пароли не совпадают'],
+            ['password', 'compare', 'compareAttribute' => 'passwordRepeat', 'message' => 'Пароли не совпадают', 'on' => self::SCENARIO_DEFAULT_REGISTER],
             ['passwordRepeat', 'safe'],
             [
                 'cityId',
