@@ -49,6 +49,17 @@ final readonly class AuthService
         return $user;
     }
 
+    public function authenticateWithVkId(string $email, ?int $vkId): ?User
+    {
+        $user = $this->userRepository->getByEmail($email);
+
+        if ($user === null || $user->getVkId() !== $vkId) {
+            return null;
+        }
+
+        return $user;
+    }
+
     /**
      * Регистрирует нового пользователя в системе
      *
@@ -87,6 +98,8 @@ final readonly class AuthService
             $profile,
             $city,
             $authKey,
+            avatarPath: $dto->avatar,
+            vkId: $dto->vkId,
         );
 
         $user = $this->userRepository->save($user);
