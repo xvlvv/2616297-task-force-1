@@ -159,7 +159,7 @@ class SiteController extends Controller
             $user = $authService->authenticateWithVkId($formModel->email, $vkUserData['vk_id'] ?? null);
             Yii::$app->session->remove('vk_user_data');
         } else {
-            $user = $authService->authenticate($formModel->name, $formModel->password);
+            $user = $authService->authenticate($formModel->email, $formModel->password);
         }
 
         if (null === $user) {
