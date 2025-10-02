@@ -3,7 +3,9 @@
 use Xvlvv\DataMapper\CityMapper;
 use Xvlvv\Services\Application\GeocoderInterface;
 use Xvlvv\Services\Application\LocationService;
+use Xvlvv\Services\Application\VkAuthService;
 use Xvlvv\Services\Application\YandexGeocoderService;
+use yii\helpers\Url;
 use yii\httpclient\Client;
 use Xvlvv\DataMapper\TaskMapper;
 use Xvlvv\DataMapper\UserMapper;
@@ -26,6 +28,7 @@ use Xvlvv\Services\Application\FinishTaskService;
 use Xvlvv\Services\Application\PublishTaskService;
 use Xvlvv\Services\Application\StartTaskService;
 use Xvlvv\Services\Application\TaskResponseService;
+use yii\symfonymailer\Mailer;
 
 /**
  * @var array $params
@@ -88,6 +91,11 @@ $config = [
                 $cityRepo = Yii::$container->get(CityRepositoryInterface::class);
                 return new YandexGeocoderService($client, $cityRepo);
             },
+            VkAuthService::class => function () {
+                $userRepo = Yii::$container->get(UserRepository::class);
+                $vkAuth = Yii::$app->authClientCollection->getClient('vk-id');
+                return new VkAuthService($userRepo, $vkAuth);
+            }
         ],
     ],
     'components' => [
@@ -106,10 +114,13 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [],
+        ],
         'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
+            'class' => Mailer::class,
             'viewPath' => '@app/mail',
-            // send all mails to a file by default.
             'useFileTransport' => true,
         ],
         'log' => [
@@ -154,6 +165,8 @@ $config = [
                 'task/complete/<id:\d+>' => 'task/complete',
                 'task/fail/<id:\d+>' => 'task/fail',
                 'GET api/locations' => 'api/location/search',
+                'oauth/redirect' => 'api/oauth/redirect',
+                'oauth/callback' => 'api/oauth/callback',
             ],
         ],
         'session' => [
@@ -163,6 +176,14 @@ $config = [
     ],
     'params' => $params,
 ];
+
+if (isset($_ENV['VK_CLIENT_ID'])) {
+    $config['components']['authClientCollection']['clients']['vk-id'] = [
+        'class' => 'app\auth\VkIdOauth',
+        'clientId' => $_ENV['VK_CLIENT_ID'],
+        'returnUrl' => 'https://chemosynthetically-unhit-jerald.ngrok-free.dev/oauth/callback'
+    ];
+}
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
