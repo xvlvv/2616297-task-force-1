@@ -181,7 +181,6 @@ if (isset($_ENV['VK_CLIENT_ID'])) {
     $config['components']['authClientCollection']['clients']['vk-id'] = [
         'class' => 'app\auth\VkIdOauth',
         'clientId' => $_ENV['VK_CLIENT_ID'],
-        'returnUrl' => 'https://chemosynthetically-unhit-jerald.ngrok-free.dev/oauth/callback'
     ];
 }
 
