@@ -173,6 +173,19 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($loginForm, 'password')->passwordInput() ?>
 
+    <?php if (Yii::$app->authClientCollection->hasClient('vk-id')): ?>
+
+        <?= Html::a(
+            '<span class="vk-icon"></span><span>Войти с VK ID</span>',
+            ['/oauth/redirect'],
+            [
+                'class' => 'button button--vk',
+                'title' => 'Войти с VK ID',
+            ]
+        ) ?>
+
+    <?php endif ?>
+
     <?= Html::submitButton('Войти', ['class' => 'button']) ?>
 
     <?php ActiveForm::end(); ?>
