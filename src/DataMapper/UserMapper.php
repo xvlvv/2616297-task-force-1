@@ -50,7 +50,8 @@ final class UserMapper
             $city,
             $arUser->access_token,
             $arUser->avatar_path ?? null,
-            $arUser->id
+            $arUser->id,
+            $arUser->vk_id,
         );
     }
 

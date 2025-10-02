@@ -25,6 +25,7 @@ class User
      * @param string|null $accessToken
      * @param string|null $avatarPath Путь к аватару
      * @param int|null $id ID пользователя
+     * @param int|null $vkId
      */
     public function __construct(
         private string $name,
@@ -36,6 +37,7 @@ class User
         private readonly ?string $accessToken,
         private ?string $avatarPath = null,
         private ?int $id = null,
+        private ?int $vkId = null,
     ) {
     }
 
@@ -61,6 +63,20 @@ class User
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function updateWithVkId(int $vkId): void
+    {
+        if (null !== $this->getVkId()) {
+            throw new \RuntimeException('VK ID already exists');
+        }
+
+        $this->vkId = $vkId;
+    }
+
+    public function getVkId(): ?int
+    {
+        return $this->vkId;
     }
 
     /**
@@ -121,7 +137,7 @@ class User
      */
     public function setId(int $id): void
     {
-        if (null !== $this->getId()) {
+        if (null !== $this->getId() && $id !== $this->getId()) {
             throw new LogicException('Нельзя обновить уже существующий идентификатор');
         }
 

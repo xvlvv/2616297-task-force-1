@@ -2443,6 +2443,7 @@ footer {
     color: rgba(57, 57, 57, 0.86);
     margin-bottom: 7px; }
   .form-modal button {
+    margin: 20px 0 0;
     float: right; }
 
 .form-modal form .form-group.has-error {
@@ -2591,4 +2592,36 @@ footer {
 
 .has-error div {
   color: #FF116E; }
+
+.button--vk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #0077FF;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button--vk:hover {
+  background-color: #005ECC;
+  color: #fff;
+}
+
+.button--vk .vk-icon {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  background-image: url('/img/vk/logo.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
 /*# sourceMappingURL=style.css.map */

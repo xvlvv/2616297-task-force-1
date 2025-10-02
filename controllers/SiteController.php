@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\City;
 use app\models\RegistrationForm;
 use app\models\UserIdentity;
+use RuntimeException;
 use Xvlvv\DTO\RegisterUserDTO;
 use Xvlvv\Exception\UserWithEmailAlreadyExistsException;
 use Xvlvv\Services\Application\AuthService;
@@ -115,21 +116,6 @@ class SiteController extends Controller
     public function actionRegister(AuthService $authService): string|Response
     {
         $formModel = new RegistrationForm();
-        $formModel->load(Yii::$app->request->post());
-
-        if (Yii::$app->request->isPost && $formModel->validate()) {
-            $registerDTO = new RegisterUserDTO(
-                $formModel->name,
-                $formModel->email,
-                $formModel->cityId,
-                $formModel->password,
-                $formModel->isWorker,
-            );
-
-            $authService->register($registerDTO);
-
-            return $this->redirect(['site/index']);
-        }
 
         $cities = ArrayHelper::map(
             City::find()->select(['id', 'name'])->asArray()->all(),
@@ -137,7 +123,52 @@ class SiteController extends Controller
             'name'
         );
 
-        return $this->render('register', compact('formModel', 'cities'));
+        $vkUserData = Yii::$app->session->get('vk_user_data', false);
+        $isRegisterWithVK = (bool) $vkUserData;
+
+        $formModel->scenario = $isRegisterWithVK ?
+            RegistrationForm::SCENARIO_VK_REGISTER
+            : RegistrationForm::SCENARIO_DEFAULT_REGISTER;
+
+        if ($isRegisterWithVK) {
+            $formModel->load($vkUserData, '');
+        }
+
+        $formModel->load(Yii::$app->request->post());
+
+        if (!Yii::$app->request->isPost || !$formModel->validate()) {
+            return $this->render(
+                'register',
+                compact('formModel', 'cities', 'isRegisterWithVK')
+            );
+        }
+
+        $registerDTO = new RegisterUserDTO(
+            $formModel->name,
+            $formModel->email,
+            $formModel->cityId,
+            $formModel->isWorker,
+            $formModel->password,
+            $isRegisterWithVK ? (int) $vkUserData['vk_id'] : null,
+            $isRegisterWithVK ? $vkUserData['avatar'] ?? null : null,
+        );
+
+        $authService->register($registerDTO);
+
+        if ($isRegisterWithVK) {
+            $user = $authService->authenticateWithVkId($formModel->email, $vkUserData['vk_id'] ?? null);
+            Yii::$app->session->remove('vk_user_data');
+        } else {
+            $user = $authService->authenticate($formModel->email, $formModel->password);
+        }
+
+        if (null === $user) {
+            throw new RuntimeException('Ошибка при регистрации');
+        }
+
+        $identity = new UserIdentity($user);
+        Yii::$app->user->login($identity);
+        return $this->redirect('/tasks');
     }
 
     /**
