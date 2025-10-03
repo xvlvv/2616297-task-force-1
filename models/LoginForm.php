@@ -4,22 +4,35 @@ namespace app\models;
 
 use Xvlvv\Entity\User;
 use Xvlvv\Services\Application\AuthService;
-use Yii;
 use yii\base\Model;
 
+/**
+ * Модель формы для входа пользователя на сайт.
+ */
 class LoginForm extends Model
 {
+    /** @var string Email пользователя */
     public string $email = '';
+    /** @var string Пароль пользователя */
     public string $password = '';
+    /** @var User|null Доменная сущность пользователя, найденная после успешной валидации */
     private ?User $_user = null;
+    /** @var AuthService Сервис для аутентификации */
     private AuthService $authService;
 
-    public function __construct(AuthService $authService, $config = [])
+    /**
+     * @param AuthService $authService Сервис для аутентификации.
+     * @param array $config
+     */
+    public function __construct(AuthService $authService, array $config = [])
     {
         $this->authService = $authService;
         parent::__construct($config);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules(): array
     {
         return [
@@ -30,9 +43,12 @@ class LoginForm extends Model
     }
 
     /**
-     * Валидирует пароль, используя AuthService
-     * @param string $attribute
-     * @param $params
+     * Кастомный валидатор для проверки пароля.
+     * Использует `AuthService` для проверки учетных данных.
+     * В случае успеха, сохраняет найденную сущность пользователя.
+     *
+     * @param string $attribute Атрибут для валидации (в данном случае 'password').
+     * @param array|null $params Дополнительные параметры.
      */
     public function validatePassword(string $attribute, $params): void
     {
@@ -51,7 +67,8 @@ class LoginForm extends Model
     }
 
     /**
-     * Возвращает найденного пользователя после успешной валидации
+     * Возвращает доменную сущность пользователя после успешной аутентификации.
+     *
      * @return User|null
      */
     public function getUser(): ?User

@@ -12,7 +12,12 @@ use LogicException;
 final class TaskResponse
 {
     /**
-     * Конструктор TaskResponse
+     * @param int $id ID отклика
+     * @param Task $task Сущность связанного задания
+     * @param User $user Сущность пользователя-исполнителя
+     * @param bool $isRejected Флаг, отклонен ли отклик
+     * @param int|null $price Предложенная стоимость
+     * @param string|null $comment Комментарий к отклику
      */
     private function __construct(
         private int $id,
@@ -54,12 +59,17 @@ final class TaskResponse
         );
     }
 
+    /**
+     * Возвращает ID отклика.
+     * @return int
+     */
     public function getId(): int
     {
         return $this->id;
     }
 
     /**
+     * Возвращает ID связанного задания.
      * @return int|null
      */
     public function getTaskId(): ?int
@@ -68,6 +78,7 @@ final class TaskResponse
     }
 
     /**
+     * Возвращает ID исполнителя, оставившего отклик.
      * @return int|null
      */
     public function getWorkerId(): ?int
@@ -76,6 +87,7 @@ final class TaskResponse
     }
 
     /**
+     * Возвращает комментарий к отклику.
      * @return string|null
      */
     public function getComment(): ?string
@@ -83,6 +95,11 @@ final class TaskResponse
         return $this->comment;
     }
 
+    /**
+     * Отклоняет отклик.
+     * @return void
+     * @throws LogicException если отклик уже отклонен.
+     */
     public function reject(): void
     {
         if ($this->isRejected) {
@@ -92,7 +109,8 @@ final class TaskResponse
     }
 
     /**
-     * @return int
+     * Возвращает предложенную стоимость.
+     * @return int|null
      */
     public function getPrice(): int
     {
@@ -100,6 +118,7 @@ final class TaskResponse
     }
 
     /**
+     * Проверяет, отклонен ли отклик.
      * @return bool
      */
     public function isRejected(): bool

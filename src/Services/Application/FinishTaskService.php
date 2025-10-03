@@ -9,6 +9,7 @@ use Xvlvv\DTO\SaveReviewDTO;
 use Xvlvv\Exception\UserIsNotAuthorId;
 use Xvlvv\Repository\ReviewRepositoryInterface;
 use Xvlvv\Repository\TaskRepositoryInterface;
+use yii\web\NotFoundHttpException;
 
 /**
  * Сервис для завершения задачи и создания отзыва
@@ -30,7 +31,7 @@ final class FinishTaskService
      *
      * @param SaveReviewDTO $dto DTO с данными отзыва
      * @return bool
-     * @throws UserIsNotAuthorId если пользователь не является автором задачи
+     * @throws UserIsNotAuthorId|NotFoundHttpException если пользователь не является автором задачи
      */
     public function handle(SaveReviewDTO $dto): bool
     {

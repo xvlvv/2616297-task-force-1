@@ -4,9 +4,15 @@ namespace app\models;
 
 use yii\base\Model;
 
+/**
+ * Модель формы для завершения задания.
+ * Содержит правила валидации для полей комментария и оценки.
+ */
 class CompleteForm extends Model
 {
+    /** @var string Текст отзыва о работе исполнителя */
     public string $comment = '';
+    /** @var string|null Оценка работы исполнителя (от 1 до 5) */
     public ?string $rating = null;
 
     /**

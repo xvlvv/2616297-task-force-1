@@ -2,24 +2,22 @@
 
 namespace app\models;
 
-use Yii;
-use yii\base\InvalidConfigException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%file}}".
+ * ActiveRecord модель для таблицы "{{%file}}".
+ * Представляет файл, прикрепленный к заданию.
  *
  * @property int $id
- * @property string $original_name
- * @property int $task_id
- * @property string $path
- * @property string $mime_type
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property string $original_name Оригинальное имя файла
+ * @property int $task_id ID связанного задания
+ * @property string $path Путь к файлу на сервере
+ * @property string $mime_type MIME-тип файла
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property TaskFile[] $taskFiles
- * @property Task[] $tasks
+ * @property Task $task Связанная модель задания
  */
 class File extends ActiveRecord
 {
@@ -63,7 +61,7 @@ class File extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Определяет связь с моделью Task
      *
      * @return ActiveQuery
      */

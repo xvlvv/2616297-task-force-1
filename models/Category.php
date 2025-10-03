@@ -2,27 +2,25 @@
 
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%category}}".
+ * ActiveRecord модель для таблицы "{{%category}}".
+ * Представляет категорию заданий.
  *
  * @property int $id
- * @property string $name
- * @property string|null $icon
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property string $name Название категории
+ * @property string|null $icon CSS-класс иконки
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property Task[] $tasks
- * @property UserSpecialization[] $userSpecializations
- * @property User[] $users
+ * @property Task[] $tasks Задания, принадлежащие этой категории
+ * @property UserSpecialization[] $userSpecializations Связи пользователей с этой категорией
+ * @property User[] $users Пользователи, выбравшие эту категорию как специализацию
  */
 class Category extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -60,7 +58,7 @@ class Category extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Определяет связь с заданиями (Task)
      *
      * @return ActiveQuery
      */
@@ -70,7 +68,7 @@ class Category extends ActiveRecord
     }
 
     /**
-     * Gets query for [[UserSpecializations]].
+     * Определяет связь со специализациями пользователей (UserSpecialization)
      *
      * @return ActiveQuery
      */

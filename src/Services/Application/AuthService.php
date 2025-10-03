@@ -22,8 +22,8 @@ use yii\web\NotFoundHttpException;
 final readonly class AuthService
 {
     /**
-     * @param UserRepositoryInterface $userRepository
-     * @param CityRepositoryInterface $cityRepository
+     * @param UserRepositoryInterface $userRepository Репозиторий для работы с пользователями
+     * @param CityRepositoryInterface $cityRepository Репозиторий для работы с городами
      */
     public function __construct(
         private UserRepositoryInterface $userRepository,
@@ -32,11 +32,11 @@ final readonly class AuthService
     }
 
     /**
-     * Проверяет учетные данные пользователя
+     * Проверяет учетные данные пользователя по email и паролю.
      *
-     * @param string $email
-     * @param string $password
-     * @return User|null
+     * @param string $email Email пользователя.
+     * @param string $password Пароль пользователя в открытом виде.
+     * @return User|null Возвращает сущность User в случае успеха, иначе null.
      */
     public function authenticate(string $email, string $password): ?User
     {
@@ -49,6 +49,14 @@ final readonly class AuthService
         return $user;
     }
 
+    /**
+     * Аутентифицирует пользователя, ранее зарегистрированного через VK.
+     * Проверяет, что email и VK ID совпадают с сохраненными данными.
+     *
+     * @param string $email Email пользователя.
+     * @param int|null $vkId ID пользователя ВКонтакте.
+     * @return User|null Возвращает сущность User в случае успеха, иначе null.
+     */
     public function authenticateWithVkId(string $email, ?int $vkId): ?User
     {
         $user = $this->userRepository->getByEmail($email);

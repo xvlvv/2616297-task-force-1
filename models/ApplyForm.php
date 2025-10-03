@@ -6,7 +6,9 @@ use yii\base\Model;
 
 class ApplyForm extends Model
 {
+    /** @var string|null Текст комментария к отклику */
     public ?string $description = null;
+    /** @var string|null Предлагаемая стоимость выполнения задания */
     public ?string $price = null;
 
     /**

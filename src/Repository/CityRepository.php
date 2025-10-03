@@ -6,14 +6,13 @@ namespace Xvlvv\Repository;
 
 use Xvlvv\DataMapper\CityMapper;
 use Xvlvv\Entity\City;
-use \app\models\City as Model;
-use Xvlvv\Repository\CityRepositoryInterface;
+use app\models\City as Model;
 use yii\web\NotFoundHttpException;
 
 /**
  * Репозиторий для работы с сущностями City
  */
-class CityRepository implements CityRepositoryInterface
+readonly final class CityRepository implements CityRepositoryInterface
 {
     public function __construct(
         private CityMapper $mapper
@@ -52,6 +51,9 @@ class CityRepository implements CityRepositoryInterface
         return $city;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function update(City $city): void
     {
         $cityModel = $this->mapper->toActiveRecord($city);

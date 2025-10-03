@@ -4,12 +4,24 @@ declare(strict_types=1);
 
 namespace app\models;
 
+/**
+ * Модель формы для фильтрации списка заданий.
+ * Наследуется от Task для удобства, но является моделью формы.
+ */
 class TaskSearch extends Task
 {
+    /** @var string|array Массив ID выбранных категорий */
     public string|array $categories = [];
+
+    /** @var bool Флаг "Без исполнителя" */
     public bool $checkWorker = false;
+
+    /** @var string Выбранный период времени для фильтрации */
     public string $createdAt = '';
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules(): array
     {
         return [
@@ -17,6 +29,9 @@ class TaskSearch extends Task
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels(): array
     {
         return [
@@ -26,6 +41,10 @@ class TaskSearch extends Task
         ];
     }
 
+    /**
+     * Возвращает массив опций для выпадающего списка периодов.
+     * @return string[]
+     */
     public static function getPeriodOptions(): array
     {
         return [

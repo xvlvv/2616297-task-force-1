@@ -2,12 +2,12 @@
 
 namespace app\controllers\api;
 
-use Throwable;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
 use Xvlvv\Services\Application\LocationService;
 use yii\filters\ContentNegotiator;
+
 
 class LocationController extends Controller
 {

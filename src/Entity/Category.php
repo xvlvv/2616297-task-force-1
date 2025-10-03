@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Xvlvv\Entity;
 
 /**
- * Сущность Категория
+ * Доменная сущность Категория.
  */
 readonly final class Category
 {
@@ -20,6 +20,7 @@ readonly final class Category
     }
 
     /**
+     * Возвращает ID категории.
      * @return int
      */
     public function getId(): int
@@ -28,6 +29,7 @@ readonly final class Category
     }
 
     /**
+     * Возвращает название категории.
      * @return string
      */
     public function getName(): string

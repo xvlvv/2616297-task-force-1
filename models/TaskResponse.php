@@ -6,19 +6,20 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%task_response}}".
+ * ActiveRecord модель для таблицы "{{%task_response}}".
+ * Представляет отклик исполнителя на задание.
  *
  * @property int $id
- * @property int $task_id
- * @property int $worker_id
- * @property string|null $comment
- * @property int|null $price
- * @property int $is_rejected
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property int $task_id ID связанного задания
+ * @property int $worker_id ID исполнителя, оставившего отклик
+ * @property string|null $comment Комментарий к отклику
+ * @property int|null $price Предложенная стоимость
+ * @property int $is_rejected Флаг, отклонен ли отклик заказчиком
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property Task $task
- * @property User $worker
+ * @property Task $task Связанная модель задания
+ * @property User $worker Связанная модель пользователя-исполнителя
  */
 class TaskResponse extends ActiveRecord
 {
@@ -65,7 +66,7 @@ class TaskResponse extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Определяет связь с моделью Task
      *
      * @return ActiveQuery
      */
@@ -75,7 +76,7 @@ class TaskResponse extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Worker]].
+     * Определяет связь с моделью User (исполнитель)
      *
      * @return ActiveQuery
      */

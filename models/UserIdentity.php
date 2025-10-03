@@ -8,30 +8,44 @@ use yii\web\IdentityInterface;
 use Xvlvv\Entity\User;
 use app\models\User as UserModel;
 
-final class UserIdentity implements IdentityInterface
+/**
+ * Класс Identity для аутентификации пользователя в Yii.
+ * Обертка над доменной сущностью User.
+ */
+readonly final class UserIdentity implements IdentityInterface
 {
+    /**
+     * @param User $user Доменная сущность пользователя
+     */
     public function __construct(
         private User $user
     ) {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
+     * Находит Identity по ID пользователя, используя репозиторий.
      */
     public static function findIdentity($id): ?IdentityInterface
     {
+        /** @var UserRepositoryInterface $userRepo */
         $userRepo = Yii::$container->get(UserRepositoryInterface::class);
         $user = $userRepo->getById($id);
         return $user ? new self($user) : null;
     }
 
+    /**
+     * Возвращает вложенную доменную сущность User.
+     * @return User
+     */
     public function getUser(): User
     {
         return $this->user;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
+     * Находит Identity по токену доступа.
      */
     public static function findIdentityByAccessToken($token, $type = null): ?string
     {
@@ -39,7 +53,7 @@ final class UserIdentity implements IdentityInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getId(): int|string
     {
@@ -47,15 +61,15 @@ final class UserIdentity implements IdentityInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function getAuthKey()
+    public function getAuthKey(): ?string
     {
         return $this->getUser()->getAccessToken();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function validateAuthKey($authKey): bool
     {

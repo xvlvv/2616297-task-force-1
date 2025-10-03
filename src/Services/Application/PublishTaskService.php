@@ -17,19 +17,19 @@ use yii\web\NotFoundHttpException;
 /**
  * Сервис для публикации новой задачи
  */
-final class PublishTaskService
+readonly final class PublishTaskService
 {
     /**
-     * @param CityRepositoryInterface $cityRepository
-     * @param TaskRepositoryInterface $taskRepository
-     * @param CategoryRepositoryInterface $categoryRepository
-     * @param UserRepositoryInterface $userRepository
+     * @param CityRepositoryInterface $cityRepository Репозиторий для работы с городами
+     * @param TaskRepositoryInterface $taskRepository Репозиторий для работы с заданиями
+     * @param CategoryRepositoryInterface $categoryRepository Репозиторий для работы с категориями
+     * @param UserRepositoryInterface $userRepository Репозиторий для работы с пользователями
      */
     public function __construct(
-        private readonly CityRepositoryInterface $cityRepository,
-        private readonly TaskRepositoryInterface $taskRepository,
-        private readonly CategoryRepositoryInterface $categoryRepository,
-        private readonly UserRepositoryInterface $userRepository,
+        private CityRepositoryInterface $cityRepository,
+        private TaskRepositoryInterface $taskRepository,
+        private CategoryRepositoryInterface $categoryRepository,
+        private UserRepositoryInterface $userRepository,
     ) {
     }
 

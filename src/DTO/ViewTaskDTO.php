@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Xvlvv\DTO;
 
-use Couchbase\Coordinate;
 use Xvlvv\Domain\ValueObject\Coordinates;
 use Xvlvv\Enums\Status;
 
