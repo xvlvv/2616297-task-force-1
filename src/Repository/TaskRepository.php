@@ -22,13 +22,12 @@ use app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
 use Yii;
 use yii\db\ActiveQuery;
-use yii\db\Exception;
 use yii\web\NotFoundHttpException;
 
 /**
  * Репозиторий для работы с сущностями Task
  */
-class TaskRepository implements TaskRepositoryInterface
+readonly final class TaskRepository implements TaskRepositoryInterface
 {
     /**
      * @param TaskResponseRepositoryInterface $taskResponseRepo
@@ -82,7 +81,7 @@ class TaskRepository implements TaskRepositoryInterface
             $transaction->commit();
             return $taskId;
         } catch (
-        Throwable $e
+        Throwable
         ) {
             $transaction->rollBack();
             return null;
@@ -240,7 +239,7 @@ class TaskRepository implements TaskRepositoryInterface
             ->orderBy(['created_at' => SORT_DESC])
             ->all();
 
-        $tasks = array_map(function ($task) {
+        $tasks = array_map(function (TaskModel $task) {
             return new RenderTaskDTO(
                 $task->id,
                 $task->name,
@@ -311,6 +310,9 @@ class TaskRepository implements TaskRepositoryInterface
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function workerHasActiveTask(int $id): bool
     {
         $task = TaskModel::find()->where(['worker_id' => $id, 'status' => Status::IN_PROGRESS])->one();
@@ -318,10 +320,41 @@ class TaskRepository implements TaskRepositoryInterface
         return null === $task;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getCompletedTasksCountByWorkerId(int $workerId): int
     {
         return (int) TaskModel::find()
             ->where(['worker_id' => $workerId, 'status' => Status::COMPLETED])
             ->count();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function findForUserByStatuses(int $userId, array $statuses): array
+    {
+        $query = TaskModel::find()
+            ->alias('task')
+            ->distinct()
+            ->with([
+                'category',
+            ])
+            ->leftJoin(TaskResponse::tableName() . ' response', 'response.task_id = task.id')
+            ->where(['task.status' => $statuses])
+            ->andWhere(['or',
+                ['task.customer_id' => $userId],
+                ['response.worker_id' => $userId]
+            ])
+            ->orderBy(['task.created_at' => SORT_DESC]);
+
+        $arTasks = $query->all();
+
+        return array_map(
+            function (TaskModel $task) {
+                return $this->mapper->toDomainEntity($task);
+            }, $arTasks
+        );
     }
 }
