@@ -16,8 +16,8 @@ final readonly class TaskListItemDTO
      * @param int|null $budget Бюджет задания.
      * @param string $createdAt Время создания задания (в формате для отображения).
      * @param string $description Описание задания.
-     * @param string $cityName Название города.
-     * @param string $categoryName Название категории.
+     * @param string $city
+     * @param string $category
      */
     public function __construct(
         public int $id,
@@ -25,8 +25,8 @@ final readonly class TaskListItemDTO
         public ?int $budget,
         public string $createdAt,
         public string $description,
-        public string $cityName,
-        public string $categoryName
+        public string $city,
+        public string $category
     ) {
     }
 }

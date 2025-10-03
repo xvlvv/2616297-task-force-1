@@ -130,7 +130,7 @@ readonly class YandexGeocoderService implements GeocoderInterface
      * @param int $rspn Флаг для ограничения поиска границами из bbox
      * @return array Ответ от API в виде массива или пустой массив в случае ошибки
      */
-    private function makeRequest(string $address, ?string $boundingBox = null, int $results = 10, $rspn = 0): array
+    private function makeRequest(string $address, ?string $boundingBox = null, int $results = 10, int $rspn = 0): array
     {
         $requestParams = [
             'apikey' => $this->apiKey,

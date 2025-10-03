@@ -29,23 +29,13 @@ use yii\web\View;
         <?php if (empty($tasks)): ?>
             <p>Заданий с таким статусом не найдено.</p>
         <?php else: ?>
-            <?php foreach ($tasks as $task): ?>
-                <div class="task-card">
-                    <div class="header-task">
-                        <a href="<?= Url::to(['/task/view', 'id' => $task->id]) ?>" class="link link--block link--big">
-                            <?= Html::encode($task->name) ?>
-                        </a>
-                        <p class="price price--task"><?= Html::encode($task->budget) ?> ₽</p>
-                    </div>
-                    <p class="info-text"><span class="current-time"><?= Yii::$app->formatter->asRelativeTime($task->createdAt) ?></span></p>
-                    <p class="task-text"><?= Html::encode($task->description) ?></p>
-                    <div class="footer-task">
-                        <p class="info-text town-text"><?= Html::encode($task->cityName) ?></p>
-                        <p class="info-text category-text"><?= Html::encode($task->categoryName) ?></p>
-                        <a href="<?= Url::to(['/task/view', 'id' => $task->id]) ?>" class="button button--black">Смотреть Задание</a>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+            <?= yii\widgets\ListView::widget([
+                'dataProvider' => $tasks,
+                'itemView' => 'item',
+                'summary' => '',
+                'emptyText' => 'Новых заданий по заданным критериям не найдено',
+            ]);
+            ?>
         <?php endif; ?>
     </div>
 </main>

@@ -62,7 +62,7 @@ class User
 
     /**
      * Возвращает email пользователя.
-     * @return string|null
+     * @return string
      */
     public function getEmail(): string
     {
@@ -94,10 +94,19 @@ class User
     }
 
     /**
-     * Возвращает хеш пароля.
-     * @return string
+     * Проверяет, проходил ли пользователь регистрацию через VK ID
+     * @return bool
      */
-    public function getPasswordHash(): string
+    public function isRegisteredWithVk(): bool
+    {
+        return null !== $this->getVkId() && null === $this->getPasswordHash();
+    }
+
+    /**
+     * Возвращает хеш пароля.
+     * @return string|null
+     */
+    public function getPasswordHash(): ?string
     {
         return $this->passwordHash;
     }

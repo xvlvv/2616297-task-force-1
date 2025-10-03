@@ -16,6 +16,12 @@ use yii\widgets\ActiveForm;
 <main class="main-content main-content--left container">
     <?= $this->render('_menu') ?>
     <div class="my-profile-form">
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
+            <div class="alert alert--success">
+                <?= Yii::$app->session->getFlash('success') ?>
+            </div>
+        <?php endif; ?>
+
         <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
         <h3 class="head-main head-regular">Мой профиль</h3>
 

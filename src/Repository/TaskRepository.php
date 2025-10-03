@@ -209,6 +209,10 @@ readonly final class TaskRepository implements TaskRepositoryInterface
             $query->andWhere(['not', ['worker_id' => null]]);
         }
 
+        if (null !== $dto->user) {
+            $query->andWhere(['category_id' => $dto->user->getCity()->getId()]);
+        }
+
         if (!empty($dto->createdAt)) {
             $pastDate = (new DateTime())
                 ->modify("-{$dto->createdAt} hours")
@@ -227,10 +231,16 @@ readonly final class TaskRepository implements TaskRepositoryInterface
     {
         $categoryQuery = $this->getNewTasksQuery();
 
-        $categories = $categoryQuery
+        $categoriesQuery = $categoryQuery
             ->joinWith('category', false)
             ->select(['{{%category}}.id', '{{%category}}.name'])
-            ->distinct()
+            ->distinct();
+
+        if (null !== $dto->user) {
+            $categoriesQuery->andWhere(['category_id' => $dto->user->getCity()->getId()]);
+        }
+
+        $categories = $categoriesQuery
             ->asArray()
             ->all();
 

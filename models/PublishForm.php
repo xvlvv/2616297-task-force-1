@@ -52,6 +52,14 @@ class PublishForm extends Model
     {
         return [
             [['name', 'description', 'categoryId', 'budget', 'endDate'], 'required', 'message' => 'Обязательное поле'],
+            [
+                'endDate',
+                'compare',
+                'compareValue' => date('Y-m-d'),
+                'operator' => '>',
+                'type' => 'date',
+                'message' => 'Срок исполнения должен быть в будущем'
+            ],
             [['files'], 'file', 'maxFiles' => 5],
             [['latitude', 'longitude', 'additionalInfo'], 'safe'],
             ['budget', 'integer', 'min' => 1, 'message' => 'Бюджет задания должен быть больше 0'],

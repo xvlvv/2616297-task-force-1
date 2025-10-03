@@ -49,9 +49,15 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                         ['class' => 'link link--nav']
                     ) ?>
                 </li>
-                <li class="list-item <?= 'task/something' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
-                    <a href="#" class="link link--nav">Мои задания</a>
-                </li>
+                <?php if (Yii::$app->user->can('applyTask')): ?>
+                    <li class="list-item <?= 'task/my' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+                        <?= Html::a(
+                            'Мои задания',
+                            ['task/my'],
+                            ['class' => 'link link--nav']
+                        ) ?>
+                    </li>
+                <?php endif ?>
                 <?php if (Yii::$app->user->can('publishTask')): ?>
                     <li class="list-item <?= 'task/publish' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
                         <?= Html::a(
@@ -65,6 +71,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 $isInSettingsSection = 'settings/profile' === Yii::$app->requestedRoute
                                        || 'settings/security' === Yii::$app->requestedRoute;
                 ?>
+                <?php
+                if (false === Yii::$app->user?->identity?->getUser()?->isRegisteredWithVk()
+                    || Yii::$app->user->can(
+                        'applyToTask'
+                    )): ?>
                 <li class="list-item <?= $isInSettingsSection ? 'list-item--active' : '' ?>">
                     <?= Html::a(
                         'Настройки',
@@ -72,6 +83,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                         ['class' => 'link link--nav']
                     ) ?>
                 </li>
+                <?php endif ?>
             </ul>
         </div>
         <?php endif ?>
@@ -94,12 +106,19 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             <p class="user-name"><?= Html::encode($user->getName()) ?></p>
             <div class="popup-head">
                 <ul class="popup-menu">
+                    <?php
+                    if (false === Yii::$app->user?->identity?->getUser()?->isRegisteredWithVk()
+                        || Yii::$app->user->can(
+                        'applyToTask'
+                    )): ?>
                     <li class="menu-item">
-                        <a href="#" class="link">Настройки</a>
+                        <?= Html::a(
+                            'Настройки',
+                            ['settings/profile'],
+                            ['class' => 'link']
+                        ) ?>
                     </li>
-                    <li class="menu-item">
-                        <a href="#" class="link">Связаться с нами</a>
-                    </li>
+                    <?php endif ?>
                     <li class="menu-item">
                         <?= Html::a(
                             'Выход из системы',

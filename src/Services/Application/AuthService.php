@@ -95,7 +95,13 @@ final readonly class AuthService
         };
 
         $profile = $profileFactory->createFromDTO($profileDTO);
-        $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($dto->password);
+
+        $passwordHash = null;
+
+        if (null === $dto->vkId) {
+            $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($dto->password);
+        }
+
         $authKey = Yii::$app->getSecurity()->generateRandomString();
 
         $user = new User(

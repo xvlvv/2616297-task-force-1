@@ -2,7 +2,9 @@
 
 namespace app\controllers\api;
 
+use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Yii;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 use Xvlvv\Services\Application\LocationService;
@@ -23,6 +25,16 @@ class LocationController extends Controller
                     'application/json' => Response::FORMAT_JSON,
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['search'],
+                        'roles' => ['@']
+                    ],
+                ],
+            ]
         ];
     }
 

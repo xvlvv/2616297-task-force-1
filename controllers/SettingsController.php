@@ -108,6 +108,9 @@ final class SettingsController extends Controller
         );
 
         $profileEditService->update($user->getId(), $dto);
+
+        Yii::$app->session->setFlash('success', 'Данные профиля успешно обновлены');
+
         return $this->refresh();
     }
 
@@ -119,13 +122,20 @@ final class SettingsController extends Controller
      */
     public function actionSecurity(SecurityService $securityService): Response|string
     {
+        if (
+            true === Yii::$app->user?->identity?->getUser()?->isRegisteredWithVk()
+            && !Yii::$app->user->can('applyToTask')
+        ) {
+            return $this->redirect(['/tasks']);
+        }
+
         $formModel = new SecurityForm();
 
         if (Yii::$app->request->isPost && $formModel->load(Yii::$app->request->post()) && $formModel->validate()) {
             $dto = new ChangePasswordDTO($formModel->newPassword);
             $securityService->changePassword(Yii::$app->user->id, $dto);
 
-            Yii::$app->session->setFlash('success', 'Пароль успешно изменен!');
+            Yii::$app->session->setFlash('success', 'Пароль успешно изменен');
             return $this->refresh();
         }
 

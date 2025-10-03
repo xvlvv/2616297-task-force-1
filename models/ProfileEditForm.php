@@ -62,6 +62,14 @@ class ProfileEditForm extends Model
             ['email', 'email'],
             ['email', 'validateUniqueEmail'],
             [['birthday', 'phone', 'telegram', 'bio'], 'string'],
+            [
+                'birthday',
+                'compare',
+                'compareValue' => date('Y-m-d'),
+                'operator' => '<=',
+                'type' => 'date',
+                'message' => 'Дата рождения не может быть в будущем'
+            ],
             [['specializations'], 'each', 'rule' => ['integer']],
             [['avatarFile'], 'image', 'extensions' => 'png, jpg, jpeg', 'maxSize' => 1024 * 1024 * 5],
         ];

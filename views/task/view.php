@@ -55,7 +55,17 @@ YandexMapAsset::register($this);
         <h4 class="head-regular">Отклики на задание</h4>
             <?php foreach ($task->responses as $response): ?>
             <div class="response-card">
-                <img class="customer-photo" src="<?= Html::encode($response->avatarPath) ?>" width="146" height="156" alt="Фото заказчиков">
+                <?= Html::tag(
+                    'img',
+                    Html::encode($response->avatarPath),
+                    [
+                        'class' => 'customer-photo',
+                        'width' => '146',
+                        'height' => '156',
+                        'alt' => 'Фото заказчиков',
+                        'src' => $response->avatarPath
+                    ]
+                ) ?>
                 <div class="feedback-wrapper">
                     <?= Html::a(
                         Html::encode($response->workerName),

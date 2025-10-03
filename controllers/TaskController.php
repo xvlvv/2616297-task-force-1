@@ -17,7 +17,7 @@ use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\SaveReviewDTO;
 use Xvlvv\DTO\SaveTaskResponseDTO;
 use Xvlvv\DTO\StartTaskDTO;
-use Xvlvv\Enums\Status;
+use Xvlvv\Entity\Category;
 use Xvlvv\Repository\CategoryRepositoryInterface;
 use Xvlvv\Repository\TaskRepositoryInterface;
 use Xvlvv\Repository\TaskResponseRepositoryInterface;
@@ -46,6 +46,9 @@ use yii\widgets\ActiveForm;
  */
 class TaskController extends Controller
 {
+    /**
+     * {@inheritDoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -125,6 +128,7 @@ class TaskController extends Controller
     {
         $pageSize = 3;
         $model = new TaskSearch();
+        $user = Yii::$app->user?->identity?->getUser();
 
         $model->load(Yii::$app->request->get());
 
@@ -132,7 +136,8 @@ class TaskController extends Controller
             new GetNewTasksDTO(
                 $model->categories,
                 $model->checkWorker,
-                $model->createdAt
+                $model->createdAt,
+                user: $user
             )
         );
 
@@ -148,6 +153,7 @@ class TaskController extends Controller
             $model->createdAt,
             $pagination->getOffset(),
             $pageSize,
+            $user
         );
 
         $dto = $taskRepository->getNewTasks($getNewTasksDTO);
@@ -203,11 +209,10 @@ class TaskController extends Controller
         CategoryRepositoryInterface $categoryRepo,
     ): string|Response {
         $formModel = new PublishForm();
-        $categories = ArrayHelper::map(
-            $categoryRepo->getAll(),
-            'id',
-            'name'
-        );
+        $categories = array_map(fn(Category $category) => ['id' => $category->getId(), 'name' => $category->getName()],
+            $categoryRepo->getAll());
+
+        $categories = ArrayHelper::map($categories, 'id', 'name');
 
         if (!Yii::$app->request->isPost) {
             return $this->render('publish', compact('formModel', 'categories'));
@@ -435,8 +440,12 @@ class TaskController extends Controller
             'closed' => 'Закрытые',
         ];
 
+        $provider = new ArrayDataProvider([
+            'allModels' => $taskDTOs,
+        ]);
+
         return $this->render('my', [
-            'tasks' => $taskDTOs,
+            'tasks' => $provider,
             'activeTab' => $activeTab,
             'tabTitles' => $tabTitles,
         ]);

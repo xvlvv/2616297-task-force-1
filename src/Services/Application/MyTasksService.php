@@ -74,8 +74,8 @@ readonly final class MyTasksService
             budget: $task->getBudget(),
             createdAt: $task->getCreatedDate(),
             description: $task->getDescription(),
-            cityName: $task->getCityName(),
-            categoryName: $task->getCategory()->getName()
+            city: $task->getCityName(),
+            category: $task->getCategory()->getName()
         );
     }
 }
