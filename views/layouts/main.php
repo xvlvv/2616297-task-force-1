@@ -61,8 +61,16 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                         ) ?>
                     </li>
                 <?php endif ?>
-                <li class="list-item <?= 'site/something' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
-                    <a href="#" class="link link--nav" >Настройки</a>
+                <?php
+                $isInSettingsSection = 'settings/profile' === Yii::$app->requestedRoute
+                                       || 'settings/security' === Yii::$app->requestedRoute;
+                ?>
+                <li class="list-item <?= $isInSettingsSection ? 'list-item--active' : '' ?>">
+                    <?= Html::a(
+                        'Настройки',
+                        ['settings/profile'],
+                        ['class' => 'link link--nav']
+                    ) ?>
                 </li>
             </ul>
         </div>
@@ -106,9 +114,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <?php endif ?>
 </header>
 
-<main class="main-content container">
-    <?= $content ?>
-</main>
+<?= $content ?>
 
 <?php $this->endBody() ?>
 </body>
