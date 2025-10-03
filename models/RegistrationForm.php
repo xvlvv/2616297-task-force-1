@@ -43,7 +43,14 @@ class RegistrationForm extends Model
     public function scenarios(): array
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_DEFAULT_REGISTER] = ['name', 'email', 'cityId', 'password', 'passwordRepeat', 'isWorker'];
+        $scenarios[self::SCENARIO_DEFAULT_REGISTER] = [
+            'name',
+            'email',
+            'cityId',
+            'password',
+            'passwordRepeat',
+            'isWorker'
+        ];
         $scenarios[self::SCENARIO_VK_REGISTER] = ['name', 'email', 'cityId', 'isWorker'];
         return $scenarios;
     }
@@ -56,9 +63,20 @@ class RegistrationForm extends Model
         return [
             ['name', 'required', 'message' => 'Введите имя'],
             ['email', 'required', 'message' => 'Введите адрес электронной почты'],
-            [['password', 'passwordRepeat'], 'required', 'message' => 'Введите пароль', 'on' => self::SCENARIO_DEFAULT_REGISTER],
+            [
+                ['password', 'passwordRepeat'],
+                'required',
+                'message' => 'Введите пароль',
+                'on' => self::SCENARIO_DEFAULT_REGISTER
+            ],
             ['cityId', 'required', 'message' => 'Укажите ваш город'],
-            ['password', 'compare', 'compareAttribute' => 'passwordRepeat', 'message' => 'Пароли не совпадают', 'on' => self::SCENARIO_DEFAULT_REGISTER],
+            [
+                'password',
+                'compare',
+                'compareAttribute' => 'passwordRepeat',
+                'message' => 'Пароли не совпадают',
+                'on' => self::SCENARIO_DEFAULT_REGISTER
+            ],
             ['passwordRepeat', 'safe'],
             [
                 'cityId',

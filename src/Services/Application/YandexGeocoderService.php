@@ -24,8 +24,7 @@ readonly class YandexGeocoderService implements GeocoderInterface
     public function __construct(
         private Client $httpClient,
         private CityRepositoryInterface $cityRepository,
-    )
-    {
+    ) {
         if (!isset($_ENV['YANDEX_GEOCODER_API_KEY'])) {
             throw new InvalidConfigException('Yandex Geocoder API key is not configured');
         }
@@ -42,7 +41,8 @@ readonly class YandexGeocoderService implements GeocoderInterface
 
         if (null === $restriction) {
             $userCity = $this->makeRequest($city->getName(), results: 1);
-            $envelope = $userCity['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['boundedBy']['Envelope'] ?? [];
+            $envelope = $userCity['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['boundedBy']['Envelope']
+                        ?? [];
         }
 
         if (isset($envelope, $envelope['lowerCorner'], $envelope['upperCorner'])) {
@@ -79,11 +79,11 @@ readonly class YandexGeocoderService implements GeocoderInterface
             $components = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['Components'] ?? [];
             foreach ($components as $component) {
                 $key = match ($component['kind']) {
-                    'country'  => 'country',
+                    'country' => 'country',
                     'locality' => 'city',
-                    'street'   => 'street',
-                    'house'    => 'house',
-                    default    => null,
+                    'street' => 'street',
+                    'house' => 'house',
+                    default => null,
                 };
 
                 if ($key) {

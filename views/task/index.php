@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * @var array $tasks Массив DTO заданий
@@ -59,7 +59,8 @@ use yii\widgets\LinkPager;
                         'item' => function ($index, $label, $name, $checked, $value) {
                             $id = 'category-' . $value;
                             $checkbox = Html::checkbox($name, $checked, ['value' => $value, 'id' => $id]);
-                            return Html::label($checkbox . ' ' . Html::encode($label), $id, ['class' => 'control-label']);
+                            return Html::label($checkbox . ' ' . Html::encode($label), $id, ['class' => 'control-label']
+                            );
                         },
                         'tag' => false,
                     ])->label(false);

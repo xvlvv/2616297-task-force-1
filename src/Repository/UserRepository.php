@@ -1,15 +1,17 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
+use app\models\CustomerProfile as CustomerProfileModel;
 use app\models\ExecutorProfile;
 use app\models\Review;
+use app\models\User as UserModel;
 use app\models\UserSpecialization;
 use Exception;
-use RuntimeException;
 use LogicException;
+use RuntimeException;
 use Throwable;
 use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\DTO\UserReviewViewDTO;
@@ -17,9 +19,7 @@ use Xvlvv\DTO\UserSpecializationDTO;
 use Xvlvv\DTO\ViewUserDTO;
 use Xvlvv\Entity\Category;
 use Xvlvv\Entity\CustomerProfile;
-use app\models\CustomerProfile as CustomerProfileModel;
 use Xvlvv\Entity\User;
-use app\models\User as UserModel;
 use Xvlvv\Entity\WorkerProfile;
 use Xvlvv\Enums\UserRole;
 use Yii;
@@ -47,20 +47,6 @@ readonly final class UserRepository implements UserRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getById(int $id): ?User
-    {
-        $userModel = UserModel::findOne($id);
-
-        if (null === $userModel) {
-            return null;
-        }
-
-        return $this->userMapper->toDomainEntity($userModel);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getByIdOrFail(int $id): User
     {
         $user = $this->getById($id);
@@ -75,6 +61,20 @@ readonly final class UserRepository implements UserRepositoryInterface
     /**
      * {@inheritDoc}
      */
+    public function getById(int $id): ?User
+    {
+        $userModel = UserModel::findOne($id);
+
+        if (null === $userModel) {
+            return null;
+        }
+
+        return $this->userMapper->toDomainEntity($userModel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getByEmailOrFail(string $email): User
     {
         $user = $this->getByEmail($email);
@@ -84,6 +84,32 @@ readonly final class UserRepository implements UserRepositoryInterface
         }
 
         return $user;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getByEmail(string|null $email): ?User
+    {
+        if (null === $email) {
+            return null;
+        }
+
+        $userModel = UserModel::find()
+            ->with(
+                [
+                    'city',
+                    'workerProfile',
+                    'customerProfile',
+                ]
+            )
+            ->where(['email' => $email])->one();
+
+        if (null === $userModel) {
+            return null;
+        }
+
+        return $this->userMapper->toDomainEntity($userModel);
     }
 
     /**
@@ -168,14 +194,6 @@ readonly final class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function isUserExistsByEmail(string $email): bool
-    {
-        return UserModel::find()->where(['email' => $email])->exists();
-    }
-
-    /**
      * Преобразует сущность User в модель ActiveRecord UserModel
      *
      * @param User $user Сущность пользователя
@@ -204,58 +222,32 @@ readonly final class UserRepository implements UserRepositoryInterface
         return $userModel;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getUserRank(int $userId): int
+    private function updateSpecializations(int $userId, array $newSpecializationIds): void
     {
-        $ratingsSubQuery = UserModel::find()
-            ->select([
-                'id' => '{{%user}}.id',
-                'avg_rating' => new Expression('IFNULL(AVG({{%review}}.rating), 0)')
-            ])
-            ->leftJoin(Review::tableName(), '{{%review}}.worker_id = {{%user}}.id')
-            ->where(['{{%user}}.role' => UserRole::WORKER])
-            ->groupBy('{{%user}}.id');
+        UserSpecialization::deleteAll(['user_id' => $userId]);
 
-        $rankedUsersQuery = (new Query())
-            ->select([
-                'id',
-                'user_rank' => new Expression('RANK() OVER (ORDER BY avg_rating DESC)')
-            ])
-            ->from(['ratings' => $ratingsSubQuery]);
-
-        $finalQuery = (new Query())
-            ->select('user_rank')
-            ->from(['ranked_users' => $rankedUsersQuery])
-            ->where(['id' => $userId]);
-
-        $rank = $finalQuery->scalar();
-
-        if (null === $rank) {
-            throw new LogicException('Cannot calculate rank for not worker type user');
+        if (empty($newSpecializationIds)) {
+            return;
         }
 
-        return $rank;
+        foreach ($newSpecializationIds as $categoryId) {
+            try {
+                $specialization = new UserSpecialization();
+                $specialization->user_id = $userId;
+                $specialization->category_id = $categoryId;
+                $specialization->save();
+            } catch (Throwable) {
+                throw new RuntimeException('Ошибка при сохранении специализации');
+            }
+        }
     }
 
     /**
-     * Находит модель UserModel по ID и роли или выбрасывает исключение
-     *
-     * @param int $id ID пользователя
-     * @param UserRole $role Роль пользователя
-     * @return UserModel Модель ActiveRecord
-     * @throws NotFoundHttpException если пользователь не найден
+     * {@inheritDoc}
      */
-    private function getModelByIdOrFail(int $id, UserRole $role): UserModel
+    public function isUserExistsByEmail(string $email): bool
     {
-        $user = UserModel::findWithRating()->where(['id' => $id, 'role' => $role])->one();
-
-        if (null === $user) {
-            throw new NotFoundHttpException();
-        }
-
-        return $user;
+        return UserModel::find()->where(['email' => $email])->exists();
     }
 
     /**
@@ -316,29 +308,57 @@ readonly final class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * Находит модель UserModel по ID и роли или выбрасывает исключение
+     *
+     * @param int $id ID пользователя
+     * @param UserRole $role Роль пользователя
+     * @return UserModel Модель ActiveRecord
+     * @throws NotFoundHttpException если пользователь не найден
+     */
+    private function getModelByIdOrFail(int $id, UserRole $role): UserModel
+    {
+        $user = UserModel::findWithRating()->where(['id' => $id, 'role' => $role])->one();
+
+        if (null === $user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $user;
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public function getByEmail(string|null $email): ?User
+    public function getUserRank(int $userId): int
     {
-        if (null === $email) {
-            return null;
+        $ratingsSubQuery = UserModel::find()
+            ->select([
+                'id' => '{{%user}}.id',
+                'avg_rating' => new Expression('IFNULL(AVG({{%review}}.rating), 0)')
+            ])
+            ->leftJoin(Review::tableName(), '{{%review}}.worker_id = {{%user}}.id')
+            ->where(['{{%user}}.role' => UserRole::WORKER])
+            ->groupBy('{{%user}}.id');
+
+        $rankedUsersQuery = (new Query())
+            ->select([
+                'id',
+                'user_rank' => new Expression('RANK() OVER (ORDER BY avg_rating DESC)')
+            ])
+            ->from(['ratings' => $ratingsSubQuery]);
+
+        $finalQuery = (new Query())
+            ->select('user_rank')
+            ->from(['ranked_users' => $rankedUsersQuery])
+            ->where(['id' => $userId]);
+
+        $rank = $finalQuery->scalar();
+
+        if (null === $rank) {
+            throw new LogicException('Cannot calculate rank for not worker type user');
         }
 
-        $userModel = UserModel::find()
-            ->with(
-                [
-                    'city',
-                    'workerProfile',
-                    'customerProfile',
-                ]
-            )
-            ->where(['email' => $email])->one();
-
-        if (null === $userModel) {
-            return null;
-        }
-
-        return $this->userMapper->toDomainEntity($userModel);
+        return $rank;
     }
 
     public function getByVkId(int $vkId): ?User
@@ -352,25 +372,5 @@ readonly final class UserRepository implements UserRepositoryInterface
         }
 
         return $this->userMapper->toDomainEntity($userModel);
-    }
-
-    private function updateSpecializations(int $userId, array $newSpecializationIds): void
-    {
-        UserSpecialization::deleteAll(['user_id' => $userId]);
-
-        if (empty($newSpecializationIds)) {
-            return;
-        }
-
-        foreach ($newSpecializationIds as $categoryId) {
-            try {
-                $specialization = new UserSpecialization();
-                $specialization->user_id = $userId;
-                $specialization->category_id = $categoryId;
-                $specialization->save();
-            } catch (Throwable) {
-                throw new RuntimeException('Ошибка при сохранении специализации');
-            }
-        }
     }
 }

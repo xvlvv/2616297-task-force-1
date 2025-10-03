@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
+use app\models\City as Model;
 use Xvlvv\DataMapper\CityMapper;
 use Xvlvv\Entity\City;
-use app\models\City as Model;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -17,6 +17,20 @@ readonly final class CityRepository implements CityRepositoryInterface
     public function __construct(
         private CityMapper $mapper
     ) {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByIdOrFail(int $id): City
+    {
+        $city = $this->getById($id);
+
+        if (null === $city) {
+            throw new NotFoundHttpException('City not found');
+        }
+
+        return $city;
     }
 
     /**
@@ -35,20 +49,6 @@ readonly final class CityRepository implements CityRepositoryInterface
             $city->name,
             $city->bounding_box,
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getByIdOrFail(int $id): City
-    {
-        $city = $this->getById($id);
-
-        if (null === $city) {
-            throw new NotFoundHttpException('City not found');
-        }
-
-        return $city;
     }
 
     /**

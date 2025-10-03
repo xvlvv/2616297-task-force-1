@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
+use app\models\Category as Model;
 use Xvlvv\DataMapper\CategoryMapper;
 use Xvlvv\Entity\Category;
-use \app\models\Category as Model;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -17,20 +17,6 @@ class CategoryRepository implements CategoryRepositoryInterface
     public function __construct(
         private readonly CategoryMapper $mapper
     ) {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getById(int $id): ?Category
-    {
-        $category = Model::findOne($id);
-
-        if (null === $category) {
-            return null;
-        }
-
-        return $this->mapper->toDomainEntity($category);
     }
 
     public function getByIds(array $ids): array
@@ -57,6 +43,20 @@ class CategoryRepository implements CategoryRepositoryInterface
         }
 
         return $category;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getById(int $id): ?Category
+    {
+        $category = Model::findOne($id);
+
+        if (null === $category) {
+            return null;
+        }
+
+        return $this->mapper->toDomainEntity($category);
     }
 
     public function getAll(): array

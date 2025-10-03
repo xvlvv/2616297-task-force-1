@@ -39,7 +39,8 @@ readonly final class MyTasksService
         return array_map(
             function (Task $task) {
                 return $this->mapEntityToDTO($task);
-            }, $domainTasks
+            },
+            $domainTasks
         );
     }
 

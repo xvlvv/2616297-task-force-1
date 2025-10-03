@@ -48,7 +48,7 @@ $config = [
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
     ],
     'container' => [
         'definitions' => [
@@ -88,7 +88,7 @@ $config = [
             TaskMapper::class => TaskMapper::class,
             AuthService::class => AuthService::class,
             StartTaskService::class => StartTaskService::class,
-            PublishTaskService::class  => PublishTaskService::class,
+            PublishTaskService::class => PublishTaskService::class,
             TaskResponseService::class => TaskResponseService::class,
             FinishTaskService::class => FinishTaskService::class,
             CancelTaskService::class => CancelTaskService::class,
@@ -185,7 +185,7 @@ $config = [
         ],
         'session' => [
             'class' => 'yii\web\Session',
-            'cookieParams' => ['lifetime' => 7 * 24 *60 * 60]
+            'cookieParams' => ['lifetime' => 7 * 24 * 60 * 60]
         ],
     ],
     'params' => $params,

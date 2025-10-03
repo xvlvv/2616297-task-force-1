@@ -33,6 +33,6 @@ class TaskWorkerRule extends Rule
             return false;
         }
 
-        return $taskRepo->isWorker($taskId, (int) $user);
+        return $taskRepo->isWorker($taskId, (int)$user);
     }
 }

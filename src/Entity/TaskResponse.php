@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Entity;
 
@@ -47,8 +47,7 @@ final class TaskResponse
         bool $isRejected,
         ?int $price = null,
         ?string $comment = null,
-    ): TaskResponse
-    {
+    ): TaskResponse {
         return new self(
             $id,
             $task,
@@ -60,21 +59,21 @@ final class TaskResponse
     }
 
     /**
-     * Возвращает ID отклика.
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    /**
      * Возвращает ID связанного задания.
      * @return int|null
      */
     public function getTaskId(): ?int
     {
         return $this->task->getId();
+    }
+
+    /**
+     * Возвращает ID отклика.
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     /**
@@ -110,7 +109,7 @@ final class TaskResponse
 
     /**
      * Возвращает предложенную стоимость.
-     * @return int|null
+     * @return int
      */
     public function getPrice(): int
     {

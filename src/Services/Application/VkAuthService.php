@@ -5,7 +5,6 @@ namespace Xvlvv\Services\Application;
 use app\auth\VkIdOauth;
 use Exception;
 use Xvlvv\Entity\User;
-use Xvlvv\Repository\UserRepository;
 use Xvlvv\Repository\UserRepositoryInterface;
 use Yii;
 use yii\web\BadRequestHttpException;
@@ -56,7 +55,7 @@ readonly final class VkAuthService
             throw new BadRequestHttpException();
         }
 
-        $user = $this->userRepo->getByVkId((int) $vkId);
+        $user = $this->userRepo->getByVkId((int)$vkId);
 
         if ($user) {
             return $user;

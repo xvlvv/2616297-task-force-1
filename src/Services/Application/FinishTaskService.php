@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Services\Application;
 
@@ -14,7 +14,7 @@ use yii\web\NotFoundHttpException;
 /**
  * Сервис для завершения задачи и создания отзыва
  */
-final class FinishTaskService
+final readonly class FinishTaskService
 {
     /**
      * @param TaskRepositoryInterface $taskRepository

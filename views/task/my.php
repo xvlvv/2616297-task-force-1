@@ -16,19 +16,23 @@ use yii\web\View;
     <div class="left-menu">
         <h3 class="head-main head-task">Мои задания</h3>
         <ul class="side-menu-list">
-            <?php foreach ($tabTitles as $tabKey => $tabTitle): ?>
+            <?php
+            foreach ($tabTitles as $tabKey => $tabTitle): ?>
                 <li class="side-menu-item <?= ($activeTab === $tabKey) ? 'side-menu-item--active' : '' ?>">
                     <a href="<?= Url::to(['/task/my', 'tab' => $tabKey]) ?>" class="link link--nav"><?= $tabTitle ?></a>
                 </li>
-            <?php endforeach; ?>
+            <?php
+            endforeach; ?>
         </ul>
     </div>
     <div class="left-column left-column--task">
         <h3 class="head-main head-regular"><?= $tabTitles[$activeTab] ?? 'Задания' ?></h3>
 
-        <?php if (empty($tasks)): ?>
+        <?php
+        if (empty($tasks)): ?>
             <p>Заданий с таким статусом не найдено.</p>
-        <?php else: ?>
+        <?php
+        else: ?>
             <?= yii\widgets\ListView::widget([
                 'dataProvider' => $tasks,
                 'itemView' => 'item',
@@ -36,6 +40,7 @@ use yii\web\View;
                 'emptyText' => 'Новых заданий по заданным критериям не найдено',
             ]);
             ?>
-        <?php endif; ?>
+        <?php
+        endif; ?>
     </div>
 </main>

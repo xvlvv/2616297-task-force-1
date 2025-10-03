@@ -63,12 +63,12 @@ class TaskController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['publish'],
-                        'matchCallback' => fn () => Yii::$app->user->can('publishTask')
+                        'matchCallback' => fn() => Yii::$app->user->can('publishTask')
                     ],
                     [
                         'allow' => true,
                         'actions' => ['apply', 'my'],
-                        'matchCallback' => fn () => Yii::$app->user->can('applyToTask')
+                        'matchCallback' => fn() => Yii::$app->user->can('applyToTask')
                     ],
                     [
                         'allow' => true,
@@ -281,7 +281,7 @@ class TaskController extends Controller
             $id,
             Yii::$app->user->identity->getUser()->getId(),
             $completeForm->description,
-            (int) $completeForm->price,
+            (int)$completeForm->price,
         );
 
         $responseService->createResponse($saveResponseDTO);
@@ -362,7 +362,7 @@ class TaskController extends Controller
         }
 
         $saveReviewDTO = new SaveReviewDTO(
-            (int) $completeForm->rating,
+            (int)$completeForm->rating,
             $completeForm->comment,
             $id,
             Yii::$app->user->identity->getUser()->getId(),

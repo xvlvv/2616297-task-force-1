@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Entity;
 
@@ -40,15 +40,6 @@ class User
         private ?int $id = null,
         private ?int $vkId = null,
     ) {
-    }
-
-    /**
-     * Возвращает ID пользователя.
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     /**
@@ -221,6 +212,15 @@ class User
         }
 
         $this->id = $id;
+    }
+
+    /**
+     * Возвращает ID пользователя.
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     /**

@@ -35,6 +35,6 @@ class TaskAuthorRule extends Rule
             return false;
         }
 
-        return $taskRepo->isAuthor($taskId, (int) $user);
+        return $taskRepo->isAuthor($taskId, (int)$user);
     }
 }

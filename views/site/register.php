@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * @var User $formModel Форма регистрации
@@ -31,15 +31,17 @@ use yii\widgets\ActiveForm;
                 <?= $form->field($formModel, 'cityId')->dropDownList($cities) ?>
             </div>
 
-            <?php if (!$isRegisterWithVK): ?>
-            <div class="half-wrapper">
-                <?= $form->field($formModel, 'password')->textInput() ?>
-            </div>
+            <?php
+            if (!$isRegisterWithVK): ?>
+                <div class="half-wrapper">
+                    <?= $form->field($formModel, 'password')->textInput() ?>
+                </div>
 
-            <div class="half-wrapper">
-                <?= $form->field($formModel, 'passwordRepeat')->textInput() ?>
-            </div>
-            <?php endif ?>
+                <div class="half-wrapper">
+                    <?= $form->field($formModel, 'passwordRepeat')->textInput() ?>
+                </div>
+            <?php
+            endif ?>
 
             <div class="form-group">
                 <?= $form->field(
@@ -54,7 +56,8 @@ use yii\widgets\ActiveForm;
                 ?>
             </div>
 
-            <?php if (!$isRegisterWithVK && Yii::$app->authClientCollection->hasClient('vk-id')): ?>
+            <?php
+            if (!$isRegisterWithVK && Yii::$app->authClientCollection->hasClient('vk-id')): ?>
 
                 <?= Html::a(
                     '<span class="vk-icon"></span><span>Войти с VK ID</span>',
@@ -65,11 +68,13 @@ use yii\widgets\ActiveForm;
                     ]
                 ) ?>
 
-            <?php endif ?>
+            <?php
+            endif ?>
 
             <?= Html::submitInput('Создать аккаунт', ['class' => 'button button--blue']) ?>
 
-            <?php ActiveForm::end() ?>
+            <?php
+            ActiveForm::end() ?>
         </div>
     </div>
 </main>

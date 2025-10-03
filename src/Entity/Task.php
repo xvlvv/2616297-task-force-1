@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Entity;
 
@@ -17,6 +17,42 @@ use Yii;
  */
 final class Task
 {
+    /**
+     * Инициализирует ID заказчика и исполнителя
+     *
+     * @param int $customerId
+     * @param string $name
+     * @param string $description
+     * @param string $createdAt
+     * @param string $endDate
+     * @param Category $category
+     * @param TaskStateManager $taskStateManager
+     * @param int|null $id
+     * @param int|null $workerId
+     * @param int|null $budget
+     * @param Status $currentStatus
+     * @param City|null $city
+     * @param Coordinates|null $coordinates
+     * @param string|null $locationInfo
+     */
+    private function __construct(
+        private int $customerId,
+        private string $name,
+        private string $description,
+        private string $createdAt,
+        private string $endDate,
+        private Category $category,
+        private readonly TaskStateManager $taskStateManager,
+        private ?int $id = null,
+        private ?int $workerId = null,
+        private ?int $budget = null,
+        private Status $currentStatus = Status::NEW,
+        private ?City $city = null,
+        private ?Coordinates $coordinates = null,
+        private ?string $locationInfo = null,
+    ) {
+    }
+
     /**
      * Фабричный метод для создания объекта Task с автоматическим резолвом TaskStateManager
      *
@@ -69,42 +105,6 @@ final class Task
     }
 
     /**
-     * Инициализирует ID заказчика и исполнителя
-     *
-     * @param int $customerId
-     * @param string $name
-     * @param string $description
-     * @param string $createdAt
-     * @param string $endDate
-     * @param Category $category
-     * @param TaskStateManager $taskStateManager
-     * @param int|null $id
-     * @param int|null $workerId
-     * @param int|null $budget
-     * @param Status $currentStatus
-     * @param City|null $city
-     * @param Coordinates|null $coordinates
-     * @param string|null $locationInfo
-     */
-    private function __construct(
-        private int $customerId,
-        private string $name,
-        private string $description,
-        private string $createdAt,
-        private string $endDate,
-        private Category $category,
-        private readonly TaskStateManager $taskStateManager,
-        private ?int $id = null,
-        private ?int $workerId = null,
-        private ?int $budget = null,
-        private Status $currentStatus = Status::NEW,
-        private ?City $city = null,
-        private ?Coordinates $coordinates = null,
-        private ?string $locationInfo = null,
-    ) {
-    }
-
-    /**
      * @return int|null
      */
     public function getBudget(): ?int
@@ -112,22 +112,9 @@ final class Task
         return $this->budget;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     public function getDescription(): string
     {
         return $this->description;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getCreatedDate(): string
@@ -145,16 +132,6 @@ final class Task
         return $this->category;
     }
 
-    /**
-     * Возвращает текущий статус задания
-     *
-     * @return Status
-     */
-    public function getCurrentStatus(): Status
-    {
-        return $this->currentStatus;
-    }
-
     public function getCoordinates(): ?Coordinates
     {
         return $this->coordinates;
@@ -170,16 +147,18 @@ final class Task
         return $this->city?->getName();
     }
 
-    /**
-     * Возвращает следующий статус задания в зависимости от указанного действия, null если действие не найдено либо
-     * для текущего статус данное действие невозможно
-     *
-     * @param Action $action
-     * @return Status|null
-     */
-    public function getNextStatus(Action $action): ?Status
+    public function getName(): string
     {
-        return $this->taskStateManager->getNextStatus($this->getCurrentStatus(), $action);
+        return $this->name;
+    }
+
+    /**
+     * Проваливает задание
+     * @return bool
+     */
+    public function fail(): bool
+    {
+        return $this->applyAction(Action::FAIL);
     }
 
     /**
@@ -201,12 +180,34 @@ final class Task
     }
 
     /**
-     * Проваливает задание
-     * @return bool
+     * Возвращает текущий статус задания
+     *
+     * @return Status
      */
-    public function fail(): bool
+    public function getCurrentStatus(): Status
     {
-        return $this->applyAction(Action::FAIL);
+        return $this->currentStatus;
+    }
+
+    /**
+     * Устанавливает новый статус
+     * @param Status $status
+     */
+    private function setStatus(Status $status): void
+    {
+        $this->currentStatus = $status;
+    }
+
+    /**
+     * Возвращает следующий статус задания в зависимости от указанного действия, null если действие не найдено либо
+     * для текущего статус данное действие невозможно
+     *
+     * @param Action $action
+     * @return Status|null
+     */
+    public function getNextStatus(Action $action): ?Status
+    {
+        return $this->taskStateManager->getNextStatus($this->getCurrentStatus(), $action);
     }
 
     /**
@@ -244,12 +245,11 @@ final class Task
     }
 
     /**
-     * Устанавливает новый статус
-     * @param Status $status
+     * @return int|null
      */
-    private function setStatus(Status $status): void
+    public function getWorkerId(): ?int
     {
-        $this->currentStatus = $status;
+        return $this->workerId;
     }
 
     /**
@@ -292,8 +292,8 @@ final class Task
     /**
      * @return int|null
      */
-    public function getWorkerId(): ?int
+    public function getId(): ?int
     {
-        return $this->workerId;
+        return $this->id;
     }
 }

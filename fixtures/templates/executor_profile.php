@@ -17,7 +17,7 @@ $bio = implode(', ', [
 ]);
 
 return [
-    'user_id' => $faker->numberBetween(1,10),
+    'user_id' => $faker->numberBetween(1, 10),
     'day_of_birth' => $faker->dateTimeInInterval(interval: '-18 years'),
     'description' => $faker->text(255),
     'bio' => $bio,

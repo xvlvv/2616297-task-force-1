@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
 use app\models\File;
+use app\models\Task as TaskModel;
 use app\models\TaskResponse;
 use DateMalformedStringException;
 use DateTime;
@@ -18,7 +19,6 @@ use Xvlvv\DTO\SaveTaskDTO;
 use Xvlvv\DTO\ViewNewTasksDTO;
 use Xvlvv\DTO\ViewTaskDTO;
 use Xvlvv\Entity\Task;
-use app\models\Task as TaskModel;
 use Xvlvv\Enums\Status;
 use Yii;
 use yii\db\ActiveQuery;
@@ -37,6 +37,35 @@ readonly final class TaskRepository implements TaskRepositoryInterface
         private TaskResponseRepositoryInterface $taskResponseRepo,
         private TaskMapper $mapper,
     ) {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function update(Task $task): void
+    {
+        $taskId = $task->getId();
+        if (null === $taskId) {
+            throw new InvalidArgumentException('Cannot update unsaved task');
+        }
+
+        $taskModel = TaskModel::findOne($taskId);
+
+        if (null === $taskModel) {
+            throw new InvalidArgumentException('Cannot update unsaved task');
+        }
+
+        if ($taskModel->status !== $task->getCurrentStatus()->value) {
+            $taskModel->status = $task->getCurrentStatus()->value;
+        }
+
+        if ($taskModel->worker_id !== $task->getWorkerId()) {
+            $taskModel->worker_id = $task->getWorkerId();
+        }
+
+        if (!$taskModel->save()) {
+            throw new RuntimeException('Failed to update task');
+        }
     }
 
     /**
@@ -86,37 +115,6 @@ readonly final class TaskRepository implements TaskRepositoryInterface
             $transaction->rollBack();
             return null;
         }
-
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function update(Task $task): void
-    {
-        $taskId = $task->getId();
-        if (null === $taskId) {
-            throw new InvalidArgumentException('Cannot update unsaved task');
-        }
-
-        $taskModel = TaskModel::findOne($taskId);
-
-        if (null === $taskModel) {
-            throw new InvalidArgumentException('Cannot update unsaved task');
-        }
-
-        if ($taskModel->status !== $task->getCurrentStatus()->value) {
-            $taskModel->status = $task->getCurrentStatus()->value;
-        }
-
-        if ($taskModel->worker_id !== $task->getWorkerId()) {
-            $taskModel->worker_id = $task->getWorkerId();
-        }
-
-        if (!$taskModel->save()) {
-            throw new RuntimeException('Failed to update task');
-        }
     }
 
     /**
@@ -140,6 +138,21 @@ readonly final class TaskRepository implements TaskRepositoryInterface
         $customerId = $task->customer_id;
 
         return $userId === $customerId;
+    }
+
+    /**
+     * Находит задание по ID или выбрасывает исключение
+     * @param int $taskId
+     * @return TaskModel
+     * @throws NotFoundHttpException
+     */
+    private function getModelByIdOrFail(int $taskId): TaskModel
+    {
+        $task = TaskModel::find()->with('category', 'city')->where(['id' => $taskId])->one();
+        if ($task === null) {
+            throw new NotFoundHttpException();
+        }
+        return $task;
     }
 
     /**
@@ -169,11 +182,44 @@ readonly final class TaskRepository implements TaskRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getByIdOrFail(int $taskId): Task
+    public function getNewTasks(GetNewTasksDTO $dto): ViewNewTasksDTO
     {
-        $task = $this->getModelByIdOrFail($taskId);
+        $categoryQuery = $this->getNewTasksQuery();
 
-        return $this->mapper->toDomainEntity($task);
+        $categoriesQuery = $categoryQuery
+            ->joinWith('category', false)
+            ->select(['{{%category}}.id', '{{%category}}.name'])
+            ->distinct();
+
+        if (null !== $dto->user) {
+            $categoriesQuery->andWhere(['category_id' => $dto->user->getCity()->getId()]);
+        }
+
+        $categories = $categoriesQuery
+            ->asArray()
+            ->all();
+
+        $tasksModels = $this
+            ->getFilteredTasksQuery($dto)
+            ->orderBy(['created_at' => SORT_DESC])
+            ->all();
+
+        $tasks = array_map(function (TaskModel $task) {
+            return new RenderTaskDTO(
+                $task->id,
+                $task->name,
+                $task->description,
+                $task->category->name,
+                $task->city->name,
+                $task->budget,
+                $task->created_at,
+            );
+        }, $tasksModels);
+
+        return new ViewNewTasksDTO(
+            $tasks,
+            $categories
+        );
     }
 
     /**
@@ -226,64 +272,6 @@ readonly final class TaskRepository implements TaskRepositoryInterface
 
     /**
      * {@inheritdoc}
-     */
-    public function getNewTasks(GetNewTasksDTO $dto): ViewNewTasksDTO
-    {
-        $categoryQuery = $this->getNewTasksQuery();
-
-        $categoriesQuery = $categoryQuery
-            ->joinWith('category', false)
-            ->select(['{{%category}}.id', '{{%category}}.name'])
-            ->distinct();
-
-        if (null !== $dto->user) {
-            $categoriesQuery->andWhere(['category_id' => $dto->user->getCity()->getId()]);
-        }
-
-        $categories = $categoriesQuery
-            ->asArray()
-            ->all();
-
-        $tasksModels = $this
-            ->getFilteredTasksQuery($dto)
-            ->orderBy(['created_at' => SORT_DESC])
-            ->all();
-
-        $tasks = array_map(function (TaskModel $task) {
-            return new RenderTaskDTO(
-                $task->id,
-                $task->name,
-                $task->description,
-                $task->category->name,
-                $task->city->name,
-                $task->budget,
-                $task->created_at,
-            );
-        }, $tasksModels);
-
-        return new ViewNewTasksDTO(
-            $tasks,
-            $categories
-        );
-    }
-
-    /**
-     * Находит задание по ID или выбрасывает исключение
-     * @param int $taskId
-     * @return TaskModel
-     * @throws NotFoundHttpException
-     */
-    private function getModelByIdOrFail(int $taskId): TaskModel
-    {
-        $task = TaskModel::find()->with('category', 'city')->where(['id' => $taskId])->one();
-        if ($task === null) {
-            throw new NotFoundHttpException();
-        }
-        return $task;
-    }
-
-    /**
-     * {@inheritdoc}
      * @throws DateMalformedStringException
      */
     public function getFilteredTasksQueryCount(GetNewTasksDTO $dto): int
@@ -321,6 +309,16 @@ readonly final class TaskRepository implements TaskRepositoryInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getByIdOrFail(int $taskId): Task
+    {
+        $task = $this->getModelByIdOrFail($taskId);
+
+        return $this->mapper->toDomainEntity($task);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function workerHasActiveTask(int $id): bool
@@ -335,7 +333,7 @@ readonly final class TaskRepository implements TaskRepositoryInterface
      */
     public function getCompletedTasksCountByWorkerId(int $workerId): int
     {
-        return (int) TaskModel::find()
+        return (int)TaskModel::find()
             ->where(['worker_id' => $workerId, 'status' => Status::COMPLETED])
             ->count();
     }
@@ -353,7 +351,8 @@ readonly final class TaskRepository implements TaskRepositoryInterface
             ])
             ->leftJoin(TaskResponse::tableName() . ' response', 'response.task_id = task.id')
             ->where(['task.status' => $statuses])
-            ->andWhere(['or',
+            ->andWhere([
+                'or',
                 ['task.customer_id' => $userId],
                 ['response.worker_id' => $userId]
             ])
@@ -364,7 +363,8 @@ readonly final class TaskRepository implements TaskRepositoryInterface
         return array_map(
             function (TaskModel $task) {
                 return $this->mapper->toDomainEntity($task);
-            }, $arTasks
+            },
+            $arTasks
         );
     }
 }

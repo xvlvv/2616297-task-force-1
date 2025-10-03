@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\DataMapper;
 
@@ -67,6 +67,16 @@ final readonly class UserMapper
     }
 
     /**
+     * Создает доменный объект CustomerProfile.
+     * @param CustomerProfileModel|null $arProfile
+     * @return UserProfileInterface
+     */
+    private function createCustomerProfile(?CustomerProfileModel $arProfile): UserProfileInterface
+    {
+        return $this->customerProfileFactory->createFromDTO(new CustomerProfileDTO());
+    }
+
+    /**
      * Создает доменный объект WorkerProfile.
      * Сначала создает DTO из AR-модели, затем передает его в фабрику.
      * @param WorkerProfileModel|null $arProfile
@@ -97,15 +107,5 @@ final readonly class UserMapper
         );
 
         return $this->workerProfileFactory->createFromDTO($dto);
-    }
-
-    /**
-     * Создает доменный объект CustomerProfile.
-     * @param CustomerProfileModel|null $arProfile
-     * @return UserProfileInterface
-     */
-    private function createCustomerProfile(?CustomerProfileModel $arProfile): UserProfileInterface
-    {
-        return $this->customerProfileFactory->createFromDTO(new CustomerProfileDTO());
     }
 }

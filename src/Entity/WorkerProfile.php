@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Entity;
 
@@ -11,23 +11,18 @@ use Xvlvv\DTO\WorkerProfileDTO;
  */
 class WorkerProfile implements UserProfileInterface
 {
-    /** @var bool Показывать контакты только заказчику */
-    private bool $showContactsOnlyToCustomers;
-
-    /** @var string|null Дата рождения */
-    private ?string $dayOfBirth;
-
     /** @var string|null Информация "О себе" */
     private ?string $bio;
-
+    /** @var string|null Дата рождения */
+    private ?string $dayOfBirth;
     /** @var string|null Номер телефона */
     private ?string $phoneNumber;
-
-    /** @var string|null Имя пользователя в Telegram */
-    private ?string $telegramUsername;
-
+    /** @var bool Показывать контакты только заказчику */
+    private bool $showContactsOnlyToCustomers;
     /** @var Category[] Массив сущностей категорий-специализаций */
     private array $specializations;
+    /** @var string|null Имя пользователя в Telegram */
+    private ?string $telegramUsername;
 
     /**
      * @param WorkerProfileDTO $dto DTO с данными для инициализации
@@ -80,21 +75,21 @@ class WorkerProfile implements UserProfileInterface
     }
 
     /**
-     * Возвращает массив сущностей категорий-специализаций.
-     * @return Category[]
-     */
-    public function getSpecializations(): array
-    {
-        return $this->specializations;
-    }
-
-    /**
      * Возвращает массив ID специализаций.
      * @return int[]
      */
     public function getSpecializationsIds(): array
     {
         return array_map(fn(Category $spec) => $spec->getId(), $this->getSpecializations());
+    }
+
+    /**
+     * Возвращает массив сущностей категорий-специализаций.
+     * @return Category[]
+     */
+    public function getSpecializations(): array
+    {
+        return $this->specializations;
     }
 
     /**

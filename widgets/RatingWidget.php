@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace app\widgets;
 
@@ -23,7 +23,7 @@ class RatingWidget extends Widget
 
     public function run(): string
     {
-        $this->rating = (int) $this->rating;
+        $this->rating = (int)$this->rating;
         $result = "<div class='stars-rating {$this->wrapperClass}'>";
 
         for ($i = $this->minRating + 1; $i <= $this->maxRating; $i++) {

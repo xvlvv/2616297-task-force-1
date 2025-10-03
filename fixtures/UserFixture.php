@@ -22,6 +22,7 @@ class UserFixture extends ActiveFixture
             self::$idMap[$alias] = $row['id'];
         }
     }
+
     public static function getId(string $alias): ?int
     {
         return self::$idMap[$alias] ?? null;

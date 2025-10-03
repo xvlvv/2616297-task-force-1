@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
@@ -26,5 +26,6 @@ interface CategoryRepositoryInterface
      * @throws NotFoundHttpException
      */
     public function getByIdOrFail(int $id): Category;
+
     public function getAll(): array;
 }

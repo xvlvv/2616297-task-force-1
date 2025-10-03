@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
 use app\models\Task;
+use app\models\TaskResponse as Model;
 use app\models\User;
 use http\Exception\RuntimeException;
 use LogicException;
@@ -12,7 +13,6 @@ use Xvlvv\DataMapper\TaskMapper;
 use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\DTO\TaskResponseViewDTO;
 use Xvlvv\Entity\TaskResponse;
-use app\models\TaskResponse as Model;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
@@ -31,25 +31,6 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
         private UserMapper $userMapper,
         private TaskMapper $taskMapper,
     ) {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function save(TaskResponse $taskResponse): bool
-    {
-        $taskResponseModel = new Model();
-        $taskResponseModel->task_id = $taskResponse->getTaskId();
-        $taskResponseModel->worker_id = $taskResponse->getWorkerId();
-        $taskResponseModel->comment = $taskResponse->getComment();
-        $taskResponseModel->price = $taskResponse->getPrice();
-        $taskResponseModel->is_rejected = $taskResponse->isRejected();
-
-        if (!$taskResponseModel->save()) {
-            throw new RuntimeException('Ошибка сохранения профиля пользователя');
-        }
-
-        return true;
     }
 
     /**
@@ -93,12 +74,12 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
                 $response->id,
                 $worker->id,
                 $worker->name,
-                (float) $worker->rating,
+                (float)$worker->rating,
                 $worker->reviewsCount,
                 $worker->avatar_path,
                 $response->created_at,
                 $response->price,
-                (bool) $response->is_rejected,
+                (bool)$response->is_rejected,
                 $response->comment,
             );
         }
@@ -119,6 +100,30 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
         return $model->save();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function save(TaskResponse $taskResponse): bool
+    {
+        $taskResponseModel = new Model();
+        $taskResponseModel->task_id = $taskResponse->getTaskId();
+        $taskResponseModel->worker_id = $taskResponse->getWorkerId();
+        $taskResponseModel->comment = $taskResponse->getComment();
+        $taskResponseModel->price = $taskResponse->getPrice();
+        $taskResponseModel->is_rejected = $taskResponse->isRejected();
+
+        if (!$taskResponseModel->save()) {
+            throw new RuntimeException('Ошибка сохранения профиля пользователя');
+        }
+
+        return true;
+    }
+
+    public function getTaskIdByResponseId(int $id): int
+    {
+        return $this->getByIdOrFail($id)->getTaskId();
+    }
+
     public function getByIdOrFail(int $id): TaskResponse
     {
         $response = Model::find()
@@ -137,14 +142,9 @@ class TaskResponseRepository implements TaskResponseRepositoryInterface
             $response->id,
             $task,
             $user,
-            (bool) $response->is_rejected,
+            (bool)$response->is_rejected,
             $response->price,
             $response->comment,
         );
-    }
-
-    public function getTaskIdByResponseId(int $id): int
-    {
-        return $this->getByIdOrFail($id)->getTaskId();
     }
 }

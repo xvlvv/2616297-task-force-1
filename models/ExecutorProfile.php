@@ -43,7 +43,13 @@ class ExecutorProfile extends ActiveRecord
             [['restrict_contacts'], 'boolean'],
             [['phone_number'], 'string', 'max' => 11],
             [['telegram_username'], 'string', 'max' => 64],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [
+                ['user_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => User::class,
+                'targetAttribute' => ['user_id' => 'id']
+            ],
         ];
     }
 

@@ -16,21 +16,27 @@ use yii\widgets\ActiveForm;
 <main class="main-content main-content--left container">
     <?= $this->render('_menu') ?>
     <div class="my-profile-form">
-        <?php if (Yii::$app->session->hasFlash('success')): ?>
+        <?php
+        if (Yii::$app->session->hasFlash('success')): ?>
             <div class="alert alert--success">
                 <?= Yii::$app->session->getFlash('success') ?>
             </div>
-        <?php endif; ?>
+        <?php
+        endif; ?>
 
-        <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+        <?php
+        $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
         <h3 class="head-main head-regular">Мой профиль</h3>
 
         <div class="photo-editing">
             <div>
-                <?php if (null !== $user->getAvatarPath()): ?>
-                <p class="form-label">Аватар</p>
-                <?= Html::img($user->getAvatarPath(), ['class' => 'avatar-preview', 'width' => 83, 'height' => 83]) ?>
-                <?php endif ?>
+                <?php
+                if (null !== $user->getAvatarPath()): ?>
+                    <p class="form-label">Аватар</p>
+                    <?= Html::img($user->getAvatarPath(), ['class' => 'avatar-preview', 'width' => 83, 'height' => 83]
+                    ) ?>
+                <?php
+                endif ?>
             </div>
             <?= $form->field($model, 'avatarFile', ['template' => '{input}{label}{error}'])
                 ->fileInput(['id' => 'button-input', 'hidden' => true])
@@ -62,6 +68,7 @@ use yii\widgets\ActiveForm;
         ]) ?>
 
         <?= Html::submitInput('Сохранить', ['class' => 'button button--blue']) ?>
-        <?php ActiveForm::end(); ?>
+        <?php
+        ActiveForm::end(); ?>
     </div>
 </main>

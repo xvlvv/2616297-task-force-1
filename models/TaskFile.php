@@ -37,8 +37,20 @@ class TaskFile extends ActiveRecord
             [['task_id', 'file_id'], 'integer', 'min' => 1],
             [['created_at', 'updated_at'], 'safe'],
             [['task_id', 'file_id'], 'unique', 'targetAttribute' => ['task_id', 'file_id']],
-            [['file_id'], 'exist', 'skipOnError' => true, 'targetClass' => File::class, 'targetAttribute' => ['file_id' => 'id']],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
+            [
+                ['file_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => File::class,
+                'targetAttribute' => ['file_id' => 'id']
+            ],
+            [
+                ['task_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Task::class,
+                'targetAttribute' => ['task_id' => 'id']
+            ],
         ];
     }
 

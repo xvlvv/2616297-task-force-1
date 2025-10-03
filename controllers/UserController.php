@@ -28,6 +28,7 @@ class UserController extends Controller
             ]
         ];
     }
+
     /**
      * Отображает публичный профиль исполнителя.
      *

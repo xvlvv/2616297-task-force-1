@@ -1,11 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Domain\User\Role;
 
 use Xvlvv\Entity\UserRoleInterface;
-use Xvlvv\Entity\UserProfileInterface;
 use Xvlvv\Enums\UserRole;
 
 final class Customer implements UserRoleInterface

@@ -47,7 +47,7 @@ final class TaskMapper
         }
 
         if (null !== $task->latitude
-        && null !== $task->longitude) {
+            && null !== $task->longitude) {
             $coordinates = new Coordinates($task->latitude, $task->longitude);
         }
 

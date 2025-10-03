@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Entity;
 
-use DomainException;
-use LogicException;
 use Xvlvv\Enums\UserRole;
 
 /**
