@@ -1,11 +1,14 @@
 services:
   php:
-    image: yiisoftware/yii2-php:8.2-fpm-nginx
+    build:
+      context: .
+      dockerfile: /Dockerfile
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
     ports:
       - '8000:80'
+
   mysql_db:
     image: mysql:8.0
     restart: always

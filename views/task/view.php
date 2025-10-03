@@ -67,7 +67,7 @@ YandexMapAsset::register($this);
                                 'width' => '146',
                                 'height' => '156',
                                 'alt' => 'Фото заказчиков',
-                                'src' => $response->avatarPath
+                                'src' => $response->avatarPath ?? '/img/no-photo.jpg'
                             ]
                         ) ?>
                         <div class="feedback-wrapper">
