@@ -6,16 +6,17 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%user_specialization}}".
+ * ActiveRecord модель для таблицы "{{%user_specialization}}".
+ * Представляет связующую таблицу (M:M) между пользователями и категориями (специализациями).
  *
  * @property int $id
- * @property int $user_id
- * @property int $category_id
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property int $user_id ID пользователя
+ * @property int $category_id ID категории (специализации)
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property Category $category
- * @property User $user
+ * @property Category $category Связанная модель категории
+ * @property User $user Связанная модель пользователя
  */
 class UserSpecialization extends ActiveRecord
 {
@@ -56,7 +57,7 @@ class UserSpecialization extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Category]].
+     * Определяет связь с моделью Category
      *
      * @return ActiveQuery
      */
@@ -66,7 +67,7 @@ class UserSpecialization extends ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Определяет связь с моделью User
      *
      * @return ActiveQuery
      */

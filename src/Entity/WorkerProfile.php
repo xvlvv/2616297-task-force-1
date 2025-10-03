@@ -11,15 +11,26 @@ use Xvlvv\DTO\WorkerProfileDTO;
  */
 class WorkerProfile implements UserProfileInterface
 {
+    /** @var bool Показывать контакты только заказчику */
     private bool $showContactsOnlyToCustomers;
+
+    /** @var string|null Дата рождения */
     private ?string $dayOfBirth;
+
+    /** @var string|null Информация "О себе" */
     private ?string $bio;
+
+    /** @var string|null Номер телефона */
     private ?string $phoneNumber;
+
+    /** @var string|null Имя пользователя в Telegram */
     private ?string $telegramUsername;
 
+    /** @var Category[] Массив сущностей категорий-специализаций */
+    private array $specializations;
+
     /**
-     * Конструктор WorkerProfile
-     * @param WorkerProfileDTO $dto
+     * @param WorkerProfileDTO $dto DTO с данными для инициализации
      */
     public function __construct(
         WorkerProfileDTO $dto
@@ -29,9 +40,11 @@ class WorkerProfile implements UserProfileInterface
         $this->bio = $dto->bio;
         $this->phoneNumber = $dto->phoneNumber;
         $this->telegramUsername = $dto->telegramUsername;
+        $this->specializations = $dto->specializations;
     }
 
     /**
+     * Проверяет, скрыты ли контакты.
      * @return bool
      */
     public function isShowContactsOnlyToCustomers(): bool
@@ -40,6 +53,7 @@ class WorkerProfile implements UserProfileInterface
     }
 
     /**
+     * Возвращает дату рождения.
      * @return string|null
      */
     public function getDayOfBirth(): ?string
@@ -48,6 +62,7 @@ class WorkerProfile implements UserProfileInterface
     }
 
     /**
+     * Возвращает информацию "О себе".
      * @return string|null
      */
     public function getBio(): ?string
@@ -56,6 +71,7 @@ class WorkerProfile implements UserProfileInterface
     }
 
     /**
+     * Возвращает номер телефона.
      * @return string|null
      */
     public function getPhoneNumber(): ?string
@@ -63,12 +79,62 @@ class WorkerProfile implements UserProfileInterface
         return $this->phoneNumber;
     }
 
+    /**
+     * Возвращает массив сущностей категорий-специализаций.
+     * @return Category[]
+     */
+    public function getSpecializations(): array
+    {
+        return $this->specializations;
+    }
 
     /**
+     * Возвращает массив ID специализаций.
+     * @return int[]
+     */
+    public function getSpecializationsIds(): array
+    {
+        return array_map(fn(Category $spec) => $spec->getId(), $this->getSpecializations());
+    }
+
+    /**
+     * Возвращает имя пользователя в Telegram.
      * @return string|null
      */
     public function getTelegramUsername(): ?string
     {
         return $this->telegramUsername;
+    }
+
+    /**
+     * Обновляет детали профиля.
+     *
+     * @param string|null $birthday Новая дата рождения
+     * @param string|null $phone Новый номер телефона
+     * @param string|null $telegram Новый юзернейм в Telegram
+     * @param string|null $bio Новая информация "О себе"
+     * @param Category[] $categories Массив новых сущностей категорий-специализаций
+     */
+    public function updateDetails(
+        ?string $birthday,
+        ?string $phone,
+        ?string $telegram,
+        ?string $bio,
+        array $categories
+    ): void {
+        $this->dayOfBirth = $birthday;
+        $this->phoneNumber = $phone;
+        $this->telegramUsername = $telegram;
+        $this->bio = $bio;
+        $this->updateSpecializations($categories);
+    }
+
+    /**
+     * Обновляет внутренний список категорий-специализаций.
+     * @param array $specializations
+     */
+    private function updateSpecializations(array $specializations): void
+    {
+        $this->specializations = $specializations;
     }
 }

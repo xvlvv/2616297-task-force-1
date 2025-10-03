@@ -26,4 +26,5 @@ interface CategoryRepositoryInterface
      * @throws NotFoundHttpException
      */
     public function getByIdOrFail(int $id): Category;
+    public function getAll(): array;
 }

@@ -84,7 +84,11 @@ interface UserRepositoryInterface
      */
     public function getUserRank(int $userId): int;
 
-    public function isAuthor(int $userId): bool;
-
+    /**
+     * Находит пользователя по его VK ID
+     *
+     * @param int $vkId ID пользователя ВКонтакте
+     * @return User|null Возвращает сущность User, если пользователь найден, иначе null
+     */
     public function getByVkId(int $vkId): ?User;
 }

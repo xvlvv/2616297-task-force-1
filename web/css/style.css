@@ -1724,4 +1724,12 @@ form .has-error textarea:hover {
   background-repeat: no-repeat;
 }
 
+.alert {
+  margin: 0 0 15px;
+}
+
+.alert--success {
+  color: #25a325;
+}
+
 /*# sourceMappingURL=style.css.map */

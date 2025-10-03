@@ -6,6 +6,7 @@ namespace Xvlvv\Repository;
 
 use app\models\ExecutorProfile;
 use app\models\Review;
+use app\models\UserSpecialization;
 use Exception;
 use RuntimeException;
 use LogicException;
@@ -14,6 +15,7 @@ use Xvlvv\DataMapper\UserMapper;
 use Xvlvv\DTO\UserReviewViewDTO;
 use Xvlvv\DTO\UserSpecializationDTO;
 use Xvlvv\DTO\ViewUserDTO;
+use Xvlvv\Entity\Category;
 use Xvlvv\Entity\CustomerProfile;
 use app\models\CustomerProfile as CustomerProfileModel;
 use Xvlvv\Entity\User;
@@ -28,7 +30,7 @@ use yii\web\NotFoundHttpException;
 /**
  * Репозиторий для работы с сущностями User
  */
-class UserRepository implements UserRepositoryInterface
+readonly final class UserRepository implements UserRepositoryInterface
 {
     /**
      * @param ReviewRepositoryInterface $reviewRepo
@@ -105,7 +107,7 @@ class UserRepository implements UserRepositoryInterface
 
         try {
             $userModel->save();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             throw new RuntimeException('Ошибка при сохранении');
         }
 
@@ -119,11 +121,30 @@ class UserRepository implements UserRepositoryInterface
             default => throw new LogicException('Неизвестный тип профиля'),
         };
 
+        if ($user->getProfile() instanceof WorkerProfile) {
+            /** @var WorkerProfile $profile */
+            $profile = $user->getProfile();
+            $specializationIds = array_map(
+                fn(Category $spec) => $spec->getId(),
+                $profile->getSpecializations()
+            );
+            $this->updateSpecializations($user->getId(), $specializationIds);
+        }
+
         $profileModel = $profileModelClass::findOne(['user_id' => $user->getId()]);
 
         if ($profileModel === null) {
             $profileModel = new $profileModelClass();
             $profileModel->user_id = $user->getId();
+        }
+
+        if ($user->getProfile() instanceof WorkerProfile) {
+            /** @var WorkerProfile $profile */
+            $profile = $user->getProfile();
+            $profileModel->day_of_birth = $profile->getDayOfBirth();
+            $profileModel->bio = $profile->getBio();
+            $profileModel->phone_number = $profile->getPhoneNumber();
+            $profileModel->telegram_username = $profile->getTelegramUsername();
         }
 
         if (!$profileModel->save()) {
@@ -320,20 +341,6 @@ class UserRepository implements UserRepositoryInterface
         return $this->userMapper->toDomainEntity($userModel);
     }
 
-    public function isAuthor(int $userId): bool
-    {
-        $user = $this->getByIdOrFail($userId);
-
-        return $user->getUserRole() === UserRole::CUSTOMER;
-    }
-
-    public function isWorker(int $userId): bool
-    {
-        $user = $this->getByIdOrFail($userId);
-
-        return $user->getUserRole() === UserRole::WORKER;
-    }
-
     public function getByVkId(int $vkId): ?User
     {
         $userModel = UserModel::find()
@@ -345,5 +352,25 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return $this->userMapper->toDomainEntity($userModel);
+    }
+
+    private function updateSpecializations(int $userId, array $newSpecializationIds): void
+    {
+        UserSpecialization::deleteAll(['user_id' => $userId]);
+
+        if (empty($newSpecializationIds)) {
+            return;
+        }
+
+        foreach ($newSpecializationIds as $categoryId) {
+            try {
+                $specialization = new UserSpecialization();
+                $specialization->user_id = $userId;
+                $specialization->category_id = $categoryId;
+                $specialization->save();
+            } catch (Throwable) {
+                throw new RuntimeException('Ошибка при сохранении специализации');
+            }
+        }
     }
 }

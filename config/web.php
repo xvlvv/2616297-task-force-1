@@ -1,11 +1,16 @@
 <?php
 
+use Xvlvv\DataMapper\CategoryMapper;
 use Xvlvv\DataMapper\CityMapper;
+use Xvlvv\Factory\CustomerProfileFactory;
+use Xvlvv\Factory\WorkerProfileFactory;
 use Xvlvv\Services\Application\GeocoderInterface;
 use Xvlvv\Services\Application\LocationService;
+use Xvlvv\Services\Application\MyTasksService;
+use Xvlvv\Services\Application\ProfileEditService;
+use Xvlvv\Services\Application\SecurityService;
 use Xvlvv\Services\Application\VkAuthService;
 use Xvlvv\Services\Application\YandexGeocoderService;
-use yii\helpers\Url;
 use yii\httpclient\Client;
 use Xvlvv\DataMapper\TaskMapper;
 use Xvlvv\DataMapper\UserMapper;
@@ -66,7 +71,14 @@ $config = [
                 return new TaskResponseRepository($reviewRepo, $userMapper, $taskMapper);
             },
             ReviewRepositoryInterface::class => ReviewRepository::class,
-            UserMapper::class => UserMapper::class,
+            UserMapper::class => function () {
+                $cityMapper = Yii::$container->get(CityMapper::class);
+                $workerFactory = Yii::$container->get(WorkerProfileFactory::class);
+                $customerFactory = Yii::$container->get(CustomerProfileFactory::class);
+                $categoryMapper = Yii::$container->get(CategoryMapper::class);
+
+                return new UserMapper($cityMapper, $workerFactory, $customerFactory, $categoryMapper);
+            },
             UserRepositoryInterface::class => function () {
                 $reviewRepo = Yii::$container->get(ReviewRepositoryInterface::class);
                 $taskRepo = Yii::$container->get(TaskRepositoryInterface::class);
@@ -82,20 +94,21 @@ $config = [
             CancelTaskService::class => CancelTaskService::class,
             FailTaskService::class => FailTaskService::class,
             Client::class => Client::class,
-            LocationService::class => function () {
-                $geocoder = Yii::$container->get(GeocoderInterface::class);
-                return new LocationService($geocoder);
-            },
+            LocationService::class => LocationService::class,
             GeocoderInterface::class => function () {
                 $client = Yii::$container->get(Client::class);
                 $cityRepo = Yii::$container->get(CityRepositoryInterface::class);
                 return new YandexGeocoderService($client, $cityRepo);
             },
             VkAuthService::class => function () {
-                $userRepo = Yii::$container->get(UserRepository::class);
+                $userRepo = Yii::$container->get(UserRepositoryInterface::class);
                 $vkAuth = Yii::$app->authClientCollection->getClient('vk-id');
                 return new VkAuthService($userRepo, $vkAuth);
-            }
+            },
+            ProfileEditService::class => ProfileEditService::class,
+            CategoryMapper::class => CategoryMapper::class,
+            SecurityService::class => SecurityService::class,
+            MyTasksService::class => MyTasksService::class
         ],
     ],
     'components' => [
@@ -155,6 +168,7 @@ $config = [
                 'tasks' => 'task/index',
                 'tasks/view/<id:\d+>' => 'task/view',
                 'task/apply/<id:\d+>' => 'task/apply',
+                'my-tasks' => 'task/my',
                 'user/view/<id:\d+>' => 'user/view',
                 'register' => 'site/register',
                 'logout' => 'site/logout',
