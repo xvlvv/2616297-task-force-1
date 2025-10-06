@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Domain\Task;
 
@@ -14,8 +14,7 @@ class ApplyAction extends Action
     public function __construct(
         protected string $name,
         protected string $internalName,
-    )
-    {
+    ) {
         $this->taskRepository = Yii::$container->get(TaskRepositoryInterface::class);
         parent::__construct($this->name, $this->internalName);
     }

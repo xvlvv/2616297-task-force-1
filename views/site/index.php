@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /**
  * @var LoginForm $loginForm Форма авторизации на сайте
@@ -34,7 +34,7 @@ use yii\widgets\ActiveForm;
                         <h3>Публикация заявки</h3>
                         <p>Создайте новую заявку.</p>
                         <p>Опишите в ней все детали
-                            и  стоимость работы.</p>
+                            и стоимость работы.</p>
                     </div>
                 </div>
                 <div class="landing-instruction-step">
@@ -71,7 +71,7 @@ use yii\widgets\ActiveForm;
                             Большой выбор заданий
                         </li>
                         <li>
-                            Работайте где  удобно
+                            Работайте где удобно
                         </li>
                         <li>
                             Свободный график
@@ -173,7 +173,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($loginForm, 'password')->passwordInput() ?>
 
-    <?php if (Yii::$app->authClientCollection->hasClient('vk-id')): ?>
+    <?php
+    if (Yii::$app->authClientCollection->hasClient('vk-id')): ?>
 
         <?= Html::a(
             '<span class="vk-icon"></span><span>Войти с VK ID</span>',
@@ -184,11 +185,13 @@ use yii\widgets\ActiveForm;
             ]
         ) ?>
 
-    <?php endif ?>
+    <?php
+    endif ?>
 
     <?= Html::submitButton('Войти', ['class' => 'button']) ?>
 
-    <?php ActiveForm::end(); ?>
+    <?php
+    ActiveForm::end(); ?>
 
     <?= Html::button('Закрыть', ['class' => 'form-modal-close']) ?>
 </section>

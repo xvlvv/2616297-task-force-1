@@ -40,7 +40,9 @@ class m250922_184426_init_rbac extends Migration
         $auth = Yii::$app->authManager;
 
         if (!$auth instanceof DbManager) {
-            throw new InvalidConfigException('You should configure "authManager" component to use database before executing this migration.');
+            throw new InvalidConfigException(
+                'You should configure "authManager" component to use database before executing this migration.'
+            );
         }
 
         $auth->removeAll();

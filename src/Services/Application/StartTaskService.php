@@ -1,17 +1,18 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Services\Application;
 
 use Xvlvv\DTO\StartTaskDTO;
 use Xvlvv\Exception\PermissionDeniedException;
 use Xvlvv\Repository\TaskRepositoryInterface;
+use yii\web\NotFoundHttpException;
 
 /**
  * Сервис для назначения исполнителя и старта задачи
  */
-final class StartTaskService
+readonly final class StartTaskService
 {
     /**
      * @param TaskRepositoryInterface $taskRepository
@@ -26,7 +27,7 @@ final class StartTaskService
      *
      * @param StartTaskDTO $dto
      * @return bool
-     * @throws PermissionDeniedException если пользователь не является автором задачи
+     * @throws PermissionDeniedException|NotFoundHttpException если пользователь не является автором задачи
      */
     public function handle(StartTaskDTO $dto): bool
     {

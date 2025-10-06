@@ -49,6 +49,7 @@ class VkIdOauth extends OAuth2
 
         return $result['user'] ?? [];
     }
+
     private function generatePkce(): VkCodeVerifierDTO
     {
         $codeVerifier = Yii::$app->security->generateRandomString(64);
@@ -93,7 +94,7 @@ class VkIdOauth extends OAuth2
         $deviceId = $this->getDeviceId();
 
         if (null === $codeVerifier
-        || null === $deviceId) {
+            || null === $deviceId) {
             throw new HttpException(400);
         }
 

@@ -6,18 +6,19 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%executor_profile}}".
+ * ActiveRecord модель для таблицы "{{%executor_profile}}".
+ * Представляет профиль пользователя с ролью "Исполнитель".
  *
- * @property int $user_id
- * @property string|null $day_of_birth
- * @property string|null $bio
- * @property string|null $phone_number
- * @property string|null $telegram_username
- * @property bool|null $restrict_contacts
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property int $user_id ID пользователя
+ * @property string|null $day_of_birth Дата рождения
+ * @property string|null $bio Информация "О себе"
+ * @property string|null $phone_number Номер телефона
+ * @property string|null $telegram_username Имя пользователя в Telegram
+ * @property bool|null $restrict_contacts Флаг "Показывать контакты только заказчику"
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property User $user
+ * @property User $user Связанная модель пользователя
  */
 class ExecutorProfile extends ActiveRecord
 {
@@ -42,7 +43,13 @@ class ExecutorProfile extends ActiveRecord
             [['restrict_contacts'], 'boolean'],
             [['phone_number'], 'string', 'max' => 11],
             [['telegram_username'], 'string', 'max' => 64],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [
+                ['user_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => User::class,
+                'targetAttribute' => ['user_id' => 'id']
+            ],
         ];
     }
 
@@ -64,7 +71,7 @@ class ExecutorProfile extends ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Определяет связь с моделью User
      *
      * @return ActiveQuery
      */

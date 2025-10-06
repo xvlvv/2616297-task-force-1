@@ -9,15 +9,22 @@ use Xvlvv\Repository\CityRepositoryInterface;
 use yii\base\InvalidConfigException;
 use yii\httpclient\Client;
 
-class YandexGeocoderService implements GeocoderInterface
+/**
+ * Сервис для взаимодействия с Yandex Geocoder API
+ */
+readonly class YandexGeocoderService implements GeocoderInterface
 {
     private string $apiKey;
 
+    /**
+     * @param Client $httpClient HTTP-клиент для отправки запросов
+     * @param CityRepositoryInterface $cityRepository Репозиторий для работы с городами
+     * @throws InvalidConfigException если API-ключ не настроен
+     */
     public function __construct(
         private Client $httpClient,
         private CityRepositoryInterface $cityRepository,
-    )
-    {
+    ) {
         if (!isset($_ENV['YANDEX_GEOCODER_API_KEY'])) {
             throw new InvalidConfigException('Yandex Geocoder API key is not configured');
         }
@@ -25,13 +32,17 @@ class YandexGeocoderService implements GeocoderInterface
         $this->apiKey = $_ENV['YANDEX_GEOCODER_API_KEY'];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function findByAddress(string $address, City $city): array
     {
         $restriction = $city->getBoundingBox();
 
         if (null === $restriction) {
             $userCity = $this->makeRequest($city->getName(), results: 1);
-            $envelope = $userCity['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['boundedBy']['Envelope'] ?? [];
+            $envelope = $userCity['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['boundedBy']['Envelope']
+                        ?? [];
         }
 
         if (isset($envelope, $envelope['lowerCorner'], $envelope['upperCorner'])) {
@@ -68,11 +79,11 @@ class YandexGeocoderService implements GeocoderInterface
             $components = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['Components'] ?? [];
             foreach ($components as $component) {
                 $key = match ($component['kind']) {
-                    'country'  => 'country',
+                    'country' => 'country',
                     'locality' => 'city',
-                    'street'   => 'street',
-                    'house'    => 'house',
-                    default    => null,
+                    'street' => 'street',
+                    'house' => 'house',
+                    default => null,
                 };
 
                 if ($key) {
@@ -110,7 +121,16 @@ class YandexGeocoderService implements GeocoderInterface
         return $locations;
     }
 
-    private function makeRequest(string $address, ?string $boundingBox = null, int $results = 10, $rspn = 0): array
+    /**
+     * Выполняет GET-запрос к Yandex Geocoder API
+     *
+     * @param string $address Адрес для геокодирования
+     * @param string|null $boundingBox Ограничивающий прямоугольник для поиска
+     * @param int $results Максимальное количество результатов
+     * @param int $rspn Флаг для ограничения поиска границами из bbox
+     * @return array Ответ от API в виде массива или пустой массив в случае ошибки
+     */
+    private function makeRequest(string $address, ?string $boundingBox = null, int $results = 10, int $rspn = 0): array
     {
         $requestParams = [
             'apikey' => $this->apiKey,

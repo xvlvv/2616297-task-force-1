@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Enums;
 
@@ -22,7 +22,7 @@ enum Status: string
      */
     public function getName(): string
     {
-        return match($this->value) {
+        return match ($this->value) {
             self::NEW->value => 'Новое',
             self::CANCELLED->value => 'Отменено',
             self::IN_PROGRESS->value => 'В работе',

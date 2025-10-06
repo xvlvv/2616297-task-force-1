@@ -1,8 +1,10 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\DTO;
+
+use Xvlvv\Entity\User;
 
 /**
  * DTO для фильтрации и получения списка новых заданий
@@ -15,6 +17,7 @@ readonly final class GetNewTasksDTO
      * @param string $createdAt Период создания для фильтрации
      * @param int $offset Смещение для пагинации
      * @param int $limit Лимит записей для пагинации
+     * @param User|null $user Текущий пользователь
      */
     public function __construct(
         public string|array $categories,
@@ -22,6 +25,7 @@ readonly final class GetNewTasksDTO
         public string $createdAt,
         public int $offset = 0,
         public int $limit = 0,
+        public ?User $user = null,
     ) {
     }
 }

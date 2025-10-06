@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\DTO;
 
@@ -16,7 +16,6 @@ readonly final class UserSpecializationDTO
     public function __construct(
         public int $id,
         public string $name,
-    )
-    {
+    ) {
     }
 }

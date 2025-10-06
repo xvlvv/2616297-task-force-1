@@ -6,16 +6,28 @@ use app\models\Category;
 use app\models\Task;
 use Xvlvv\Domain\ValueObject\Coordinates;
 use Xvlvv\Entity\Category as CategoryEntity;
-use Xvlvv\Entity\City;
 use Xvlvv\Entity\Task as TaskEntity;
 use Xvlvv\Enums\Status;
 use Xvlvv\Repository\CityRepository;
-use Xvlvv\Repository\TaskRepository;
 use Yii;
+use yii\base\InvalidConfigException;
+use yii\di\NotInstantiableException;
 use yii\web\NotFoundHttpException;
 
-class TaskMapper
+/**
+ * Маппер для преобразования данных между ActiveRecord моделью Task и доменной сущностью Task.
+ */
+final class TaskMapper
 {
+    /**
+     * Преобразует ActiveRecord модель в доменную сущность.
+     *
+     * @param Task $task ActiveRecord модель задания.
+     * @return TaskEntity Доменная сущность задания.
+     * @throws NotFoundHttpException если у задания отсутствует категория.
+     * @throws InvalidConfigException
+     * @throws NotInstantiableException
+     */
     public function toDomainEntity(Task $task): TaskEntity
     {
         $repo = Yii::$container->get(CityRepository::class);
@@ -35,7 +47,7 @@ class TaskMapper
         }
 
         if (null !== $task->latitude
-        && null !== $task->longitude) {
+            && null !== $task->longitude) {
             $coordinates = new Coordinates($task->latitude, $task->longitude);
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\DataMapper;
 
@@ -27,6 +27,12 @@ final class CityMapper
         );
     }
 
+    /**
+     * Преобразует доменную сущность в ActiveRecord модель.
+     *
+     * @param City $city Доменная сущность города.
+     * @return CityModel ActiveRecord модель города.
+     */
     public function toActiveRecord(City $city): CityModel
     {
         $cityModel = CityModel::findOne($city->getId());

@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Entity;
 
 use LogicException;
+use RuntimeException;
 use Xvlvv\Enums\UserRole;
 use Yii;
 
@@ -18,7 +19,7 @@ class User
      *
      * @param string $name Имя
      * @param string|null $email Email
-     * @param string|null $password_hash Хеш пароля
+     * @param string|null $passwordHash Хеш пароля
      * @param UserRoleInterface $userRole Роль пользователя
      * @param UserProfileInterface $profile Профиль пользователя
      * @param City $city Город
@@ -30,7 +31,7 @@ class User
     public function __construct(
         private string $name,
         private ?string $email,
-        private ?string $password_hash,
+        private ?string $passwordHash,
         private readonly UserRoleInterface $userRole,
         private readonly UserProfileInterface $profile,
         private City $city,
@@ -42,14 +43,7 @@ class User
     }
 
     /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    /**
+     * Возвращает имя пользователя.
      * @return string
      */
     public function getName(): string
@@ -58,6 +52,7 @@ class User
     }
 
     /**
+     * Возвращает email пользователя.
      * @return string
      */
     public function getEmail(): string
@@ -65,40 +60,69 @@ class User
         return $this->email;
     }
 
+    /**
+     * Привязывает VK ID к существующему пользователю.
+     * @param int $vkId
+     * @return void
+     * @throws RuntimeException если VK ID уже привязан.
+     */
     public function updateWithVkId(int $vkId): void
     {
         if (null !== $this->getVkId()) {
-            throw new \RuntimeException('VK ID already exists');
+            throw new RuntimeException('VK ID already exists');
         }
 
         $this->vkId = $vkId;
     }
 
+    /**
+     * Возвращает VK ID пользователя.
+     * @return int|null
+     */
     public function getVkId(): ?int
     {
         return $this->vkId;
     }
 
     /**
-     * @return string
+     * Проверяет, проходил ли пользователь регистрацию через VK ID
+     * @return bool
      */
-    public function getPasswordHash(): string
+    public function isRegisteredWithVk(): bool
     {
-        return $this->password_hash;
+        return null !== $this->getVkId() && null === $this->getPasswordHash();
     }
 
+    /**
+     * Возвращает хеш пароля.
+     * @return string|null
+     */
+    public function getPasswordHash(): ?string
+    {
+        return $this->passwordHash;
+    }
+
+    /**
+     * Возвращает путь к аватару.
+     * @return string|null
+     */
     public function getAvatarPath(): ?string
     {
         return $this->avatarPath;
     }
 
+    /**
+     * Возвращает объект профиля пользователя (WorkerProfile или CustomerProfile).
+     * @return UserProfileInterface
+     */
     public function getProfile(): UserProfileInterface
     {
         return $this->profile;
     }
 
     /**
-     * @return string
+     * Возвращает enum роли пользователя.
+     * @return UserRole
      */
     public function getUserRole(): UserRole
     {
@@ -106,17 +130,58 @@ class User
     }
 
     /**
-     * Проверяет корректность пароля
+     * Проверяет, соответствует ли переданный пароль хешу.
      *
-     * @param string $password
+     * @param string $password Пароль в открытом виде для проверки.
      * @return bool
      */
     public function isValidPassword(string $password): bool
     {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
+        return Yii::$app->security->validatePassword($password, $this->passwordHash);
     }
 
     /**
+     * Изменяет имя пользователя.
+     * @param string $name
+     * @return void
+     */
+    public function changeName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Изменяет email пользователя.
+     * @param string $email
+     * @return void
+     */
+    public function changeEmail(string $email): void
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * Изменяет путь к аватару.
+     * @param string $avatarPath
+     * @return void
+     */
+    public function changeAvatar(string $avatarPath): void
+    {
+        $this->avatarPath = $avatarPath;
+    }
+
+    /**
+     * Изменяет хеш пароля.
+     * @param string $newPasswordHash Новый хеш пароля.
+     * @return void
+     */
+    public function changePassword(string $newPasswordHash): void
+    {
+        $this->passwordHash = $newPasswordHash;
+    }
+
+    /**
+     * Возвращает сущность города пользователя.
      * @return City
      */
     public function getCity(): City
@@ -124,16 +189,21 @@ class User
         return $this->city;
     }
 
+    /**
+     * Возвращает токен доступа (Auth Key).
+     * @return string|null
+     */
     public function getAccessToken(): ?string
     {
         return $this->accessToken;
     }
 
     /**
-     * Устанавливает ID для нового пользователя
+     * Устанавливает ID для новой сущности пользователя.
+     * Защищает от перезаписи существующего ID.
      *
      * @param int $id
-     * @throws LogicException
+     * @throws LogicException если ID уже установлен.
      */
     public function setId(int $id): void
     {
@@ -145,7 +215,17 @@ class User
     }
 
     /**
-     * Проверяет право на создание задания через объект роли
+     * Возвращает ID пользователя.
+     * @return int|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Проверяет, может ли пользователь создавать задания.
+     * Делегирует проверку объекту роли.
      * @return bool
      */
     public function canCreateTask(): bool
@@ -154,7 +234,8 @@ class User
     }
 
     /**
-     * Проверяет право откликаться на задание через объект роли
+     * Проверяет, может ли пользователь откликаться на задания.
+     * Делегирует проверку объекту роли.
      * @return bool
      */
     public function canApplyToTask(): bool

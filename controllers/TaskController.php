@@ -10,7 +10,6 @@ use app\models\CompleteForm;
 use app\models\TaskSearch;
 use DateTimeImmutable;
 use RuntimeException;
-use Xvlvv\DataMapper\CityMapper;
 use Xvlvv\DTO\CancelTaskDTO;
 use Xvlvv\DTO\CreateTaskDTO;
 use Xvlvv\DTO\FailTaskDTO;
@@ -18,17 +17,19 @@ use Xvlvv\DTO\GetNewTasksDTO;
 use Xvlvv\DTO\SaveReviewDTO;
 use Xvlvv\DTO\SaveTaskResponseDTO;
 use Xvlvv\DTO\StartTaskDTO;
+use Xvlvv\Entity\Category;
 use Xvlvv\Repository\CategoryRepositoryInterface;
-use Xvlvv\Repository\CityRepository;
 use Xvlvv\Repository\TaskRepositoryInterface;
 use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Services\Application\CancelTaskService;
 use Xvlvv\Services\Application\FailTaskService;
 use Xvlvv\Services\Application\FinishTaskService;
+use Xvlvv\Services\Application\MyTasksService;
 use Xvlvv\Services\Application\PublishTaskService;
 use Xvlvv\Services\Application\StartTaskService;
 use Xvlvv\Services\Application\TaskResponseService;
 use Yii;
+use yii\base\Exception;
 use yii\data\ArrayDataProvider;
 use yii\data\Pagination;
 use yii\filters\AccessControl;
@@ -36,6 +37,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
@@ -44,6 +46,9 @@ use yii\widgets\ActiveForm;
  */
 class TaskController extends Controller
 {
+    /**
+     * {@inheritDoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -58,12 +63,12 @@ class TaskController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['publish'],
-                        'matchCallback' => fn () => Yii::$app->user->can('publishTask')
+                        'matchCallback' => fn() => Yii::$app->user->can('publishTask')
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['apply'],
-                        'matchCallback' => fn () => Yii::$app->user->can('applyToTask')
+                        'actions' => ['apply', 'my'],
+                        'matchCallback' => fn() => Yii::$app->user->can('applyToTask')
                     ],
                     [
                         'allow' => true,
@@ -123,6 +128,7 @@ class TaskController extends Controller
     {
         $pageSize = 3;
         $model = new TaskSearch();
+        $user = Yii::$app->user?->identity?->getUser();
 
         $model->load(Yii::$app->request->get());
 
@@ -130,7 +136,8 @@ class TaskController extends Controller
             new GetNewTasksDTO(
                 $model->categories,
                 $model->checkWorker,
-                $model->createdAt
+                $model->createdAt,
+                user: $user
             )
         );
 
@@ -146,6 +153,7 @@ class TaskController extends Controller
             $model->createdAt,
             $pagination->getOffset(),
             $pageSize,
+            $user
         );
 
         $dto = $taskRepository->getNewTasks($getNewTasksDTO);
@@ -187,16 +195,24 @@ class TaskController extends Controller
         );
     }
 
+    /**
+     * Обрабатывает публикацию задачи
+     *
+     * @param PublishTaskService $publishTaskService
+     * @param CategoryRepositoryInterface $categoryRepo
+     * @return string|Response
+     * @throws Exception
+     * @throws NotFoundHttpException
+     */
     public function actionPublish(
         PublishTaskService $publishTaskService,
         CategoryRepositoryInterface $categoryRepo,
     ): string|Response {
         $formModel = new PublishForm();
-        $categories = ArrayHelper::map(
-            $categoryRepo->getAll(),
-            'id',
-            'name'
-        );
+        $categories = array_map(fn(Category $category) => ['id' => $category->getId(), 'name' => $category->getName()],
+            $categoryRepo->getAll());
+
+        $categories = ArrayHelper::map($categories, 'id', 'name');
 
         if (!Yii::$app->request->isPost) {
             return $this->render('publish', compact('formModel', 'categories'));
@@ -238,6 +254,15 @@ class TaskController extends Controller
         return $this->redirect($newTask);
     }
 
+    /**
+     * Обрабатывает отклик к задаче
+     *
+     * @param int $id
+     * @param TaskResponseService $responseService
+     * @return array|Response
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     */
     public function actionApply(int $id, TaskResponseService $responseService): array|Response
     {
         $completeForm = new ApplyForm();
@@ -256,7 +281,7 @@ class TaskController extends Controller
             $id,
             Yii::$app->user->identity->getUser()->getId(),
             $completeForm->description,
-            (int) $completeForm->price,
+            (int)$completeForm->price,
         );
 
         $responseService->createResponse($saveResponseDTO);
@@ -264,6 +289,14 @@ class TaskController extends Controller
         return $this->redirect(['task/view', 'id' => $id]);
     }
 
+    /**
+     * Обрабатывает отказ для отклика по заданию
+     *
+     * @param int $id
+     * @param TaskResponseService $responseService
+     * @param TaskResponseRepositoryInterface $taskResponseRepository
+     * @return Response
+     */
     public function actionRejectResponse(
         int $id,
         TaskResponseService $responseService,
@@ -275,6 +308,15 @@ class TaskController extends Controller
         return $this->redirect(['task/view', 'id' => $taskId]);
     }
 
+    /**
+     * Обрабатывает выбор исполнителя по заданию
+     *
+     * @param int $id
+     * @param StartTaskService $service
+     * @param TaskResponseRepositoryInterface $taskResponseRepository
+     * @return Response
+     * @throws NotFoundHttpException
+     */
     public function actionStart(
         int $id,
         StartTaskService $service,
@@ -294,6 +336,15 @@ class TaskController extends Controller
         return $this->redirect(['task/view', 'id' => $taskId]);
     }
 
+    /**
+     * Обрабатывает заверение задания
+     *
+     * @param int $id
+     * @param FinishTaskService $service
+     * @return array|Response
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     */
     public function actionComplete(
         int $id,
         FinishTaskService $service,
@@ -311,7 +362,7 @@ class TaskController extends Controller
         }
 
         $saveReviewDTO = new SaveReviewDTO(
-            (int) $completeForm->rating,
+            (int)$completeForm->rating,
             $completeForm->comment,
             $id,
             Yii::$app->user->identity->getUser()->getId(),
@@ -322,6 +373,14 @@ class TaskController extends Controller
         return $this->redirect(['task/view', 'id' => $id]);
     }
 
+    /**
+     * Обрабатывает отмену задания
+     *
+     * @param int $id
+     * @param CancelTaskService $service
+     * @return array|Response
+     * @throws NotFoundHttpException
+     */
     public function actionCancel(
         int $id,
         CancelTaskService $service,
@@ -336,6 +395,14 @@ class TaskController extends Controller
         return $this->redirect(['task/view', 'id' => $id]);
     }
 
+    /**
+     * Обрабатывает отказ исполнителя от задания
+     *
+     * @param int $id
+     * @param FailTaskService $service
+     * @return array|Response
+     * @throws NotFoundHttpException
+     */
     public function actionFail(
         int $id,
         FailTaskService $service,
@@ -348,5 +415,39 @@ class TaskController extends Controller
         $service->handle($failTaskDTO);
 
         return $this->redirect(['task/view', 'id' => $id]);
+    }
+
+    /**
+     * Отображает страницу "Мои задания" с фильтрацией по статусу
+     *
+     * @param MyTasksService $myTasksService
+     * @return string
+     */
+    public function actionMy(MyTasksService $myTasksService): string
+    {
+        $activeTab = Yii::$app->request->get('tab', 'new');
+        $userId = Yii::$app->user->id;
+
+        if (!in_array($activeTab, ['new', 'in-progress', 'closed'])) {
+            $activeTab = 'new';
+        }
+
+        $taskDTOs = $myTasksService->findTasksForUser($userId, $activeTab);
+
+        $tabTitles = [
+            'new' => 'Новые',
+            'in-progress' => 'В процессе',
+            'closed' => 'Закрытые',
+        ];
+
+        $provider = new ArrayDataProvider([
+            'allModels' => $taskDTOs,
+        ]);
+
+        return $this->render('my', [
+            'tasks' => $provider,
+            'activeTab' => $activeTab,
+            'tabTitles' => $tabTitles,
+        ]);
     }
 }

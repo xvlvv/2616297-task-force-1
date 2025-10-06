@@ -1,8 +1,9 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 /** @var yii\web\View $this */
+
 /** @var string $content */
 
 use app\assets\AppAsset;
@@ -17,15 +18,18 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 ?>
-<?php $this->beginPage() ?>
+<?php
+$this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <?php
+    $this->head() ?>
 </head>
 <body>
-<?php $this->beginBody() ?>
+<?php
+$this->beginBody() ?>
 
 <header class="page-header">
     <nav class="main-nav">
@@ -39,78 +43,117 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
         echo Html::a($logoImage, ['/site/index'], ['class' => 'header-logo']);
         ?>
-        <?php if (!Yii::$app->user->isGuest): ?>
-        <div class="nav-wrapper">
-            <ul class="nav-list">
-                <li class="list-item <?= 'task/index' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
-                    <?= Html::a(
-                        'Новое',
-                        ['task/index'],
-                        ['class' => 'link link--nav']
-                    ) ?>
-                </li>
-                <li class="list-item <?= 'task/something' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
-                    <a href="#" class="link link--nav">Мои задания</a>
-                </li>
-                <?php if (Yii::$app->user->can('publishTask')): ?>
-                    <li class="list-item <?= 'task/publish' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+        <?php
+        if (!Yii::$app->user->isGuest): ?>
+            <div class="nav-wrapper">
+                <ul class="nav-list">
+                    <li class="list-item <?= 'task/index' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
                         <?= Html::a(
-                            'Создать задание',
-                            ['task/publish'],
+                            'Новое',
+                            ['task/index'],
                             ['class' => 'link link--nav']
                         ) ?>
                     </li>
-                <?php endif ?>
-                <li class="list-item <?= 'site/something' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
-                    <a href="#" class="link link--nav" >Настройки</a>
-                </li>
-            </ul>
-        </div>
-        <?php endif ?>
-    </nav>
-    <?php if (!Yii::$app->user->isGuest): ?>
-    <?php $user = Yii::$app->user->identity->getUser() ?>
-    <div class="user-block">
-        <a href="#">
-            <?= $user->getAvatarPath() ? Html::img(
-                $user->getAvatarPath(),
-                [
-                    'class' => 'user-photo',
-                    'width' => 55,
-                    'height' => 55,
-                    'alt' => 'Аватар'
-                ]
-            ) : '' ?>
-        </a>
-        <div class="user-menu">
-            <p class="user-name"><?= Html::encode($user->getName()) ?></p>
-            <div class="popup-head">
-                <ul class="popup-menu">
-                    <li class="menu-item">
-                        <a href="#" class="link">Настройки</a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="link">Связаться с нами</a>
-                    </li>
-                    <li class="menu-item">
-                        <?= Html::a(
-                            'Выход из системы',
-                            ['site/logout'],
-                            ['class' => 'link']
-                        ) ?>
-                    </li>
+                    <?php
+                    if (Yii::$app->user->can('applyTask')): ?>
+                        <li class="list-item <?= 'task/my' === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+                            <?= Html::a(
+                                'Мои задания',
+                                ['task/my'],
+                                ['class' => 'link link--nav']
+                            ) ?>
+                        </li>
+                    <?php
+                    endif ?>
+                    <?php
+                    if (Yii::$app->user->can('publishTask')): ?>
+                        <li class="list-item <?= 'task/publish'
+                                                 === Yii::$app->requestedRoute ? 'list-item--active' : '' ?>">
+                            <?= Html::a(
+                                'Создать задание',
+                                ['task/publish'],
+                                ['class' => 'link link--nav']
+                            ) ?>
+                        </li>
+                    <?php
+                    endif ?>
+                    <?php
+                    $isInSettingsSection = 'settings/profile' === Yii::$app->requestedRoute
+                                           || 'settings/security' === Yii::$app->requestedRoute;
+                    ?>
+                    <?php
+                    if (false === Yii::$app->user?->identity?->getUser()?->isRegisteredWithVk()
+                        || Yii::$app->user->can(
+                            'applyToTask'
+                        )): ?>
+                        <li class="list-item <?= $isInSettingsSection ? 'list-item--active' : '' ?>">
+                            <?= Html::a(
+                                'Настройки',
+                                ['settings/profile'],
+                                ['class' => 'link link--nav']
+                            ) ?>
+                        </li>
+                    <?php
+                    endif ?>
                 </ul>
             </div>
+        <?php
+        endif ?>
+    </nav>
+    <?php
+    if (!Yii::$app->user->isGuest): ?>
+        <?php
+        $user = Yii::$app->user->identity->getUser() ?>
+        <div class="user-block">
+            <a href="#">
+                <?= $user->getAvatarPath() ? Html::img(
+                    $user->getAvatarPath(),
+                    [
+                        'class' => 'user-photo',
+                        'width' => 55,
+                        'height' => 55,
+                        'alt' => 'Аватар'
+                    ]
+                ) : '' ?>
+            </a>
+            <div class="user-menu">
+                <p class="user-name"><?= Html::encode($user->getName()) ?></p>
+                <div class="popup-head">
+                    <ul class="popup-menu">
+                        <?php
+                        if (false === Yii::$app->user?->identity?->getUser()?->isRegisteredWithVk()
+                            || Yii::$app->user->can(
+                                'applyToTask'
+                            )): ?>
+                            <li class="menu-item">
+                                <?= Html::a(
+                                    'Настройки',
+                                    ['settings/profile'],
+                                    ['class' => 'link']
+                                ) ?>
+                            </li>
+                        <?php
+                        endif ?>
+                        <li class="menu-item">
+                            <?= Html::a(
+                                'Выход из системы',
+                                ['site/logout'],
+                                ['class' => 'link']
+                            ) ?>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-    </div>
-    <?php endif ?>
+    <?php
+    endif ?>
 </header>
 
-<main class="main-content container">
-    <?= $content ?>
-</main>
+<?= $content ?>
 
-<?php $this->endBody() ?>
+<?php
+$this->endBody() ?>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php
+$this->endPage() ?>

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\DTO;
 
@@ -15,6 +15,7 @@ readonly final class WorkerProfileDTO implements ProfileDataInterface
      * @param string|null $bio Описание
      * @param string|null $phoneNumber Номер телефона
      * @param string|null $telegramUsername Имя в Telegram
+     * @param array $specializations Массив специализаций исполнителя
      */
     public function __construct(
         public bool $showContactsOnlyToCustomers,
@@ -22,6 +23,7 @@ readonly final class WorkerProfileDTO implements ProfileDataInterface
         public ?string $bio = null,
         public ?string $phoneNumber = null,
         public ?string $telegramUsername = null,
+        public array $specializations = [],
     ) {
     }
 }

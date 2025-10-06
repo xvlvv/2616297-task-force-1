@@ -1,12 +1,13 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\DataMapper;
 
 use app\models\CustomerProfile as CustomerProfileModel;
 use app\models\ExecutorProfile as WorkerProfileModel;
 use app\models\User as ARUser;
+use app\models\UserSpecialization;
 use Xvlvv\DTO\CustomerProfileDTO;
 use Xvlvv\DTO\WorkerProfileDTO;
 use Xvlvv\Entity\User as DomainUser;
@@ -15,12 +16,22 @@ use Xvlvv\Enums\UserRole;
 use Xvlvv\Factory\CustomerProfileFactory;
 use Xvlvv\Factory\WorkerProfileFactory;
 
-final class UserMapper
+/**
+ * Маппер для преобразования данных между ActiveRecord моделью User и доменной сущностью User.
+ */
+final readonly class UserMapper
 {
+    /**
+     * @param CityMapper $cityMapper Маппер для городов.
+     * @param WorkerProfileFactory $workerProfileFactory Фабрика для профилей исполнителей.
+     * @param CustomerProfileFactory $customerProfileFactory Фабрика для профилей заказчиков.
+     * @param CategoryMapper $categoryMapper Маппер для категорий/специализаций.
+     */
     public function __construct(
-        private readonly CityMapper $cityMapper,
-        private readonly WorkerProfileFactory $workerProfileFactory,
-        private readonly CustomerProfileFactory $customerProfileFactory
+        private CityMapper $cityMapper,
+        private WorkerProfileFactory $workerProfileFactory,
+        private CustomerProfileFactory $customerProfileFactory,
+        private CategoryMapper $categoryMapper,
     ) {
     }
 
@@ -56,25 +67,6 @@ final class UserMapper
     }
 
     /**
-     * Создает доменный объект WorkerProfile.
-     * Сначала создает DTO из AR-модели, затем передает его в фабрику.
-     * @param WorkerProfileModel|null $arProfile
-     * @return UserProfileInterface
-     */
-    private function createWorkerProfile(?WorkerProfileModel $arProfile): UserProfileInterface
-    {
-        $dto = new WorkerProfileDTO(
-            showContactsOnlyToCustomers: (bool)$arProfile->restrict_contacts,
-            dayOfBirth: $arProfile->day_of_birth,
-            bio: $arProfile->bio,
-            phoneNumber: $arProfile->phone_number,
-            telegramUsername: $arProfile->telegram_username
-        );
-
-        return $this->workerProfileFactory->createFromDTO($dto);
-    }
-
-    /**
      * Создает доменный объект CustomerProfile.
      * @param CustomerProfileModel|null $arProfile
      * @return UserProfileInterface
@@ -82,5 +74,38 @@ final class UserMapper
     private function createCustomerProfile(?CustomerProfileModel $arProfile): UserProfileInterface
     {
         return $this->customerProfileFactory->createFromDTO(new CustomerProfileDTO());
+    }
+
+    /**
+     * Создает доменный объект WorkerProfile.
+     * Сначала создает DTO из AR-модели, затем передает его в фабрику.
+     * @param WorkerProfileModel|null $arProfile
+     * @return UserProfileInterface
+     */
+    private function createWorkerProfile(?WorkerProfileModel $arProfile): UserProfileInterface
+    {
+        if ($arProfile === null) {
+            return $this->workerProfileFactory->createFromDTO(
+                new WorkerProfileDTO(
+                    showContactsOnlyToCustomers: false,
+                )
+            );
+        }
+
+        $userSpecializations = array_map(
+            fn($categoryModel) => $this->categoryMapper->toDomainEntity($categoryModel->category),
+            UserSpecialization::find()->where(['user_id' => $arProfile->user_id])->all()
+        );
+
+        $dto = new WorkerProfileDTO(
+            showContactsOnlyToCustomers: (bool)$arProfile->restrict_contacts,
+            dayOfBirth: $arProfile->day_of_birth,
+            bio: $arProfile->bio,
+            phoneNumber: $arProfile->phone_number,
+            telegramUsername: $arProfile->telegram_username,
+            specializations: $userSpecializations
+        );
+
+        return $this->workerProfileFactory->createFromDTO($dto);
     }
 }

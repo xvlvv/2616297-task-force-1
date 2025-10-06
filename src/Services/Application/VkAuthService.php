@@ -5,14 +5,21 @@ namespace Xvlvv\Services\Application;
 use app\auth\VkIdOauth;
 use Exception;
 use Xvlvv\Entity\User;
-use Xvlvv\Repository\UserRepository;
+use Xvlvv\Repository\UserRepositoryInterface;
 use Yii;
 use yii\web\BadRequestHttpException;
 
-class VkAuthService
+/**
+ * Сервис для обработки аутентификации через VK ID
+ */
+readonly final class VkAuthService
 {
+    /**
+     * @param UserRepositoryInterface $userRepo Репозиторий для работы с пользователями
+     * @param VkIdOauth $client OAuth-клиент для взаимодействия с VK ID
+     */
     public function __construct(
-        private UserRepository $userRepo,
+        private UserRepositoryInterface $userRepo,
         private VkIdOauth $client
     ) {
     }
@@ -48,7 +55,7 @@ class VkAuthService
             throw new BadRequestHttpException();
         }
 
-        $user = $this->userRepo->getByVkId((int) $vkId);
+        $user = $this->userRepo->getByVkId((int)$vkId);
 
         if ($user) {
             return $user;

@@ -1,11 +1,12 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Repository;
 
+use app\models\Category as Model;
+use Xvlvv\DataMapper\CategoryMapper;
 use Xvlvv\Entity\Category;
-use \app\models\Category as Model;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -13,21 +14,21 @@ use yii\web\NotFoundHttpException;
  */
 class CategoryRepository implements CategoryRepositoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getById(int $id): ?Category
-    {
-        $category = Model::findOne($id);
+    public function __construct(
+        private readonly CategoryMapper $mapper
+    ) {
+    }
 
-        if (null === $category) {
-            return null;
+    public function getByIds(array $ids): array
+    {
+        $arModels = Model::find()->where(['id' => $ids])->all();
+
+        $domainEntities = [];
+        foreach ($arModels as $model) {
+            $domainEntities[] = $this->mapper->toDomainEntity($model);
         }
 
-        return new Category(
-            $category->id,
-            $category->name,
-        );
+        return $domainEntities;
     }
 
     /**
@@ -44,8 +45,30 @@ class CategoryRepository implements CategoryRepositoryInterface
         return $category;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getById(int $id): ?Category
+    {
+        $category = Model::findOne($id);
+
+        if (null === $category) {
+            return null;
+        }
+
+        return $this->mapper->toDomainEntity($category);
+    }
+
     public function getAll(): array
     {
-        return Model::find()->select(['id', 'name'])->all();
+        $arModels = Model::find()->select(['id', 'name'])->all();
+
+        $domainEntities = [];
+
+        foreach ($arModels as $model) {
+            $domainEntities[] = $this->mapper->toDomainEntity($model);
+        }
+
+        return $domainEntities;
     }
 }

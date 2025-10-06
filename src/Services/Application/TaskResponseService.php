@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Services\Application;
 
 use LogicException;
+use RuntimeException;
 use Xvlvv\DTO\SaveTaskResponseDTO;
 use Xvlvv\Entity\TaskResponse;
 use Xvlvv\Exception\DuplicateTaskResponseException;
@@ -12,11 +13,12 @@ use Xvlvv\Exception\UserCannotApplyToTaskException;
 use Xvlvv\Repository\TaskRepositoryInterface;
 use Xvlvv\Repository\TaskResponseRepositoryInterface;
 use Xvlvv\Repository\UserRepositoryInterface;
+use yii\web\NotFoundHttpException;
 
 /**
  * Сервис для создания откликов на задачи
  */
-final class TaskResponseService
+readonly final class TaskResponseService
 {
     /**
      * @param TaskResponseRepositoryInterface $repository Репозиторий откликов
@@ -24,9 +26,9 @@ final class TaskResponseService
      * @param TaskRepositoryInterface $taskRepository Репозиторий задач
      */
     public function __construct(
-        private readonly TaskResponseRepositoryInterface $repository,
-        private readonly UserRepositoryInterface $userRepository,
-        private readonly TaskRepositoryInterface $taskRepository,
+        private TaskResponseRepositoryInterface $repository,
+        private UserRepositoryInterface $userRepository,
+        private TaskRepositoryInterface $taskRepository,
     ) {
     }
 
@@ -37,7 +39,7 @@ final class TaskResponseService
      * @return bool
      * @throws UserCannotApplyToTaskException если пользователь не может откликаться на задачи
      * @throws DuplicateTaskResponseException если пользователь уже оставлял отклик
-     * @throws LogicException если предложенная цена выше бюджета задачи
+     * @throws LogicException|NotFoundHttpException если предложенная цена выше бюджета задачи
      */
     public function createResponse(SaveTaskResponseDTO $dto): bool
     {
@@ -64,6 +66,13 @@ final class TaskResponseService
         return $this->repository->save($taskResponse);
     }
 
+    /**
+     * Отклоняет отклик на задание
+     *
+     * @param int $responseId ID отклика
+     * @return bool
+     * @throws RuntimeException если не удалось сохранить изменения
+     */
     public function rejectResponse(int $responseId): bool
     {
         $responseEntity = $this->repository->getByIdOrFail($responseId);

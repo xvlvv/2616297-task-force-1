@@ -2,23 +2,21 @@
 
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%customer_profile}}".
+ * ActiveRecord модель для таблицы "{{%customer_profile}}".
+ * Представляет профиль пользователя с ролью "Заказчик".
  *
- * @property int $user_id
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property int $user_id ID пользователя, к которому привязан профиль
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property User $user
+ * @property User $user Связанная модель пользователя
  */
 class CustomerProfile extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -34,7 +32,13 @@ class CustomerProfile extends ActiveRecord
     {
         return [
             [['created_at', 'updated_at'], 'safe'],
-            [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [
+                ['user_id'],
+                'exist',
+                'skipOnError' => false,
+                'targetClass' => User::class,
+                'targetAttribute' => ['user_id' => 'id']
+            ],
         ];
     }
 
@@ -51,7 +55,7 @@ class CustomerProfile extends ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Определяет связь с моделью User
      *
      * @return ActiveQuery
      */

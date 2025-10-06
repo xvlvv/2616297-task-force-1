@@ -124,7 +124,7 @@ class SiteController extends Controller
         );
 
         $vkUserData = Yii::$app->session->get('vk_user_data', false);
-        $isRegisterWithVK = (bool) $vkUserData;
+        $isRegisterWithVK = (bool)$vkUserData;
 
         $formModel->scenario = $isRegisterWithVK ?
             RegistrationForm::SCENARIO_VK_REGISTER
@@ -149,7 +149,7 @@ class SiteController extends Controller
             $formModel->cityId,
             $formModel->isWorker,
             $formModel->password,
-            $isRegisterWithVK ? (int) $vkUserData['vk_id'] : null,
+            $isRegisterWithVK ? (int)$vkUserData['vk_id'] : null,
             $isRegisterWithVK ? $vkUserData['avatar'] ?? null : null,
         );
 

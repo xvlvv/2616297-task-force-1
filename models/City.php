@@ -2,26 +2,25 @@
 
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "{{%city}}".
+ * ActiveRecord модель для таблицы "{{%city}}".
+ * Представляет город.
  *
  * @property int $id
- * @property string $name
- * @property float $latitude
- * @property float $longitude
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property string $name Название города
+ * @property float $latitude Широта
+ * @property float $longitude Долгота
+ * @property string|null $created_at Время создания
+ * @property string|null $updated_at Время последнего обновления
  *
- * @property Task[] $tasks
- * @property User[] $users
+ * @property Task[] $tasks Задания в этом городе
+ * @property User[] $users Пользователи из этого города
  */
-class City extends \yii\db\ActiveRecord
+class City extends ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -60,7 +59,7 @@ class City extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Определяет связь с заданиями (Task)
      *
      * @return ActiveQuery
      */
@@ -69,8 +68,9 @@ class City extends \yii\db\ActiveRecord
         return $this->hasMany(Task::class, ['city_id' => 'id']);
     }
 
+
     /**
-     * Gets query for [[Users]].
+     * Определяет связь с пользователями (User)
      *
      * @return ActiveQuery
      */

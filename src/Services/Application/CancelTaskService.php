@@ -1,20 +1,21 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Xvlvv\Services\Application;
 
 use Xvlvv\DTO\CancelTaskDTO;
 use Xvlvv\Exception\PermissionDeniedException;
 use Xvlvv\Repository\TaskRepositoryInterface;
+use yii\web\NotFoundHttpException;
 
 /**
  * Сервис для отмены задачи заказчиком
  */
-class CancelTaskService
+readonly final class CancelTaskService
 {
     /**
-     * @param TaskRepositoryInterface $taskRepository
+     * @param TaskRepositoryInterface $taskRepository Репозиторий по работе с заданиями
      */
     public function __construct(
         private TaskRepositoryInterface $taskRepository,
@@ -26,7 +27,7 @@ class CancelTaskService
      *
      * @param CancelTaskDTO $dto
      * @return bool
-     * @throws PermissionDeniedException если пользователь не является автором задачи
+     * @throws PermissionDeniedException|NotFoundHttpException если пользователь не является автором задачи
      */
     public function handle(CancelTaskDTO $dto): bool
     {
