@@ -15,6 +15,7 @@ use Xvlvv\DTO\ViewTaskDTO;
 use Xvlvv\Enums\Action;
 use Xvlvv\Enums\Status;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\assets\YandexMapAsset;
 
@@ -71,11 +72,12 @@ YandexMapAsset::register($this);
                             ]
                         ) ?>
                         <div class="feedback-wrapper">
-                            <?= Html::a(
-                                Html::encode($response->workerName),
-                                ['user/view', 'id' => $response->userId],
-                                ['class' => 'link link--block link--big']
-                            ) ?>
+                            <?php if (null !== $response->workerName): ?>
+                                <a class="link link--block link--big"
+                                   href="<?= Url::to(['user/view', 'id' => $response->userId]) ?>">
+                                    <?= Html::encode($response->workerName) ?>
+                                </a>
+                            <?php endif ?>
                             <div class="response-wrapper">
                                 <?= RatingWidget::widget(['rating' => $response->rating, 'wrapperClass' => 'small']) ?>
                                 <p class="reviews">
